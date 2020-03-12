@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>排序测试</title>
+	</head>
+	<body>
+		<h1>排序测试</h1>
+		<button id="button">Start</button>
+		<script>
+			var button = document.getElementById('button');
+
+			function arrData(num) {
+				var arr = [];
+				for (let i = 0; i < num; i++) {
+					arr[i] = Math.floor(Math.random() * num + 1)
+				}
+				return arr;
+			}
+			var arr10 = arrData(10);
+			var arr100 = arrData(100);
+			var arr1000 = arrData(1000);
+
+			//选择排序,当前项与后面的比较，找最大的或最小的，与当前项互换。
+			/*
+			举个栗子
+			var arr = [C,E,D,B,A,F];
+			i=0 => A,E,D,B,C,F
+			i=1 => A,B,D,E,C,F
+			i=2 => A,B,C,E,D,F
+			i=3 => A,B,C,D,E,F
+			i=4 => A,B,C,D,E,F
+			*/
+			function xuanZePaiXu(Arr) {
+				console.time(Arr.length + '长度选择排序耗时');
+				//console.log(Arr.join("-"));
+				var myArr = Arr;
+				var myArrLen = myArr.length;
+				var minIndex, value;
+				for (var i = 0; i < myArrLen - 1; i++) {
+					minIndex = i;
+					for (var j = i + 1; j < myArrLen; j++) {
+						if (myArr[j] < myArr[minIndex]) {
+							minIndex = j;
+						}
+					}
+					//console.log('执行了', minIndex, myArr[minIndex]);
+					value = myArr[minIndex];
+					myArr[minIndex] = myArr[i];
+					myArr[i] = value;
+					//console.log(myArr.join("-"));
+
+				}
+				console.timeEnd(myArrLen + '长度选择排序耗时')
+				return myArr;
+			}
+
+			//插入排序,当前项与前面的比较，把不符合条件的往后移，在当前位置前面找到符合条件的位置插件进去。
+			//为了满足上面“当前项与前面的比较”，第一次循环从数组坐标1开始。
+			/*
+			举个栗子
+			var arr = [C,E,D,B,A,F];
+			i=1 => C,E,D,B,A,F
+			i=2 => C,D,E,B,A,F
+			i=3 => B,C,D,E,A,F
+			i=4 => A,B,C,D,E,F
+			i=5 => A,B,C,D,E,F
+			*/
+			function chaRuPaiXu(Arr) {
+				console.time(Arr.length + '长度插入排序耗时');
+				var myArr = Arr;
+				var myArrLen = myArr.length;
+				var temp, j;
+				for (var i = 1; i < myArrLen; i++) {
+					temp = myArr[i];
+					j = i;
+					while (j > 0 && myArr[j - 1] > temp) {
+						myArr[j] = myArr[j - 1];
+						j--;
+					}
+					myArr[j] = temp;
+				}
+				console.timeEnd(myArrLen + '长度插入排序耗时')
+				return myArr;
+			}
+
+			//冒泡排序,每次大循环下，每个数据项与它相邻的数据比较，如果符合条件这两个数据互换位置。
+			//叫冒泡排序是因为在排序时，数据值会像气泡一样从数组的一端漂浮到另一端。
+			/*
+			举个栗子
+			var arr = [C,E,D,B,A,F];
+			i=0 => C,D,B,A,E,F
+			i=1 => C,B,A,D,E,F
+			i=2 => B,A,C,D,E,F
+			i=3 => A,B,C,D,E,F
+			i=4 => A,B,C,D,E,F
+			*/
+			function maoPiaoPaiXu(Arr) {
+				console.time(Arr.length + '长度冒泡排序耗时');
+				var myArr = Arr;
+				var myArrLen = myArr.length;
+				for (var i = 0; i < myArrLen - 1; i++) {
+					for (var j = 0; j < myArrLen - 1; j++) {
+						if (myArr[j] > myArr[j + 1]) {
+							var temp = myArr[j + 1];
+							myArr[j + 1] = myArr[j];
+							myArr[j] = temp;
+						}
+					}
+				}
+				console.timeEnd(myArrLen + '长度冒泡排序耗时')
+				return myArr;
+			}
+
+			//二分之查找,二分之查找，也称折半查找。利用二分思想，每次查找的时候把数据分为两半，缩小搜索范围，在从中间值计算数据位置。
+			/*
+			举个栗子
+			var arr = [5,13,19,21,37,56,64,75,80,88,92];
+			//找数组中数据值21的坐标
+			第一次定位 5,13,19,21,37,56,64,75,80,88,92
+			//       --             --             --
+			//       low            mid            high
+			第二次定位 5,13,19,21,37,56,64,75,80,88,92 缩小一半搜索范围
+			//       --    --    --
+			//       low   mid   high
+			第三次定位 5,13,19,21,37,56,64,75,80,88,92 再缩小一半搜索范围
+			//                -- --
+			//       (low & mid) high
+			
+			栗子讲解：
+			//low和high代表数组的两边下标，mid代表数组的中间下标
+			//若目标值比中间值大，即目标值在mid与high之间，就修改low的值。再对比中间值
+			//若目标值比中间值小，即目标值在low与mid之间，就修改high的值。再对比中间值
+			*/
+			var erFenZhiArr = [5, 13, 19, 21, 37, 56, 64, 75, 80, 88, 92];
+			//找75
+			/*
+			1 ==> low=0,high=10,mid=0+(10-0)/2=5,中间值56,因75大于56,所以low=5+1=6
+			2 ==> low=6,high=10,mid=6+(10-6)/2=8,中间值80,因75小于80,所以high=8-1=7
+			3 ==> low=6,high=7,mid=6+(7-6)/2=6,中间值64,因75大于64，所以low=6+1=7
+			4 ==> low=7,high=7,mid=7+(7-7)/2=7,中间值75,
+			
+			*/
+			function erFenZhiChaZhao(Arr, key) {
+				var low = 0;
+				var high = Arr.length - 1;
+				while (low <= high) {
+					var mid = parseInt(low + (high - low) / 2); //算出中间坐标
+					//if (key === Arr[mid]) {
+					//	return mid;
+					//} else if (key > Arr[mid]) {
+					if (key > Arr[mid]) {
+						low = mid + 1;
+					} else if (key < Arr[mid]) {
+						high = mid - 1;
+					} else {
+						//这里这么写是为了，当有好几个相同的数据值时返回最后面的数据值的坐标
+						//如果不需要返回数组最后的最后一个与key相同的数据值的坐标，则直接return -1没找到,再把循环外面的return -1删掉即可
+						if ((mid == Arr.length - 1) || (Arr[mid + 1] != key)) {
+							return mid;
+						} else {
+							low = mid + 1;
+						}
+						//return -1;
+					}
+				}
+				return -1;
+			}
+
+			//二分之插入排序，其实就是利用二分思想优化插入排序的查找数据值位置时程序
+			function erFenZhiPaiXu(Arr) {
+				//console.log(Arr);
+				console.time(Arr.length + '长度二分之插入排序耗时');
+				var myArr = Arr;
+				var myArrLen = myArr.length;
+				for (var i = 1; i < myArrLen; i++) {
+					var temp = myArr[i];
+					// j = i;
+					// while (j > 0 && myArr[j - 1] > temp) {
+					// 	myArr[j] = myArr[j - 1];
+					// 	j--;
+					// }
+					// myArr[j] = temp;
+					var low = 0;
+					var high = i - 1;
+					var mid = 0;
+					/*
+					testArr = [5,13,19,21,37,56,64,75,80,88,92];
+					i=1  low=0;high=1;mid=0+(1-0)/2=0;中间值=5,因13>5,所以low=0+1=1
+					
+					*/
+					//有问题，待解决
+					while (true) {
+
+						mid = parseInt(low + (high - low) / 2);
+
+						//console.log('low' + low);
+						//console.log('high' + high);
+						//console.log('i' + i);
+						//console.log('mid' + mid);
+						//console.log('temp' + temp);
+						//console.log('myArr[mid]' + myArr[mid]);
+
+						if (temp > myArr[mid]) {
+							low = mid + 1;
+						} else if (temp < myArr[mid]) {
+							high = mid - 1;
+						}
+						if (temp === myArr[mid]) {
+							mid = mid + 1;
+							//console.log('temp === myArr[mid]');
+							break;
+						} else if (low >= high) {
+							mid = temp >= myArr[low] ? low + 1 : low;
+							//console.log('low >= high');
+							break;
+						}
+					}
+
+					//数据往后挪
+					//[5,13,19,21,37,56,64,75,80,15,88,92]
+					//      
+					//当前i=9,把15插到数组坐标2的位置，之前15数组坐标为9
+					//j=9,j<9,
+					for (var j = i; j > mid; j--) {
+						myArr[j] = myArr[j - 1];
+					}
+					myArr[mid] = temp; //数据插入
+
+					//console.log(myArr);
+					//console.log(' ');
+				}
+				console.timeEnd(myArrLen + '长度二分之插入排序耗时')
+				return myArr;
+			}
+
+
+
+
+			button.onclick = function() {
+				//console.log(xuanZePaiXu(arr100));//100长度选择排序耗时: 0.344970703125ms
+				//console.log(xuanZePaiXu(arr1000));//1000长度选择排序耗时: 5.160888671875ms
+
+				//console.log(chaRuPaiXu(arr100));//100长度插入排序耗时: 0.25927734375ms
+				//console.log(chaRuPaiXu(arr1000));//1000长度插入排序耗时: 3.22900390625ms
+
+				//console.log(maoPiaoPaiXu(arr100));//100长度冒泡排序耗时: 0.802001953125ms
+				//console.log(maoPiaoPaiXu(arr1000));//1000长度冒泡排序耗时: 6.194091796875ms
+
+				//console.log(erFenZhiChaZhao(erFenZhiArr, 64))
+
+				//console.log(erFenZhiPaiXu(arr100));//100长度二分之插入排序耗时: 0.19775390625ms
+				//console.log(erFenZhiPaiXu(arr1000));//1000长度二分之插入排序耗时: 5.652099609375ms
+				
+			}
+			// var i = 0;
+			// while (true) {
+			// 	if (i === 5)
+			// 		break;
+			// 	console.log(i);
+			// 	i++;
+			// }
+
+			function zuoBiao(temp) {
+
+				var myArr = [5, 13, 13, 19, 21, 37, 56, 64, 75, 80, 88, 92];
+				var low = 0;
+				var high = myArr.length;
+				var mid = 0;
+				/*
+				temp=1,
+				1 => low=0,high=12,mid=0+(12-0)/2=6,myArr[mid]=56,因1<56所以high=5
+				2 => low=0,high=5,mid=0+(5-0)/2=2,myArr[mid]=13,因1<13所以high=1
+				3 => low=0,high=1,mid=0+(1-0)/2=0,myArr[mid]=5,因1<5所以high=0
+				4 => low=0,high=0退出while循环mid=0
+				
+				
+				*/
+				while (true) {
+					mid = parseInt(low + (high - low) / 2);
+					if (temp > myArr[mid]) {
+						low = mid + 1;
+					} else if (temp < myArr[mid]) {
+						high = mid - 1;
+					}
+					if (temp === myArr[mid]) {
+						mid = mid + 1;
+						console.log('temp === myArr[mid]');
+						break;
+					} else if (low >= high) {
+						mid = temp >= myArr[low] ? low + 1 : low;
+						console.log('low >= high');
+						break;
+					}
+					console.log('low=' + low);
+					console.log('high=' + high);
+					console.log('mid=' + mid);
+					console.log('');
+				}
+				console.log(myArr);
+				console.log(mid);
+			}
+		</script>
+	</body>
+</html>
