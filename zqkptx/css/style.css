@@ -1,0 +1,274 @@
+@charset "utf-8";
+html,body{
+     width: 100%; height: 100%;
+     overflow: hidden;
+     font: 1em/1.5em 'Helvetica';
+    color: #333;
+    -webkit-user-select:disabled;
+     padding: 0;
+     margin: 0;
+}
+
+
+
+#ringgroup{
+     position: absolute;
+     width: 18rem;
+     height: 18rem;
+     left: 50%;
+     top: 50%;
+     margin-left: -9rem;
+     margin-top: -9rem;
+     -webkit-perspective:20rem;
+     -webkit-transform-style:preserve-3d;
+     -moz-perspective:20rem;
+     -moz-transform-style:preserve-3d;
+}
+
+.ring{
+     position: absolute;
+     width: 100%;
+     height: 100%;
+     background: url('../img/ring.png') center / 100%;
+     -webkit-transform-style:preserve-3d;
+}
+.ring:nth-of-type(1){-webkit-transform: translateZ(0px);opacity: 1;}
+.ring:nth-of-type(2){-webkit-transform: rotateZ(60deg) translateZ(-1000px) scale(0.9);opacity: 0.7;}
+.ring:nth-of-type(3){-webkit-transform: rotateZ(120deg) translateZ(-200px) scale(0.8);opacity: 0.5;}
+.ring:nth-of-type(4){-webkit-transform: rotateZ(30deg) translateZ(-3000px) scale(0.7);opacity: 0.1;}
+
+
+.chuxian{
+     animation:chuxian 2s;
+}
+@keyframes chuxian
+{
+     from {
+          -webkit-transform: rotateZ(-360deg) translateZ(-4000px) scale(0.02);
+          -moz-transform: rotateZ(-360deg) translateZ(-4000px) scale(0.02);
+     }
+     to {
+          -webkit-transform:rotateZ(0) translateZ(3200px) scale(1);
+          -moz-transform:rotateZ(0) translateZ(3200px) scale(1);
+     }
+}
+.xuanzhuan{
+     animation:xuanzhuan 2s linear infinite;
+}
+@keyframes xuanzhuan
+{
+     from {
+          -webkit-transform: rotate(0deg);
+          -moz-transform: rotate(0deg);
+     }
+     to{
+          -webkit-transform: rotate(360deg);
+          -moz-transform: rotate(360deg);
+     }
+}
+
+/*圆弧进度条*/
+*{
+     margin:0px;
+     padding:0px;
+}
+.circleProgress_wrapper{   
+     width: 10rem;   
+     height: 10rem;
+     position: absolute;
+     left:0px;
+     top:0px;
+     right:0px;
+     bottom:0px;   
+     margin:auto;   
+     
+} 
+.wrapper{   
+     width: 5rem;   
+     height: 10rem;   
+     position: absolute;   
+     top:0px;   
+     overflow: hidden;
+}   
+.right{   
+     right:0px;   
+}   
+.left{   
+     left:0px;   
+}
+.circleProgress{
+     width: 8rem;
+     height: 8rem;
+     border:1rem solid transparent;
+     border-radius:50%;
+     position: absolute;
+     top:0px;
+}
+.rightcircle{   
+     border-top:1rem solid #01B8ff;   
+     border-right:1rem solid #01B8ff;   
+     right:0px;
+     animation:Load_right 10s linear;
+     transform: rotate(45deg);
+}
+.leftcircle{   
+     border-bottom:1rem solid #01B8ff;   
+     border-left:1rem solid #01B8ff;   
+     left:0px;
+     animation:Load_left 10s linear;
+     transform: rotate(45deg);
+}
+.baifenzhi{
+     width:10rem;
+     height:10rem;
+     position:absolute;
+     left:0px;
+     top:0px;
+     right:0px;
+     bottom:0px;
+     margin:auto;
+     text-align:center;
+     line-height: 10rem;
+     font-size:2.5rem;
+     font-weight:bold;
+}
+.baifenzhi span{
+     display:block;
+     width:100%;
+
+}
+.swz{
+     width:100%;
+     position:fixed;
+     left:0px;
+     right:0px;
+     margin-left:auto;
+     margin-right:auto;
+     bottom:2rem;
+     font-size:1rem;
+     text-align:center;
+	 font-weight:bold;
+}
+@keyframes Load_right{   
+     0%{
+          transform: rotate(-135deg);
+     }
+     50%,100%{
+          transform: rotate(45deg);
+     }
+}
+@keyframes Load_left{
+     0%,50%{
+          transform: rotate(-135deg);
+     }
+     100%{
+          transform: rotate(45deg);
+     }
+}
+
+/*文字出现*/
+.wenzichuxian{
+     animation:font_chuxian 2s linear;
+}
+@keyframes font_chuxian{
+     0%{
+          opacity: 0;
+     }
+     50%{
+          /*transform: scale(0.01);*/
+          opacity: 0;
+     }
+     90%{
+          /*transform: scale(0.01);*/
+          opacity: 0;
+     }
+     100%{
+          /*transform: scale(1);*/
+          opacity: 1;
+     }
+}
+
+
+
+
+
+
+/*登录界面css*/
+.login_container{
+     width:14.5rem;
+     height:12.5rem;
+     position:absolute;
+     left:0rem;
+     top:0rem;
+     right:0rem;
+     bottom:0rem;
+     margin:auto;
+     display:none;
+}
+ .login_container_logo{
+     width:3.5rem;
+     height:3.5rem;
+     margin:0rem auto;
+}
+.login_container_logo img{
+	width:100%;
+	height:100%;
+}
+ .login_container_input{
+     width:100%;
+     height:1.25rem;
+     margin-top:1.2rem;
+}
+ .login_container_input input{
+     width:100%;
+     height:1.2rem;
+     font-size:0.65rem;
+     outline:none;
+     border:0px;
+     border-bottom:0.1rem solid #ccc;
+}
+ .login_container_input input:focus{
+     border-bottom:0.1rem solid #52a1ff;
+}
+ .login_container_button{
+     width:100%;
+     height:1.65rem;
+     background:#52a1ff;
+     text-align:center;
+     line-height:1.69rem;
+     color:#fff;
+     font-size:0.75rem;
+     position:absolute;
+     bottom:0rem;
+     border-radius:.1rem;
+     box-shadow: 0 4px #999;
+}
+.login_container_button:active{
+	box-shadow: 0 1px #999;
+	transform: translateY(4px);
+	 -moz-user-select:none;/*火狐*/
+    -webkit-user-select:none;/*webkit浏览器*/
+    -ms-user-select:none;/*IE10*/
+    -khtml-user-select:none;/*早期浏览器*/
+    user-select:none;
+}
+ #passNY{
+     height:2rem;
+     text-align: left;
+     line-height: 2.5rem;
+     font-size:0.5rem;
+     color:red;
+}
+.login_container_wz{
+     width:100%;
+     height:0.65rem;
+     font-size:0.5rem;
+     color:#52a1ff;
+     position:absolute;
+     left:0rem;
+     bottom:-1rem;
+}
+.login_container_wz div{
+     cursor:pointer;
+}
+

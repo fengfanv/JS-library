@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0" />
+		<title>切换</title>
+		<script src="./jquery.js"></script>
+		<style>
+			* {
+				margin: 0px;
+				padding: 0px;
+			}
+			.content {
+				width: 100%;
+				height: 100vh;
+				margin: 0px auto;
+				background: #41A863;
+				overflow: hidden;
+				position: relative;
+			}
+
+			.content ul {
+				height: 96vh;
+				margin: 2vh auto;
+				position: absolute;
+				top: 0px;
+				left: 0px;
+			}
+
+			.content ul li {
+				height: 96vh;
+				outline: none;
+				text-align: center;
+				line-height: 96vh;
+				float: left;
+				list-style: none;
+			}
+			.donghua{
+				transition: .2s;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="content">
+			<ul id='uu'>
+				<li style="background:#F8951E;">1</li>
+				<li style="background:#A1478D;">2</li>
+				<li style="background:#027FFF;">3</li>
+				<li style="background:#BF2058;">4</li>
+				<li style="background:#E4C2D2;">5</li>
+				<li style="background:#D3E0D7;">6</li>
+				<li style="background:#3A0308;">7</li>
+				<li style="background:#DA3344;">8</li>
+				<li style="background:#51FED1;">9</li>
+				<li style="background:#C66205;">10</li>
+			</ul>
+		</div>
+		<script>
+			//每个子块width:300px;
+			//总长度3000px;
+			var zongshu = 10; //总共有多少个
+			var zuobiao = []; //每个的坐标
+			var l = 0; //最新left;
+			var bodyWidth = document.body.clientWidth; //屏幕的宽
+			var yuansukuan = parseFloat(bodyWidth / 3); //元素宽
+			$('#uu').css('width', yuansukuan * 10 + 'px');
+			$('#uu').find('li').css('width', yuansukuan + 'px');
+			zuobiao.push(yuansukuan);
+			var ss = 0;//基数
+			for (var i = 1; i < zongshu; i++) {
+				zuobiao.push(ss);
+				ss = ss - yuansukuan;
+			};
+			var startx = 0; //开始位置
+			var endx = 0; //结束位置
+			//触摸开始
+			$('.content').on('touchstart', function(e) {
+				// console.log('触摸开始');
+				startx = e.touches[0].pageX;
+				e.preventDefault();
+			});
+			$('.content').on('touchmove', function(e) {
+				// console.log('触摸屏幕移动！');
+				var px = e.touches[0].pageX;
+				$('#uu').css('left', (l + (px - startx) + 'px')); //原位置+移动多少距离=当前距离（位置）
+				endx = px;
+				e.preventDefault();
+			});
+			$('.content').on('touchend', function(e) {
+				if ((l + (endx - startx)) < zuobiao[zuobiao.length - 1]) {//判断是否小于最后一个（因为是负值比较，所以这里比小）
+					$('#uu').css('left', zuobiao[zuobiao.length - 1] + 'px'); //移动多少距离
+					l = zuobiao[zuobiao.length - 1];
+					console.log(zuobiao.length);//输出最后一个坐标
+				} else {
+					for (var i = 0; i < zuobiao.length; i++) {
+						if ((l + (endx - startx))+(yuansukuan/2) > zuobiao[i]) {//原位置+移动的距离+元素的一半 是否大于数组中的某个数 如果大于切换成这个 并退出循环
+							$('#uu').css('left', zuobiao[i] + 'px').addClass('donghua'); //移动多少距离
+							var times = window.setTimeout(function(){
+								window.clearTimeout(times);
+								$('#uu').removeClass('donghua');
+							},200);
+							l = zuobiao[i];
+							break;
+						}
+					}
+					console.log(i+1);
+				}
+				
+				e.preventDefault();
+			});
+		</script>
+	</body>
+</html>

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>切换浮窗</title>
+		<style>
+			*{
+				margin:0px;
+				padding:0px;
+			}
+			.fa{
+				width:1000px;
+				height:400px;
+				border: 1px solid black;
+				margin:50px auto;
+				overflow: hidden;
+			}
+			.fa li{
+				height: 380px;
+				width: 240px;
+				border: 1px solid black;
+				margin-top: 9px;
+				float: left;
+				margin-left: 4px;
+				margin-right: 4px;
+				list-style: none;
+			}
+			
+			
+			
+			
+			
+			.but{
+				width:500px;
+				height:100px;
+				margin:0px auto;
+				border:1px solid #ccc;
+				text-align: center;
+				font-size:50px;
+				cursor:pointer;
+			}
+			#but_left{
+				width:50%;
+				background: #ccc;
+				float: left;
+				line-height: 100px;
+			}
+			#but_right{
+				width:50%;
+				background: white;
+				float: right;
+				line-height: 100px;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="fa">
+			<ul id='u' style='width: 2500px; margin-left:0px;'>
+				<li>1</li>
+				<li>2</li>
+				<li>3</li>
+				<li>4</li>
+				<li>5</li>
+				<li>6</li>
+				<li>7</li>
+				<li>8</li>
+				<li>9</li>
+				<li>10</li>
+			</ul>
+		</div>
+		<div class="but">
+			<div id="but_left">'<'</div>
+			<div id="but_right">'>'</div>
+		</div>
+		<script>
+				var u = document.getElementById('u');
+				var next = document.getElementById('but_right');
+				var previous = document.getElementById('but_left');
+				
+				next.onclick=function(){
+					//下一页
+					var u_width=parseInt(u.style.width);
+					var u_left=Math.abs(parseInt(u.style.marginLeft));
+					var remain=u_width-u_left-1000;        //这个1000是当前显示窗口的这个动态获取的
+					if((remain) > 1000){									//1000就是浮窗显示的大小,在运动之前判断当前减去后,剩余的部分还够不够填充父级窗口
+						u.style.marginLeft='-'+(u_left+1000)+'px';
+					}else{
+						u.style.marginLeft='-'+(u_left+remain)+'px';
+					}
+				};
+				previous.onclick=function(){
+					//上一页
+					var u_width=parseInt(u.style.width);
+					var u_left=Math.abs(parseInt(u.style.marginLeft));
+					var remain=u_left-1000;//这个1000是当前显示窗口的
+					
+					if(remain > 0){									//1000就是浮窗显示的大小,在运动之前判断当前减去后,剩余的部分还够不够填充父级窗口
+						u.style.marginLeft='-'+(u_left-1000)+'px';
+					}else{
+						u.style.marginLeft='-'+(0)+'px';
+					}
+				}
+		</script>
+	</body>
+</html>

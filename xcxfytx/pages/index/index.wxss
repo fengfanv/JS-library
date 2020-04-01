@@ -1,0 +1,18 @@
+.container{
+	height: 100vh;
+	overflow: hidden;
+}
+.scroll-fullpage{
+	height: 100vh;
+	/*transition: 0.3s;*/
+}
+.section{
+  width:100vw;
+  height: 100vh;
+  text-align: center;
+}
+text{
+  font-size:50rpx;
+  color: #fff;
+}
+

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+    </head>
+    <body>
+    	<div>
+            <!--id名可改在area结尾处-->
+        	<select id="s_province" name="s_province"></select>	
+			<select id="s_city" name="s_city" ></select>
+			<select id="s_county" name="s_county"></select>
+        	<input type="text" placeholder="详细地址" id="address" value="">
+    	</div>
+        <button id="xz">
+            选择了
+        </button>
+    	<script src="js/jquery-1.7.1.min.js" type="text/javascript"></SCRIPT>
+		<script src="js/area.js"></script>
+        <script>_init_area();//列表初始化</script>
+        <script>
+            $('#xz').click(function(){
+                alert($('#s_province').val()+$('#s_city').val()+$('#s_county').val())
+            });
+        </script>
+    </body>
+
+</html>

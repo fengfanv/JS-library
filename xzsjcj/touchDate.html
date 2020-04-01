@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html style="font-size:calc(100vw / 750 * 100)">
+
+<head>
+	<title>选择时间插件</title>
+	<meta charset="utf-8" />
+	<style>
+		* {
+			margin: 0px;
+			padding: 0px;
+		}
+
+		li {
+			list-style: none;
+		}
+
+		.touchDatefa {
+			width: 100%;
+			height: 100vh;
+			position: fixed;
+			left: 0px;
+			top: 0px;
+			background: #68d668;
+		}
+
+		.touchDate {
+			width: 92%;
+			height: calc(100vh - 4rem);
+			background: white;
+			box-shadow: 0px 0px .5rem #ccc;
+			position: absolute;
+			left: 0px;
+			top: 0px;
+			right: 0px;
+			bottom: 0px;
+			margin: auto;
+			border-radius: .5rem;
+		}
+
+		.touchDateTitle {
+			width: 100%;
+			height: 1rem;
+			line-height: 1rem;
+			text-align: center;
+			font-size: .35rem;
+			color: black;
+		}
+
+		.touchDateContent {
+			width: 90%;
+			height: calc(100vh - 6rem);
+			margin: 0px auto;
+			overflow: hidden;
+		}
+
+		#yearfa,
+		#monthfa,
+		#dayfa {
+			height: calc(100vh - 6rem);
+			width: 33.33%;
+			float: left;
+			position: relative;
+			font-size: .5rem;
+			text-align: center;
+		}
+
+		#yearfa ul,
+		#monthfa ul,
+		#dayfa ul {
+			width: 100%;
+			margin-top: 0px;
+		}
+
+		#yearfa ul li,
+		#monthfa ul li,
+		#dayfa ul li {
+			width: 100%;
+			text-align: center;
+		}
+
+		.donghua {
+			transition: .2s;
+		}
+
+		.touchDateButton {
+			width: 88%;
+			height: .8rem;
+			background: #3aa8f5;
+			color: white;
+			text-align: center;
+			line-height: .8rem;
+			font-size: .3rem;
+			margin-left: auto;
+			margin-right: auto;
+			border-radius: .1rem;
+			box-shadow: 0 0.05rem #3193d8;
+		}
+
+		.touchDateButton:active {
+			background: #2d83bf;
+			box-shadow: 0 .01rem #3193d8;
+			transform: translateY(.1rem);
+		}
+	</style>
+</head>
+
+<body>
+	<div class="touchDatefa">
+		<div class="touchDate">
+			<div class="touchDateTitle">选择时间</div>
+			<div class="touchDateContent">
+				<div id='yearfa'></div>
+				<div id="monthfa"></div>
+				<div id="dayfa"></div>
+			</div>
+			<div class="touchDateButton">确认</div>
+		</div>
+	</div>
+	<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+	<script>
+		var curDate = new Date();
+		var year = curDate.getFullYear();//当前年
+		var month = curDate.getMonth() + 1;//当前月
+		var day = curDate.getDate();//当前日
+		console.log(year, '-', month, '-', day);
+		var yuansugao_ = parseFloat($('#yearfa').css('height')) / 3;
+		var yuansugao = yuansugao_.toFixed(4);
+		var yearArr = getyearzuobiao(year);//默认获取当前年前60年至当前年后10年
+		var monthArr = getmonthzuobiao();//个个月份坐标
+		var dayArr = getdayzuobiao(year, month);//获取当月个个日子的坐标
+		//绑定事件需要的变量
+		var starty = 0;
+		var endy = 0;
+		var ytop = 0;//年列保存的坐标
+		var mtop = 0;//月列保存的坐标
+		var dtop = 0;//日列保存的坐标
+		var ytext = year;//当前年text
+		var mtext = month;//当前月text
+		var dtext = day;//当前日text
+
+		console.log(yearArr);
+		console.log(monthArr);
+		console.log(dayArr);
+		function getyearzuobiao(year) {//获取年的坐标
+			var linshi = [];
+			var jishu = 0;
+			for (var i = year - 70; i < year + 10; i++) {
+				if (i == year - 60) {
+					var obj = {
+						top: parseFloat(yuansugao),
+						text: year - 60
+					}
+					linshi.push(obj);
+				} else {
+					var obj = {
+						top: jishu,
+						text: i
+					}
+					linshi.push(obj);
+					jishu = jishu - yuansugao;
+				}
+			}
+			return linshi;
+		}
+		drawYear();//绘制年列表
+		function getmonthzuobiao() {
+			var linshi = [];
+			var jishu = 0;
+			for (var i = 1; i <= 12; i++) {
+				if (i == 1) {
+					var obj = {
+						top: parseFloat(yuansugao),
+						text: i
+					}
+					linshi.push(obj);
+				} else {
+					var obj = {
+						top: jishu,
+						text: i
+					}
+					linshi.push(obj);
+					jishu = jishu - yuansugao;
+				}
+			}
+			return linshi;
+		}
+		drawMonth();//绘制月列表
+		function getdayzuobiao(year, month) {
+			var fullDay = new Date(year, month, 0).getDate();//获取当月总天数
+			var linshi = [];
+			var jishu = 0;
+			for (var i = 1; i <= fullDay; i++) {
+				if (i == 1) {
+					var obj = {
+						top: parseFloat(yuansugao),
+						text: i
+					}
+					linshi.push(obj);
+				} else {
+					var obj = {
+						top: jishu,
+						text: i
+					}
+					linshi.push(obj);
+					jishu = jishu - yuansugao;
+				}
+			}
+			return linshi;
+		}
+		drawDay();//绘制日列表
+		//渲染元素(年)
+		function drawYear() {
+			$('#yearfa').find('#year_ul').remove();
+			var len = yearArr.length;
+			$('#yearfa').append("<ul id='year_ul' style='height:" + (yuansugao * len) + "px;'></ul>");
+			for (var k = 0; k < len; k++) {
+				$('#yearfa > ul').append("<li style='height:" + yuansugao + "px;line-height:" + yuansugao + "px;'>" + yearArr[k].text + "</li>");
+				if (yearArr[k].text == ytext) {
+					$('#yearfa > ul').css('margin-top', yearArr[k].top + 'px');
+					ytop = yearArr[k].top;//为事件变量赋值
+				}
+			}
+		}
+		//渲染元素(月)
+		function drawMonth() {
+			$('#monthfa').find('#month_ul').remove();
+			var len = monthArr.length;
+			$('#monthfa').append("<ul id='month_ul' style='height:" + (yuansugao * len) + "px;'></ul>");
+			for (var y = 0; y < len; y++) {
+				$('#monthfa > ul').append("<li style='height:" + yuansugao + "px;line-height:" + yuansugao + "px;'>" + monthArr[y].text + "</li>");
+				if (monthArr[y].text == mtext) {
+					$('#monthfa > ul').css('margin-top', monthArr[y].top + 'px');
+					mtop = monthArr[y].top;//为事件变量赋值
+				}
+			}
+		}
+		//渲染元素(日)
+		function drawDay() {
+			$('#day_ul').remove();//移除样式不成公？
+			var len = dayArr.length;
+			$('#dayfa').append("<ul id='day_ul' style='height:" + (yuansugao * len) + "px;'></ul>");
+			for (var p = 0; p < len; p++) {
+				$('#dayfa > ul').append("<li style='height:" + yuansugao + "px;line-height:" + yuansugao + "px;'>" + dayArr[p].text + "</li>");
+				if (dtext < len) {
+					if (dayArr[p].text == dtext) {
+						$('#dayfa > ul').css('margin-top', dayArr[p].top + 'px');
+						dtop = dayArr[p].top;//为事件变量赋值
+						dtext = dayArr[p].text;
+					}
+				} else {
+					$('#dayfa > ul').css('margin-top', dayArr[0].top + 'px');
+					dtop = dayArr[0].top;//为事件变量赋值
+					dtext = dayArr[0].text;
+				}
+			}
+			console.log('日列表渲染成功');
+		}
+
+		//年列表绑定事件
+		$('#yearfa').on('touchstart', function (e) {
+			starty = e.touches[0].pageY;
+			e.preventDefault();
+		});
+		$('#yearfa').on('touchmove', function (e) {
+			var py = e.touches[0].pageY;
+			$('#year_ul').css('margin-top', (ytop + (py - starty) + 'px')); //移动多少距离
+			endy = py;
+			e.preventDefault();
+		});
+		$('#yearfa').on('touchend', function (e) {
+			var len = yearArr.length;
+			if ((ytop + (endy - starty)) < yearArr[len - 1].top) {
+				$('#year_ul').css('margin-top', yearArr[len - 1].top + 'px'); //移动多少距离
+				ytop = yearArr[len - 1].top;
+				console.log(yearArr[len - 1].text);//输出最后一个坐标
+			} else {
+				for (var i = 0; i < len; i++) {
+					if ((ytop + (endy - starty)) + (yuansugao / 2) > yearArr[i].top) {
+						$('#year_ul').css('margin-top', yearArr[i].top + 'px').addClass('donghua');//设置位置开启动画
+						var times = window.setTimeout(function () {
+							$('#year_ul').removeClass('donghua');
+							window.clearTimeout(times);
+						}, 200);
+						ytop = yearArr[i].top;
+						ytext = yearArr[i].text;
+						//年发生变化重新计算日列表
+						getdayzuobiao(ytext, mtext);
+						drawDay();//绘制日列表
+						break;
+					}
+				}
+			}
+			e.preventDefault();
+		});
+		//月列表绑定事件
+		$('#monthfa').on('touchstart', function (e) {
+			starty = e.touches[0].pageY;
+			e.preventDefault();
+		});
+		$('#monthfa').on('touchmove', function (e) {
+			var py = e.touches[0].pageY;
+			$('#month_ul').css('margin-top', (mtop + (py - starty) + 'px')); //移动多少距离
+			console.log((mtop + (py - starty)) + 'px');
+			endy = py;
+			e.preventDefault();
+		});
+		$('#monthfa').on('touchend', function (e) {
+			var len = monthArr.length;
+			if ((mtop + (endy - starty)) < monthArr[len - 1].top) {
+				$('#month_ul').css('margin-top', monthArr[len - 1].top + 'px'); //移动多少距离
+				mtop = monthArr[len - 1].top;
+				console.log(monthArr[len - 1].text);//输出最后一个坐标
+			} else {
+				for (var i = 0; i < len; i++) {
+					if ((mtop + (endy - starty)) + (yuansugao / 2) > monthArr[i].top) {
+						$('#month_ul').css('margin-top', monthArr[i].top + 'px').addClass('donghua');//设置位置开启动画
+						var times = window.setTimeout(function () {
+							$('#month_ul').removeClass('donghua');
+							window.clearTimeout(times);
+						}, 200);
+						mtop = monthArr[i].top;
+						mtext = monthArr[i].text;
+						getdayzuobiao(ytext, mtext);
+						drawDay();//绘制日列表
+						break;
+					}
+				}
+			}
+			e.preventDefault();
+		});
+		//日列表绑定事件
+		$('#dayfa').on('touchstart', function (e) {
+			starty = e.touches[0].pageY;
+			e.preventDefault();
+		});
+		$('#dayfa').on('touchmove', function (e) {
+			var py = e.touches[0].pageY;
+			$('#day_ul').css('margin-top', (dtop + (py - starty) + 'px')); //移动多少距离
+			endy = py;
+			e.preventDefault();
+		});
+		$('#dayfa').on('touchend', function (e) {
+			var len = dayArr.length;
+			if ((dtop + (endy - starty)) < dayArr[len - 1].top) {
+				$('#day_ul').css('margin-top', dayArr[len - 1].top + 'px'); //移动多少距离
+				dtop = dayArr[len - 1].top;
+				console.log(dayArr[len - 1].text);//输出最后一个坐标
+			} else {
+				for (var i = 0; i < len; i++) {
+					if ((dtop + (endy - starty)) + (yuansugao / 2) > dayArr[i].top) {
+						$('#day_ul').css('margin-top', dayArr[i].top + 'px').addClass('donghua');//设置位置开启动画
+						var times = window.setTimeout(function () {
+							$('#day_ul').removeClass('donghua');
+							window.clearTimeout(times);
+						}, 200);
+						dtop = dayArr[i].top;
+						dtext = dayArr[i].text;
+						console.log(dayArr[i].text);
+						break;
+					}
+				}
+			}
+			e.preventDefault();
+		});
+		$('.touchDateButton').on('click', function () {
+			console.log(ytext + '-' + mtext + '-' + dtext);
+		});
+
+
+	</script>
+</body>
+
+</html>

@@ -1,0 +1,20 @@
+
+<view style='width:750rpx; height:500rpx; overflow:hidden; position:relative;'>
+  <!--图片大小-->
+  <scroll-view scroll-y="true" scroll-x="true" bindscroll="bindscroll" style='width:750rpx; height:500rpx;'>
+    <image src="{{touch.src}}" style="width:{{touch.scaleWidth}}px; height:{{touch.scaleHeight}}px;" 
+  bindtouchstart="touchstart" bindtouchmove="touchmove" bindload="bindload"/>
+  </scroll-view>
+  <!--定位锚-->
+  <view style='width:100px; height:100px; position:absolute; left:0px; right:0px; top:0px; bottom:0px; margin:auto; '>
+    <view style='width:10px; height:10px; border-left:1px solid #000; border-top:1px solid #000; position:absolute; left:0px; top:0px;'></view>
+    <view style='width:10px; height:10px; border-right:1px solid #000; border-top:1px solid #000; position:absolute; right:0px; top:0px;'></view>
+    <view style='width:10px; height:10px; border-right:1px solid #000; border-bottom:1px solid #000; position:absolute; right:0px; bottom:0px;'></view>
+    <view style='width:10px; height:10px; border-left:1px solid #000; border-bottom:1px solid #000; position:absolute; left:0px; bottom:0px;'></view>
+  </view>
+</view>
+<view style='width:100px; height:50px; background:orange; color:#fff; position:fixed; left:0px; bottom:0px; text-align:center; line-height:50px; border-radius:10px;z-index:100;' bindtap='jietu'>截图</view>
+<view style='width:100px; height:50px; background:orange; color:#fff; position:fixed; left:105px; bottom:0px; text-align:center; line-height:50px; border-radius:10px;z-index:100;' bindtap='xuntu'>选择照片</view>
+<view>
+<canvas canvas-id="a1" style='width:{{touch.scaleWidth}}px; height:{{touch.scaleHeight}}px;'></canvas>
+</view>

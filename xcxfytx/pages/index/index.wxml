@@ -1,0 +1,23 @@
+
+<view class="container">
+  <view class="scroll-fullpage" bindtouchstart="scrollTouchstart" bindtouchmove="scrollTouchmove" bindtouchend="scrollTouchend" style="transform:translateY(-{{scrollindex*100}}%);  margin-top: {{margintop}}px; transition:{{miao}}s;">
+    <view class="section {{scrollindex==0?'active':''}}" style="background:#f6941d;">
+      <text>第一页</text>
+    </view>
+    <view class="section {{scrollindex==1?'active':''}}" style='background:#99cc33;'>
+      <text>第二页</text>
+    </view>
+    <view class="section {{scrollindex==2?'active':''}}" style='background:#24998d;'>
+      <text>第三页</text>
+    </view>
+    <view class="section {{scrollindex==3?'active':''}}" style='background:#0080ff;'>
+      <text>第四页</text>
+    </view>
+    <view class="section {{scrollindex==4?'active':''}}" style='background:#800080;'>
+      <text>第五页</text>
+    </view>
+    <view class="section {{scrollindex==5?'active':''}}" style='background:#c71585;'>
+      <text>第六页</text>
+    </view>
+  </view>
+</view>

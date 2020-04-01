@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html" charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>后台登录</title>
+<link rel="stylesheet" href="css/repeat.css" type="text/css"></link>
+<link rel="stylesheet" href="css/style.css" type="text/css"></link>
+</head>
+
+
+<body>
+	<div id="ringgroup">
+		<div class="ring"></div>
+		<div class="ring"></div>
+		<div class="ring"></div>
+		<div class="ring"></div>
+	</div>
+	<div class="circleProgress_wrapper">
+		<div class="wrapper left">
+       	    <div class="circleProgress leftcircle"></div>
+       	</div>
+       	<div class="wrapper right">
+       	    <div class="circleProgress rightcircle"></div>
+       	</div>
+       	
+ 	</div>
+ 	<p class='baifenzhi'><span class="baifenzhi_nu"></span></p>
+	<span class="swz"></span>
+ 	<!--登录界面-->
+ 	<div class="login_container">
+		<!--logo-->
+		<div class="login_container_logo">
+			<img src="img/logo.png" alt="logo" />
+		</div>
+		<!--手机号-->
+		<div class="login_container_input">
+			<input type="text" placeholder="账号" value=""
+				id="user" />
+		</div>
+		<div id="passNY"></div>
+		<!--密码-->
+		<div class="login_container_input" style="margin-top:0px;">
+			<input type="password" placeholder="密码" value=""
+				id="password" />
+		</div>
+		<!--登录按钮-->
+		<div class="login_container_button" id="login_button">登录</div>
+	</div>
+<script>
+		window.onload = window.onresize = function() {
+			var view_width = document.getElementsByTagName('html')[0].getBoundingClientRect().width;
+			var _html = document.getElementsByTagName('html')[0];
+			view_width > 640 ? _html.style.fontSize = 640 / 16 + 'px' : _html.style.fontSize = view_width / 16 + 'px';
+	}
+</script>
+<script type="text/javascript" src="js/jquery.js"></script>
+<script type="text/javascript" src="js/retina.min.js"></script>
+<script type="text/javascript" src="js/script.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+	startdelay = 200;
+	setTimeout("$('#ringgroup').addClass('chuxian');$('.circleProgress_wrapper').addClass('chuxian');",startdelay);
+	setTimeout("$('#ringgroup').addClass('xuanzhuan');",startdelay+2000);
+	setTimeout("$('.baifenzhi').addClass('wenzichuxian');",0);
+	var t1=window.setInterval(refreshCount, 100);
+	var text=0;
+    function refreshCount() {
+      	$('.baifenzhi_nu').html(++text+'%');
+      	switch(text) {
+		    case 20:
+		    	$('.swz').html('正在扫描盾牌系统....');
+		    break;
+		    case 40:
+		    	$('.swz').html('扫描盾牌系统成功....');
+		    break;
+		    case 60:
+		    	$('.swz').html('正在启动防御盾牌....');
+		    break;
+		    case 80:
+		    	$('.swz').html('启动盾牌成功....');
+		    break;
+		    case 90:
+		    	$('.swz').html('正在打开....');
+		    break;
+		    case 100:
+      			window.clearInterval(t1);
+      			$('#ringgroup').css('display','none');
+      			$('.circleProgress_wrapper').css('display','none');
+      			$('.baifenzhi').css('display','none');
+      			$('.login_container').css('display','block');
+      			$('.swz').html('盾牌系统防护中');
+      		defalut:
+		    break;
+      	}
+    }
+    
+});
+</script>
+</body>
+</html>

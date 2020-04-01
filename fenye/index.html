@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>js分页案例</title>
+		<style>
+			*{
+				margin:0px;
+				padding:0px;
+			}
+			.content{
+				width: 90vw;
+				height: calc(100vh - 150px);
+				border:1px solid #ccc;
+				margin:25px auto;
+
+			}
+			.son{
+				width:90%;
+				height:20px;
+				margin:10px auto;
+				border:1px solid #ccc;
+			}
+			#footer{
+				width:90%;
+				height:50px;
+				margin:10px auto;
+				border:1px solid #ccc;
+				display:flex;
+				justify-content:center;
+				align-items:center;
+
+			}
+			.btn{
+				padding:5px;
+				border-radius:2px;
+				border: 1px solid #ccc;
+				margin:5px;
+			}
+			.active{
+				background:#1598FA;
+				color:white;
+				border:1px solid #1598FA;
+			}
+
+
+
+		</style>
+	</head>
+	<body>
+		<!--内容显示-->
+		<div class="content"></div>
+
+		<!--页脚显示-->
+		<div id="footer"></div>
+		
+		<script src="js/jquery.js"></script>
+		<script src="js/fenye.js"></script>
+	</body>
+</html>

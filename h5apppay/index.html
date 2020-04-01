@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title></title>
+    <style>
+    	*{
+    		margin:0px;
+    		padding:0px;
+    	}
+    	.zhifu_button{
+    		background:rgba(70,144,210,1);
+    		box-shadow:0px 6px 0px rgba(70,255,210,1);;
+    		width:100px;
+    		height:50px;
+    		position:fixed;
+    		left:0px;
+    		right:0px;
+    		bottom:0px;
+    		top:0px;
+    		margin:auto;
+    		text-align:center;
+    		line-height:50px;
+    		color:#fff;
+    		z-index:100;
+    	}
+    	.zhifu_button:active{
+  			box-shadow: 0 2px 0px rgba(70,255,210,1);;
+  			transform: translateY(4px);
+    	}
+    </style>
+    <script type="text/javascript">
+    	var pays={};
+    	//console.log("所有plus api都应该在此事件发生后调用，否则会出现plus is undefined。"
+   		document.addEventListener('plusready',plusReady,true);
+		function plusReady(){
+			// 获取支付通道
+			plus.payment.getChannels(function(channels){
+				var txt='支付通道信息：';
+				for(var i in channels){
+					var channel=channels[i];
+					console.log('支付通道id：'+channel.id);
+					console.log('通道描述：'+channel.description);
+					console.log('服务是否就绪：'+channel.serviceReady);
+					if(channel.id=='qhpay'||channel.id=='qihoo'){	// 过滤掉不支持的支付通道：暂不支持360相关支付
+						continue;
+					}
+					pays[channel.id]=channel;
+					//检测是否安装当前服务
+					checkServices(channel);
+				}
+
+			},function(e){
+				console.log('获取支付通道失败：'+e.message);
+			});
+		}
+		
+   		
+   		// 检测是否安装支付服务
+		function checkServices(pc){
+			if(!pc.serviceReady){
+				var txt=null;
+				switch(pc.id){
+					case 'alipay':
+					txt='检测到系统未安装“支付宝快捷支付服务”，无法完成支付操作，是否立即安装？';
+					break;
+					default:
+					txt='系统未安装“'+pc.description+'”服务，无法完成支付，是否立即安装？';
+					break;
+				}
+				plus.nativeUI.confirm(txt, function(e){
+					if(e.index==0){
+						pc.installService();//安装
+					}
+				}, pc.description);
+			}
+		}
+		
+		var w=null;
+		var PAYSERVER='http://demo.dcloud.net.cn/payment/?payid=';//向后台请求订单信息的网址（自己定）接下来就是个拼网址的过程
+		// 支付
+		function pay(id){
+			if(w){return;}//检查是否请求订单中
+
+			console.log('----- 请求支付 -----');
+			var url=PAYSERVER;
+			
+			//检测是不是支持的支付通道
+			if(id=='alipay'||id=='wxpay'){
+				url+=id;                  //告诉后台用的那个支付
+			}else{
+				plus.nativeUI.alert('当前环境不支持此支付通道！', null, '支付');
+				return;
+			}
+			
+			var appid=plus.runtime.appid;//获取本appid值，这个值使用申请的微信开放平台下来的appid值
+
+			url+='&appid='+appid+'&total=';
+			
+			w=plus.nativeUI.showWaiting();
+			// 请求支付订单
+			var amount = 1;//收多少钱
+			var xhr=new XMLHttpRequest();
+			xhr.onreadystatechange=function(){
+				switch(xhr.readyState){//xhr.readyState请求状态0,1,2,3,4分别是未初始化，链接已建立，请求已接收，请求处理中，请求已完成
+					case 4:
+					w.close();w=null;
+					
+					if(xhr.status==200){//http请求状态码 200成功
+						console.log('----- 请求订单成功 -----');
+						
+						console.log(xhr.responseText);//向后台请求成功后返回微信服务器返回的订单信息    返回的   订单信息（这个很重要！！！！！！）没这个打不开支付界面
+						//返回  {"appid":"wx0411fa6a39d61297","noncestr":"m0Y40h8APjvRcb7q","package":"Sign=WXPay","partnerid":"1230636401","prepayid":"wx17225648940588e61b15c5050841639935","timestamp":1539788208,"sign":"3CABD134CB81CBBD4120B028EF33BB03"}
+						var order=xhr.responseText;
+						
+						plus.payment.request(pays[id],order,function(result){
+							console.log('----- 支付成功 -----');
+							console.log(JSON.stringify(result));
+							
+							plus.nativeUI.alert('支付成功!',function(){
+								back();
+							},'支付');
+						},function(e){
+							console.log('----- 支付失败 -----');
+							console.log('['+e.code+']：'+e.message);
+							plus.nativeUI.alert('更多错误信息请参考支付(Payment)规范文档：http://www.html5plus.org/#specification#/specification/Payment.html', null, '支付失败：'+e.code);
+						});
+					}else{
+						console.log('----- 请求订单失败 -----');
+						console.log( xhr.status );
+						plus.nativeUI.alert('获取订单信息失败！', null, '支付');
+					}
+					break;
+					
+					default:
+					break;
+				}
+			}
+			xhr.open('GET',url+amount);//创建请求
+
+			console.log('请求支付订单：'+url+amount);
+			xhr.send();//发送请求
+		}
+		
+   		
+    </script>
+</head>
+<body>
+	<div class='zhifu_button' onclick="pay('wxpay')">微信支付</div>
+</body>
+</html>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><title>Title</title></head>
+<body>
+<h4>匿名自调用函数封装插件</h4>
+<p>please click F12, see console result.请按F12查看控制台console内容</p>
+<ul id="list">
+    <li class="item">clik me show in console is apple</li>
+    <li class="item">clik me show in console is banana</li>
+    <li class="item">clik me show in console is orange</li>
+    <li class="item">clik me show in console is grape</li>
+</ul>
+<script src="./jquery.js"></script>
+<script>
+    ;(function (win, $) {
+		console.log('自个先执行了');
+        var plugin = function (item) {//主体
+            this.item = $(item);
+            this.clicka();
+        };
+		
+        plugin.prototype.clicka = function () {
+            this.item.click(function(){
+                console.log($(this).text());
+            });
+        };
+		
+        plugin.init = function (itemLists) {
+            var _this = this;
+            itemLists.each(function (key, item) {
+                new _this(item);
+            });
+        };
+        win.MyTapPlugin = plugin;
+    })(window, jQuery);
+</script>
+<script>
+    MyTapPlugin.init($('#list .item'));
+</script>
+</body>
+</html>

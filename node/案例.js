@@ -18,8 +18,8 @@ var app = express();
 
 /*获取ssl证书物理地址*/
 const httpsOption = {
-    key : fs.readFileSync("../https/2_www.kangyupeng.cn.key"),
-    cert: fs.readFileSync("../https/1_www.kangyupeng.cn_bundle.crt")
+    key : fs.readFileSync("../https/2_www.xxx.com.key"),
+    cert: fs.readFileSync("../https/1_www.xxx.com_bundle.crt")
 };
 
 app.use(express.static('public'));//暴露这个public文件夹下的静态资源，就不用手动写js释放资源了
@@ -112,7 +112,7 @@ app.post('/ce_upload', upload.array('image', 1), function(req, res, next){//第�
 var mysql  = require('mysql');  
 
 var connection = mysql.createConnection({
-  host     : '123.207.145.19',
+  host     : '',
   user     : 'root',
   password : 'rootwo',
   port: '3306',
@@ -133,7 +133,7 @@ connection.query(sql,function (err, result) {
 connection.end();
 
 var zengjia = mysql.createConnection({
-  host     : '123.207.145.19',
+  host     : '',
   user     : 'root',
   password : 'rootwo',
   port: '3306',
@@ -158,7 +158,7 @@ zengjia.end();
 
 
 var gengxin = mysql.createConnection({     
-  host     : '123.207.145.19',       
+  host     : '',       
   user     : 'root',              
   password : 'rootwo',       
   port: '3306',                   
@@ -182,7 +182,7 @@ gengxin.end();
 
 
 var shanchu = mysql.createConnection({
-  host     : '123.207.145.19',
+  host     : '',
   user     : 'root',
   password : 'rootwo',
   port: '3306',
@@ -218,15 +218,15 @@ http.createServer(function(request, response) {
     response.setHeader("Access-Control-Allow-Origin", "*");
     var timeStampStart = Date.now();
     var option = {};
-    option.hostname = 'www.jianshicha.com';
+    option.hostname = 'www.xxx.com';
     option.protocol = 'https:'
     option.port = 443;
     option.method = request.method;
     option.path = request.url.split('?')[0];
     var reqHeader = request.headers;
-    reqHeader.host = 'www.jianshicha.com';
-    reqHeader.origin = 'https://www.jianshicha.com';
-    reqHeader.referer = 'https://www.jianshicha.com';
+    reqHeader.host = 'www.xxx.com';
+    reqHeader.origin = 'https://www.xxx.com';
+    reqHeader.referer = 'https://www.xxx.com';
     option.headers = reqHeader;
     if (request.method == 'GET') {
         let data = querystring.parse(request.url.split('?')[1]);

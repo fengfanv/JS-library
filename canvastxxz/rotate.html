@@ -1,0 +1,39 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>canvas 图像旋转</title>
+		<meta charset="utf-8" />
+		<style>
+			*{
+				margin:0px;
+				padding:0px;
+			}
+			canvas{
+				border:1px solid #000;
+			}
+			
+			
+		</style>
+	</head>
+	<body>
+		<canvas width="800" height="600"></canvas>
+		<script>
+			var canvas=document.querySelector('canvas');
+			var ctx=canvas.getContext('2d');
+			//3.把旋转的矩形平移进画布
+			ctx.translate(300,300);
+			var timer=setInterval(function(){
+				//4.清除的点需要注意         ctx.clearRect(-151,-101,canvas.width,canvas.height);
+				//1.定义一个旋转的方法,确定每次时间间隔中要旋转多少弧度
+				ctx.rotate(0.01*Math.PI);
+				//2.绘制一个矩形，因为需求要求矩形以中心为轴进行旋转，但是canvas中rotate只能以画布左上角为轴，进行旋转
+				//因此，只要使矩形的中心和画布的左上角重合就可以了(起点的横纵坐标为矩形宽高的一半)
+				ctx.strokeRect(-150,-100,300,200);
+			},5);
+		</script>
+		
+		
+	</body>
+	
+	
+</html>

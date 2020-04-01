@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>圆进度条</title>
+		<style>
+			*{
+				margin:0px;
+				padding:0px;
+			}
+			.circleProgress_wrapper{   
+				width: 400px;   
+				height: 400px;   
+				margin: 50px auto;   
+				position: relative;   
+			} 
+			.wrapper{   
+				width: 200px;   
+				height: 400px;   
+				position: absolute;   
+				top:0px;   
+				overflow: hidden;
+
+			}   
+			.right{   
+				right:0px;   
+			}   
+			.left{   
+				left:0px;   
+			}
+			.circleProgress{
+				width: 320px;
+				height: 320px;
+				border:40px solid transparent;
+				border-radius:50%;
+				position: absolute;
+				top:0px;
+			}
+			.rightcircle{   
+				border-top:40px solid #01B8ff;   
+				border-right:40px solid #01B8ff;   
+				right:0px;
+				/*animation:Load_right 5s linear infinite; */
+			}
+			.leftcircle{   
+				border-bottom:40px solid #01B8ff;   
+				border-left:40px solid #01B8ff;   
+				left:0px;
+				/*animation:Load_left 5s linear infinite;*/
+			}
+			.baifenzhi{
+				width:400px;
+				height:400px;
+				position:absolute;
+				left:0px;
+				top:0px;
+				right:0px;
+				bottom:0px;
+				margin:auto;
+				text-align:center;
+				line-height: 400px;
+				font-size:100px;
+				font-weight:bold;
+			}
+			@keyframes Load_right{   
+				0%{
+					transform: rotate(-135deg);
+				}
+				50%,100%{
+					transform: rotate(45deg);
+				}
+			}
+			@keyframes Load_left{
+				0%,50%{
+					transform: rotate(-135deg);
+				}
+				100%{
+					transform: rotate(45deg);
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<div class="circleProgress_wrapper">
+			<div class="wrapper left">
+        	    <div class="circleProgress leftcircle"></div>
+        	</div>
+        	<div class="wrapper right">
+        	    <div class="circleProgress rightcircle"></div>
+        	</div>
+        	<p class='baifenzhi'></p>
+ 		</div>
+ 		<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+ 		<script>
+ 			//360deg == 100%  // 1% == 3.6deg
+ 			var val=56;
+ 			if(val >= 50){
+ 				//大于50%左边全满 右边是50差值       //这个只是视觉上让你感觉是圆形进度条（不懂看一下布局就ok了）
+ 				$('.rightcircle').css('transform','rotate(45deg)');
+ 				var cha=val-50;
+ 				$('.leftcircle').css('transform','rotate('+(-135+(cha*3.6))+'deg)');
+ 			}else{
+ 				//小于则是左边全不满，右边val值
+ 				$('.leftcircle').css('transform','rotate(-135deg)');
+ 				$('.rightcircle').css('transform','rotate('+(-135+(val*3.6))+'deg)');
+ 			}
+ 			$('.baifenzhi').html(val+'%');
+
+ 		</script>
+	</body>
+</html>

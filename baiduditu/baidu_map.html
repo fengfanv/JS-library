@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>百度地图基本操作案例</title>
+		<script src="http://api.map.baidu.com/api?v=2.0&ak=eNx8N1pbqXK9FXnR86iGOUAGAVZAus0z"></script>
+	</head>
+	<body>
+		<div id="allmap" style="width:100vw; height:100vh;"></div>
+		<script>
+			window.onload=function(){
+				var map = new BMap.Map("allmap");		   			//创建地图实例
+				var point = new BMap.Point(116.331398,39.897445);	//创建初始坐标中心点
+				map.centerAndZoom(point,12);						//初始化地图设置(中心点)(显示级别)
+
+
+				//定位当前设备所在位置
+				var geolocation = new BMap.Geolocation();           //地图定位方法
+				geolocation.getCurrentPosition(function(r){			//获取当前坐标点
+					if(this.getStatus() == BMAP_STATUS_SUCCESS){
+						map.panTo(r.point);							// 跳转到坐标点位置
+						console.log('定位的坐标：'+r.point.lng+','+r.point.lat);//输出定位位置的坐标
+					}else{
+						alert('failed：'+this.getStatus());
+					}
+				},{enableHighAccuracy: true});
+
+
+				//基本事件
+				
+				//单击事件
+				map.addEventListener('click',function(r){
+					console.log("点击坐标："+r.point.lng+","+r.point.lat);
+				});		
+
+				//拖动事件
+				map.addEventListener("dragend", function(){
+ 	 				var center = map.getCenter();    				//当前地图中心点(坐标)
+ 	 				console.log("拖动后坐标：" + center.lng + ", " + center.lat);    
+	 			});
+
+	 			//缩放事件
+	 			map.addEventListener("zoomend", function(){
+	 				//获取屏幕两点之间距离
+	 				var bounds = map.getBounds();		//获取屏幕上两点坐标(百度定的名字忘了)
+    				var point1 = bounds.getSouthWest();   // 屏幕区域左下角
+					var point2 = bounds.getNorthEast();   // 屏幕区域右上角
+					console.log("当前地图可视范围是：" + point1.lng + "," + point1.lat + "到" + point2.lng + "," + point2.lat);
+					var distance = map.getDistance(point1,point2);//api自带方法获取两坐标点之间距离  单位：米
+					console.log('两点之间距离为：'+distance.toFixed(2)+'米');
+ 	 				console.log("地图缩放至：" + this.getZoom() + "级");    
+				});
+
+	 			//添加多个覆盖物并绑定id值
+	 			var zuobiao=[{'lng':'114.462635','lat':'38.038553'},
+	 						 {'lng':'114.534499','lat':'37.988972'},
+	 						 {'lng':'114.492531','lat':'38.022181'},
+	 						 {'lng':'114.637984','lat':'38.047646'},
+	 						 {'lng':'114.534499','lat':'38.034915'},
+	 						 {'lng':'114.495989','lat':'37.972134'},
+	 						 {'lng':'114.566695','lat':'38.018543'},
+	 						 {'lng':'114.39422','lat':'38.107637'},
+	 						 {'lng':'114.477583','lat':'37.953016'},
+	 						 {'lng':'114.559221','lat':'38.03537'}
+	 						 ];
+	 			for(var i=0; i<zuobiao.length; i++){
+	 				var lng=zuobiao[i].lng;			// 获取经度
+	 				var lat=zuobiao[i].lat;			// 获取纬度
+	 				var point = new BMap.Point(lng,lat);
+	 				addMarkers(point,i);					// i为每个marker的id值
+	 			}
+	 			function addMarkers(point,id){
+	 				//定义自定义图标
+	 				var myIcon = new BMap.Icon("http://api.map.baidu.com/img/markers.png", new BMap.Size(23,25),{  
+                        offset: new BMap.Size(10, 25), 				// 指定定位位置  
+                        imageOffset: new BMap.Size(0, 0 - 10 * 25) 	// 设置图片偏移  
+                    });
+                    var marker = new BMap.Marker(point,{icon:myIcon});
+
+                    marker.addEventListener("click",function(){
+                    	var dijige=id;		// 为marker绑id值
+    					console.log('当前marker：'+dijige);
+                    });
+                    map.addOverlay(marker);
+    			};
+
+
+    			//地址解析
+    			var geocoder = new BMap.Geocoder();
+    			//地址 --> 坐标
+    			geocoder.getPoint('北京市海淀区上地10街10号',function(point){
+ 	 				if(point){
+ 	 		    		map.centerAndZoom(point,16);
+ 	 		    		map.addOverlay(new BMap.Marker(point));//添加标注				
+ 	 				}
+ 			  	},'北京市');
+    			//坐标 --> 地址
+    			geocoder.getLocation(new BMap.Point(114.52208184, 38.04895831),function(result){
+         			if(result){
+        				console.log(result.address);
+         			}
+     			});
+
+
+    			map.enableScrollWheelZoom(true);// 允许缩放，支持手势和鼠标
+			};
+		</script>
+	</body>
+</html>
+

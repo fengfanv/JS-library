@@ -1,0 +1,79 @@
+<!DOCTYPE html>  
+<html lang="en">  
+<head>  
+    <meta charset="UTF-8">  
+    <title>H5TouchMove移动方案</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no"/>
+    <style>
+		*{
+			margin:0px;
+			padding:0px;
+		}
+		#container{
+			width:100vw; 
+			height:1000px; 
+			border:1px solid #ccc; 
+			overflow:hidden;
+		}
+		#sonDiv{
+			width:100px; 
+			height:100px; 
+			background:#ccc; 
+			text-align:center; 
+			font-size:30px; 
+			line-height:100px; 
+			font-weight: bold; 
+			color:#fff;
+		}
+
+    </style>
+</head>  
+<body>
+	<div id="container">  
+	    <div id='sonDiv'>Move</div>  
+	</div>
+
+	<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+	<script>
+	var $container = $("#container");
+	var $sonDiv = document.getElementById('sonDiv');
+	var startX,startY,scale = 1;
+	var x = 0,y = 0;	//子元素左上角距离父级元素左上角的距离
+
+	//touches: 当前屏幕上所有触摸点的列表;
+	//targetTouches: 当前对象上所有触摸点的列表;
+	//changedTouches: 涉及当前(引发)事件的触摸点的列表
+
+	$sonDiv.addEventListener("touchstart",function(e){
+					//获取当前点击位置距离当前元素的left边 top边的距离
+	    startX = e.targetTouches[0].pageX;   
+	    startY = e.targetTouches[0].pageY;   
+	    return;
+	});
+
+	$sonDiv.addEventListener("touchmove",function(e){     
+	    e.preventDefault();//阻止默认行为
+	    e.stopPropagation();//阻止冒泡
+	    				//获取当前点击位置距离父级元素的left top的距离
+	    var changeX = e.changedTouches[0].pageX - startX + x;   //x轴移动多少距离 + 子元素旧坐标 = 子元素新坐标
+	    var changeY = e.changedTouches[0].pageY - startY + y;	//y轴移动多少距离 + 子元素旧坐标 = 子元素新坐标
+	    move($(this), changeX, changeY);
+	    return;
+	});
+
+	$sonDiv.addEventListener("touchend",function(e){
+		var changeX = e.changedTouches[0].pageX - startX + x;	//x轴移动多少距离 + 子元素旧坐标 = 子元素新坐标
+	    var changeY = e.changedTouches[0].pageY - startY + y;	//y轴移动多少距离 + 子元素旧坐标 = 子元素新坐标
+	    
+	    x = x + e.changedTouches[0].pageX - startX;		//保存新坐标为下一次移动做准备
+	    y = y + e.changedTouches[0].pageY - startY;		//保存新坐标为下一次移动做准备
+	    move($(this), changeX, changeY);
+	    return;
+	});
+
+	function move(ele, x, y){   //             x轴        y轴        z轴
+	    ele.css({ 'transform':'translate3d(' + x + 'px, ' + y + 'px, 0)'});   
+	}
+	</script>
+</body>
+</html> 

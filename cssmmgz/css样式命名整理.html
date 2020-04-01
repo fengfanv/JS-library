@@ -1,0 +1,267 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>CSS命名规范</title>
+	<style>
+		*{
+			margin: 0; padding: 0;
+			font-family: "微软雅黑";
+		}
+		a { -moz-transition: all 2s ease; -webkit-transition: all 2s ease; transition: all 2s ease; color:#000; text-decoration:none; width:50%; display:inline-block;}
+ a:hover{ color:red;}
+		.container {
+			background: #fafafa;
+		}
+		h1 {
+			text-align: center;
+			background: #ededed;
+			padding: 5px 0px;
+			-moz-transition: all 2s ease; -webkit-transition: all 2s ease; transition: all 2s ease;
+			
+		}
+		h1:hover { color:#fff;}
+		h1:hover i{ color:#000;}
+		
+		i{
+			font-style:normal;
+			margin-left:100px;
+			color:#ededed;
+			-moz-transition: all 3s ease; -webkit-transition: all 3s ease; transition: all 3s ease;
+			font-size:22px;
+			}
+		h4 {
+			width: 900px;
+			font:16px/2 "微软雅黑";
+			overflow: hidden;
+		}
+		p {
+			margin: 0px;
+			padding: 0px 0px;
+		}
+		.name{
+			float:right;
+		}
+		p,div{
+			zoom:1;
+		}
+		div:after,
+		p:after {
+			content: "";
+			display: block;
+			clear: both;
+		}
+		span {
+			width: 25%;
+			padding: 2px 0;
+			line-height: 24px;
+			color: #333;
+			text-decoration: none;
+			float: left;
+			border: 1px dashed #ccc;
+			margin: -1px;
+			background-color: #fff;
+			position: relative;
+			z-index: 1;
+		}
+		span:hover{
+			border-color: #adff2f;
+			background-color: #505050;
+			
+			color: #FFF;
+			z-index: 2;
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<h1>CSS样式命名整理</h1>
+		<h4>页面结构</h4>
+		<p>
+			<span>容器: container/wrap</span>
+			<span>整体宽度：wrapper</span>
+			<span>页头：header</span>
+			<span>内容：content</span>
+			<span>页面主体：main</span>
+			<span>页尾：footer</span>
+			<span>导航：nav</span>
+			<span>侧栏：sidebar</span>
+			<span>栏目：column</span>
+			<span>中间内容：center</span>
+		</p>
+		<h4>导航</h4>
+		<p>
+			<span>导航：nav</span>
+			<span>导航：mainbav/globalnav</span>
+			<span>子导航：subnav</span>
+			<span>顶导航：topnav</span>
+			<span>边导航：sidebar</span>
+			<span>左导航：leftsidebar</span>
+			<span>右导航：rightsidebar</span>
+			<span>边导航图标：sidebarIcon</span>
+			<span>菜单：menu</span>
+			<span>子菜单：submenu</span>
+			<span>标题: title</span>
+		</p>
+		<h4>功能</h4>
+		<p>
+			<span>标志：logo</span>
+			<span>登陆：login</span>
+			<span>登录条：loginbar</span>
+			<span>注册：regsiter</span>
+			<span>产品：products</span>
+			<span>产品价格：productsPrices</span>
+			<span>产品评论：productsReview</span>
+			<span>编辑评论：editor-review</span>
+			<span>最新产品：news-release</span>
+			<span>广告/标语：banner</span>
+			<span>摘要:summary</span>
+			<span>生产商：publisher</span>
+			<span>缩略图：screenshot</span>
+			<span>常见问题：faqs</span>
+			<span>关键词：keyword</span>
+			<span>博客：blog</span>
+			<span>论坛：forum</span>
+			<span>搜索：search</span>
+			<span>搜索输入框：search-input</span>
+			<span>搜索输出：search-output</span>
+			<span>搜索结果：search-results</span>
+			<span>加入我们：joinus</span>
+			<span>状态：status</span>
+			<span>按钮：btn</span>
+			<span>滚动：scroll</span>
+			<span>标签页：tab</span>
+			<span>文章列表：list</span>
+			<span>提示信息：msg/message</span>
+			<span>当前的: current</span>
+			<span>小技巧：tips</span>
+			<span>皮肤：skin</span>
+			<span>充值：pay</span>
+			<span>活动：activities</span>
+			<span>推广：promotion</span>
+			<span>公告：announcement</span>
+			<span>排行：ranking</span>
+			<span>公司简介：companyProfile </span>
+			<span>公司设备：equipment</span>
+			<span>公司荣誉：glories</span>
+			<span>企业文化：culture</span>
+			<span>企业规模：scaleScale</span>
+			<span>营销网络：salesNetwork</span>
+			<span>组织机构：organization</span>
+			<span>技术力量：technology</span>
+			<span>分支机构：branches</span>
+			<span>企业资质：EnterpriseQualification</span>
+			<span>公司实力：strengthStrength</span>
+			<span>经营理念：operationPrinciple</span>
+			<span>经理致辞：manager_oration</span>
+			<span>发展历程：developmentHistory</span>
+			<span>工程案例：EngineeringProjects</span>
+			<span>分类浏览：browseByCategory</span>
+			<span>应用领域：applicationFields</span>
+			<span>人力资源：humanResourceHr</span>
+			<span>领导致辞： leader_oration</span>
+			<span>客户留言：customerMessage</span>
+			<span>客户服务：customerService</span>
+			<span>您的要求：yourRequirements</span>
+			<span>销售信息：salesInformation</span>
+			<span>招商：EnterpriseEstablishing</span>
+			<span>教育培训：EducationTraining</span>
+			<span>在线交流：onlineCommunication</span>
+			<span>质量认证：qualityCertification</span>
+			<span>合作加盟：joinInCooperation</span>
+			<span>产品描述：productsDescription</span>
+			<span>业务范围：businessScope</span>
+			<span>产品销售：salesSales</span>
+			<span>联系我们：contactUs</span>
+			<span>信息发布：Information</span>
+			<span>返回首页：homepage</span>
+			<span>产品定购：order</span>
+			<span>电子商务：E-business</span>
+			<span>版权所有：copy Right</span>
+			<span>友情连结：hot Link</span>
+			<span>行业新闻：tradeNews</span>
+			<span>行业动态：trends</span>
+			<span>邮编：postalCodeZipcode</span>
+			<span>新闻动态：newsTrends</span>
+			<span>公司名称：companyName</span>
+			<span>销售热线：salesHot_Line</span>
+			<span>联系人：contactPerson</span>
+			<span>建设中：InConstruction</span>
+			<span>证书：certificate</span>
+			<span>地址：ADD/Add</span>
+			<span>电话：TEL/Tel</span>
+			<span>传真：FAX/Fax</span>
+			<span>产品名称：productName</span>
+			<span>产品说明：description</span>
+			<span>价格：price</span>
+			<span>品牌：brand</span>
+			<span>规格：specification</span>
+			<span>尺寸：size</span>
+			<span>生产厂家：manufacuturer</span>
+			<span>型号：model</span>
+			<span>产品标号：Item No</span>
+			<span>技术指标：techniqueData</span>
+			<span>产品描述：description</span>
+			<span>产地：productionPlace</span>
+			<span>用途：application</span>
+			<span>论坛：Forum</span>
+			<span>在线订购：on_lineOrder</span>
+			<span>招标：bidInviting</span>
+			<span>综述：general</span>
+			<span>业绩：achievements</span>
+			<span>大事：greatEvent</span>
+			<span>动态：trends</span>
+			<span>服务：service</span>
+			<span>投资：Investment</span>
+			<span>行业：Industry</span>
+			<span>规划：programming</span>
+			<span>环境：environment</span>
+			<span>发送：delivery</span>
+			<span>提交：submit</span>
+			<span>重写：reset</span>
+			<span>社区：community</span>
+			<span>业务：business</span>
+			<span>在线调查：onlineInquiry</span>
+			<span>下载中心：download</span>
+			<span>意见反馈：feedback</span>
+			<span>常见问题：FAQ</span>
+			<span>中心概况：generalProfile</span>
+			<span>游乐园：amusementPark </span>
+			<span>专题报道：specialReport</span>
+			<span>图标: icon</span>
+			<span>注释：note</span>
+			<span>指南：guild</span>
+			<span>服务：service</span>
+			<span>热点：hot</span>
+			<span>新闻：news</span>
+			<span>下载：download</span>
+			<span>投票：vote</span>
+			<span>商　标：label/branding</span>
+			<span>当前位置：breadcrumb/loc</span>
+			<span>购物车：shop</span>
+			<span>标签：tag</span>
+			<span>信誉：siteinfo-credits</span>
+			<span>网站信息：siteinfo</span>
+			<span>法律声明：siteinfo-legal</span>
+			<span>合作伙伴：partner</span>
+			<span>友情链接：friendlink</span>
+			<span>版权：copyright</span>
+		</p>
+        <marquee class="name">
+        	<a href="#">我</a><a href="#">要爱学习！</a>
+        </marquee>
+	</div>
+    
+    <!-- 刘欢老师总结 -->
+   
+ 
+
+
+
+</body> 
+</html>
+
+
+	<br><br><br><br><br><br><br><br><br><br>
+</body>
+</html>

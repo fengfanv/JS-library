@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>作用域</title>
+	</head>
+	<body>
+		<p>作用域</p>
+		<script>
+
+			
+			//bind(),call(),apply()
+			//这三个都是给方法绑定作用域,
+			//bind()绑定作用域时不立即执行，call()和apply()给方法绑定作用域时立即执行，call()和apply()的区别就是call接收参数时一个一个的参数，apply接收参数是已数组的形式接收的
+			
+			function a(){
+				this.name = 'a'
+				this.say = '我是a'
+			};
+			
+			a();
+			
+			function b(){
+				this.name = 'b'
+				console.log(this.say);
+			}
+			
+			b.bind(a);
+			
+			b();//我是a
+
+			
+			
+			
+			
+			
+		</script>
+		
+		
+		
+	</body>
+</html>

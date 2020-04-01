@@ -1,0 +1,227 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>日历</title>
+		<style>
+			*{
+				margin:0px;
+				padding:0px;
+			}
+			ul{
+				list-style: none;
+			}
+			#date_box{
+				width: 320px;
+				margin: 0 auto;
+				padding: 35px 20px;
+				font-size: 13px;
+				box-shadow: 0px 0px 10px #ccc;
+			}
+			.date-hd{
+				display: flex;
+				justify-content: space-between;
+				padding: 0 15px;
+			}
+			.today{
+				flex: 1;
+				text-align: center;
+			}
+			.ul-box{
+				overflow: hidden;
+			}
+			.ul-box > li{
+				float: left;
+				width: 14.28%;
+				text-align: center;
+				padding: 5px 0;
+			}
+			.other-month{
+				color: #999999;
+			}
+			.current-month{
+				color: #333333;
+			}
+			.today-style{
+				border-radius: 50%;
+				background: #58d321;
+			}
+			.arrow{
+				cursor: pointer;
+			}
+			.dayStyle{
+				display: inline-block;
+				width: 35px;
+				height: 35px;
+				border-radius: 50%;
+				text-align: center;
+				line-height: 35px;
+				cursor: pointer;
+			}
+			.current-month > .dayStyle:hover{
+				background: #00BDFF;
+				color: #ffffff;
+			}
+			.today-flag{
+				background: #00C2B1;
+				color: #fff;
+			}
+			.selected-style {
+				background: #00BDFF;
+				color: #ffffff;
+			}
+		</style>
+	</head>
+	<body>
+		<!--显示时间项-->
+		<div id="date_box"></div>
+
+		<script>
+			//时间方法
+			function date_unit(){
+				//获取当前时间
+				var curDate = new Date(),
+					year = curDate.getFullYear(),
+					month = curDate.getMonth(),
+					day = curDate.getDate(),
+					currentYear = curDate.getFullYear(),//当前日
+					currentMonth = curDate.getMonth(),//当前月
+					currentDay = curDate.getDate(),//当前年
+					selectedDate = '',//是否选择时间
+					el = document.querySelector('#'+arguments[0]);
+
+					//日期格式化方法
+				var formartDate = function (y,m,d,symbol) {
+					symbol = symbol || '-';
+					m = (m.toString())[1] ? m : '0'+m;
+					d = (d.toString())[1] ? d : '0'+d;
+					//console.log('日期格式化：'+y+symbol+m+symbol+d);
+					return y+symbol+m+symbol+d
+				}
+				//为切换日期按钮绑定事件
+				var bindEvent = function (){
+					el.addEventListener('click',function(e){
+						switch (e.target.id) {
+							case 'nextMonth': 
+								nextMonthFun();
+								break;
+							case 'nextYear': 
+								nextYearFun();
+								break;
+							case 'prevMonth': 
+								prevMonthFun();
+								break;
+							case 'prevYear': 
+								prevYearFun();
+								break;
+							default:
+								break;
+						};
+						//选择日期
+						if(e.target.className.indexOf('currentDate') > -1){
+							selectedDate = e.target.title;//选择时间
+							day = e.target.innerHTML;
+							console.log(selectedDate);
+							render();
+						}
+					},false)
+					
+				}
+				//遍历日期样式 头部
+				var init = function () {
+					var scheduleHd = '<div class="date-hd">'+
+										'<div>'+
+											'<span class="arrow" id="prevYear" >"<<"</span>'+
+											'<span class="arrow" id="prevMonth">"<"</span>'+
+										'</div>'+
+										'<div class="today">'+formartDate(year,month+1,day,'-')+'</div>'+
+										'<div>'+
+											'<span class="arrow" id="nextMonth">">"</span>'+
+											'<span class="arrow" id="nextYear">">>"</span>'+
+										'</div>'+
+									'</div>'
+					var scheduleWeek = '<ul class="week-ul ul-box">'+
+											'<li>日</li>'+
+											'<li>一</li>'+
+											'<li>二</li>'+
+											'<li>三</li>'+
+											'<li>四</li>'+
+											'<li>五</li>'+
+											'<li>六</li>'+
+										'</ul>'
+					var scheduleBd = '<ul class="schedule-bd ul-box" ></ul>'; 
+					el.innerHTML = scheduleHd + scheduleWeek + scheduleBd;
+					bindEvent();
+					render();
+				}
+				var render = function () {
+					var fullDay = new Date(year,month+1,0).getDate(), //当月总天数
+						startWeek = new Date(year,month,1).getDay(), //当月第一天是周几
+						total = (fullDay+startWeek)%7 == 0 ? (fullDay+startWeek) : fullDay+startWeek+(7-(fullDay+startWeek)%7),//元素总个数
+						lastMonthDay = new Date(year,month,0).getDate(), //上月最后一天
+						eleTemp = [];
+						//console.log("当月总天数："+fullDay);
+						//console.log("当月第一天是周几:"+startWeek);
+						//console.log("上月最后一天："+lastMonthDay);
+						//console.log("总块数："+total);
+					for(var i = 0; i < total; i++){
+						if(i<startWeek){
+							//小于这个月第一天是周几的就是上个月
+							eleTemp.push('<li class="other-month"><span class="dayStyle">'+(lastMonthDay-startWeek+1+i)+'</span></li>')
+							//console.log(''+lastMonthDay-startWeek+1+i);
+						}else if(i<(startWeek+fullDay)){
+							//小于这个月总天数加上第一天周几的就是当月时间
+							var nowDate = formartDate(year,month+1,(i+1-startWeek),'-');//现在时间
+							var addClass = '';
+							selectedDate == nowDate && (addClass = 'selected-style');//是否是已选择的时间
+							formartDate(currentYear,currentMonth+1,currentDay,'-') == nowDate && (addClass = 'today-flag');//判断是不是当前时间
+							eleTemp.push('<li class="current-month" ><span title='+nowDate+' class="currentDate dayStyle '+addClass+'">'+(i+1-startWeek)+'</span></li>')
+							//console.log(i+1-startWeek);
+						}else{
+							//否则就是下个月的时间
+							eleTemp.push('<li class="other-month"><span class="dayStyle">'+(i+1-(startWeek+fullDay))+'</span></li>')
+							//console.log(i+1-(startWeek+fullDay));
+						}
+					}
+					el.querySelector('.schedule-bd').innerHTML = eleTemp.join('');
+					el.querySelector('.today').innerHTML = formartDate(year,month+1,day,'-');
+				};
+				//按钮，下一个月
+				var nextMonthFun = function(){
+					if(month+1 > 11){
+						year += 1;
+						month = 0;
+					}else{
+						month += 1;
+					}
+					render();
+				}
+				//按钮，下一年
+				var nextYearFun = function () {
+					year += 1;
+					render();
+				}
+				//按钮，上一个月
+				var prevMonthFun = function () {
+					if(month-1 < 0){
+						year -= 1;
+						month = 11;
+					}else{
+						month -= 1;
+					}
+					render();
+				}
+				//按钮，上一年
+				var prevYearFun = function () {
+					year -= 1;
+					render();
+				};
+				init();
+			}
+
+	
+			date_unit("date_box");
+
+		</script>
+	</body>
+</html>

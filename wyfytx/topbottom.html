@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>上下翻页</title>
+		<style>
+			*{
+				margin:0px;
+				padding:0px;
+			}
+			.window{
+				width:100vw;
+				height:100vh;
+				overflow: hidden;
+			}
+			.father{
+				overflow:hidden;
+				width:100vw;
+				height:100vh;
+			}
+			#faWindow{
+				width:100vw;
+				height:100vh;
+				background:#f8f8f8;
+				
+			}
+			.faWindowSon{
+				width:100vw;
+				height:100vh;
+				text-align: center;
+				font-size:100px;
+				color:#fff;
+			}
+			.addTransition{
+				transition:0.3s;
+			}
+			/*上一页按钮*/
+			.toptab{
+				width:150px;
+				height: 50px;
+				position:fixed;
+				left:0px;
+				right:0px;
+				margin:0px auto;
+				top:10px;
+				font-size:50px;
+				line-height: 50px;
+				color: rgba(0,0,0,.5);
+				text-align:center;
+			}
+			/*下一页按钮*/
+			.bottomtab{
+				width:150px;
+				height: 50px;
+				position:fixed;
+				left:0px;
+				right:0px;
+				margin:0px auto;
+				bottom:10px;
+				font-size:50px;
+				line-height: 50px;
+				color: rgba(0,0,0,.5);
+				text-align:center;
+			}
+
+		</style>
+	</head>
+	<body>
+		<div class="window">
+			<div id='faWindow'>
+				<div class='faWindowSon' style="background:#f6941d;">
+					<p></p>
+				</div>
+				<div class='faWindowSon' style='background:#99cc33;'>
+					<p></p>
+				</div>
+				<div class='faWindowSon' style='background:#24998d;'>
+					<p></p>
+				</div>
+				<div class='faWindowSon' style='background:#0080ff;'>
+					<p></p>
+				</div>
+				<div class='faWindowSon' style='background:#800080;'>
+					<p></p>
+				</div>
+				<div class='faWindowSon' style='background:#c71585;'>
+					<p></p>
+				</div>
+
+			</div>
+		</div>
+		<!--上一页-->
+		<div class="toptab">︿</div>
+		<!--下一页-->
+		<div class="bottomtab">﹀</div>
+		<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+		<script>
+			$(function(){
+				$('#faWindow').on('touchstart',faTouchStart);
+				$('#faWindow').on('touchmove',faTouchMove);
+				$('#faWindow').on('touchend',faTouchEnd);
+			});
+			var scrollindex=0;  //当前页面的索引值
+			var totalnum=6;	    //总共页面数(html可设置自动值)
+			var starty=0;       //开始的位置y
+			var endy=0;         //结束的位置y
+
+
+			function faTouchStart(e){
+				e.preventDefault();
+				console.log('触摸屏幕开始！');
+				starty=e.touches[0].pageY;
+			};
+
+			
+			function faTouchMove(e){
+				e.preventDefault();
+				console.log('触摸屏幕移动！');
+				var py=e.touches[0].pageY;
+				//手指能（上或下）让div移动最大限度
+				if (py - starty < 600 && py - starty > -600) {
+        			$('#faWindow').css('margin-top', (py - starty)+'px'); //移动多少距离
+    			}
+    			endy=py;
+			};
+
+			
+			function faTouchEnd(e){
+				e.preventDefault();
+				console.log('触摸屏幕结束！');
+				//向上运动  endy-starty 判断是怎么运动 如果大于100则触发 向上运动 &小于-100 则触发 向下运动
+				//                         (是不是第一页)
+				if (endy - starty > 100 && scrollindex > 0) {
+					scrollindex=scrollindex - 1;
+				//向下运动                          (是不是到最后一页了)
+				}else if(endy - starty < -100 && scrollindex < totalnum - 1){
+					scrollindex=scrollindex + 1;
+				}
+
+				$('#faWindow').css({"transform":"translateY(-"+(scrollindex*100)+"%)",
+									"margin-top":"0px"
+				}).addClass('addTransition');
+				//添加过渡动画
+				//防止过渡动画对下一次触摸影响，在0.3秒后清楚动画，为下一次触摸做准备
+				window.setTimeout(function(){
+					$('#faWindow').removeClass('addTransition');
+				},300);
+				starty=0;
+      			endy=0;
+      			console.log('第'+(scrollindex+1)+'页');
+			};
+
+			//电脑端适配
+			//上一页
+			$('.toptab').click(function(e){
+				if(scrollindex-1 >= 0){
+					scrollindex--;
+					$('#faWindow').css({"transform":"translateY(-"+(scrollindex*100)+"%)","margin-top":"0px"}).addClass('addTransition');
+					//防止过渡动画对下一次触摸影响，在0.3秒后清楚动画，为下一次触摸做准备
+					window.setTimeout(function(){$('#faWindow').removeClass('addTransition');},300);
+				}
+			});
+			//下一页
+			$('.bottomtab').click(function(e){
+				if(scrollindex+1 < totalnum){
+					scrollindex++;
+					$('#faWindow').css({"transform":"translateY(-"+(scrollindex*100)+"%)","margin-top":"0px"}).addClass('addTransition');
+					//防止过渡动画对下一次触摸影响，在0.3秒后清楚动画，为下一次触摸做准备
+					window.setTimeout(function(){$('#faWindow').removeClass('addTransition');},300);
+				}
+			});
+		</script>
+
+
+
+	</body>
+
+
+</html>

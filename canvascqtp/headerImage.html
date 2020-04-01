@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0"/>
+	<title>Canvas裁切头像</title>
+	<style>
+		*{
+			margin:0px;
+			padding:0px;
+		}
+		.button{
+			width:20%;
+			height:50px;
+			background:#1599FA;
+			border:1px solid #81a4c4;
+			margin:10px;
+			border-radius:5px;
+			cursor: pointer;
+			text-align:center;
+			line-height:50px;
+			color:white;
+			font-size: 25px;
+			position:fixed;
+			left:0px;
+			top:0px;
+			right:0px;
+			z-index: 100;
+			margin-left:auto;
+			margin-right:auto;
+		}
+		.button input{
+			display: none;
+		}
+		.deposit{
+			width:100%;
+			height:50px;
+			line-height:50px;
+			text-align:center;
+			position:fixed;
+			left:0px;
+			bottom:0px;
+			right:0px;
+			z-index: 100;
+			margin-left:auto;
+			margin-right:auto;
+			font-size: 25px;
+			background:rgba(0,0,0,.5);
+			color:white;
+		}
+		/*触摸层*/
+		#touch{
+			width:100vw;
+			height:100vh;
+			position:fixed;
+			left: 0px;
+			top:0px;
+			z-index:98;
+		}
+		/*截图辅助层（显示需要保存的区域）*/
+		.horn{
+			position:fixed;
+			left:0px;
+			top:0px;
+			bottom:0px;
+			right:0px;
+			margin:auto;
+			width:100px;
+			height:100px;
+			border:1px solid #ccc;
+			z-index:90;
+		}
+		/*左上角*/
+		.horn_top{
+			width:10px;
+			height: 10px;
+			border-top:2px solid #ccc;
+			border-left:2px solid #ccc;
+			position:absolute;
+			left:0px;
+			top:0px;
+		}
+		/*右上角*/
+		.horn_right{
+			width:10px;
+			height: 10px;
+			border-top:2px solid #ccc;
+			border-right:2px solid #ccc;
+			position:absolute;
+			right:0px;
+			top:0px;
+		}
+		/*右下角*/
+		.horn_bottom{
+			width:10px;
+			height: 10px;
+			border-bottom:2px solid #ccc;
+			border-right:2px solid #ccc;
+			position:absolute;
+			right:0px;
+			bottom:0px;
+		}
+		/*左下角*/
+		.horn_left{
+			width:10px;
+			height: 10px;
+			border-bottom:2px solid #ccc;
+			border-left:2px solid #ccc;
+			position:absolute;
+			left:0px;
+			bottom:0px;
+		}
+		/*旋转图像*/
+		.rotate{
+			text-align:center;
+			line-height:50px;
+			width:50px;
+			height:50px;
+			background:#1599FA;
+			border:1px solid #81a4c4;
+			font-size:15px;
+			position:fixed;
+			right:5px;
+			bottom:55px;
+			z-index:99;
+			color:white;
+			border-radius:10px;
+			font-weight:bold;
+			
+		}
+	</style>
+</head>
+<body>
+<div class="button">选择文件<input type="file" id="file" accept="image/*" /></div>
+<div class='deposit'>保存</div>
+<canvas id='canvas'>您的设备不支持canvas！</canvas>
+<div class="horn">
+	<div class="horn_top"></div>
+	<div class="horn_right"></div>
+	<div class="horn_bottom"></div>
+	<div class="horn_left"></div>
+</div>
+<div id="touch"></div>
+<div class='rotate'>旋转</div>
+
+<script src="http://libs.baidu.com/jquery/2.1.4/jquery.min.js"></script>
+<script>
+	var c = document.querySelector('#canvas');
+	var touch = document.querySelector('#touch');
+	var cxt = c.getContext("2d");
+	var scale = 1;//缩放比例
+	var startLeft;
+	var startTop;
+	var startW;
+	var startH;
+	var x;
+	var y;
+	var imgW;
+	var imgH;
+	var isGesture;//多指操作
+	var isDrag;//单指操作
+	var img;
+
+	c.width = document.documentElement.clientWidth;//获取浏览器窗口大小
+	c.height = document.documentElement.clientHeight-10;//获取浏览器窗口大小
+	$('.button').click(function(){
+		document.getElementById("file").click();
+	});
+	var file=document.getElementById("file");
+	var maxSize=1024*1024*4;//4M
+	file.onchange=function(){
+		if(this.files[0].size > maxSize){
+			alert('选择文件过大！');
+			return;
+		}
+		var reader = new FileReader();
+		reader.readAsDataURL(this.files[0]);
+		reader.onload = function(e){
+			img = new Image();
+			img.src = e.target.result;
+			//console.log(e.target.result);
+			img.onload = function(){
+				/*调整大小*/
+				imgW = img.width;//获取图像原始大小
+				imgH = img.height;
+				/* 如果图片较大 超出了我一屏的大小 */
+				if(imgW > c.width||imgH > c.height){
+					scaleW = c.width/imgW;
+					scaleH = c.height/imgH;
+					//计算一个缩放比例
+					scale = Math.min(scaleW,scaleH);//找最小值
+				}
+				imgW *= scale;
+				imgH *= scale;
+				x = (c.width - imgW)/2;
+				y = (c.height - imgH)/2;
+				//缩放整张图片的尺寸，并且把图片居中显示了
+				cxt.drawImage(img,x,y,imgW,imgH);
+
+			}
+		}
+	}
+	var start = [];//两指之间按下时之间距离
+	var startPoint = {};//单手指按下时在页面中坐标
+	touch.addEventListener('touchstart',function(e){
+		/*双指缩放图片*/
+		if(e.touches.length >= 2){
+			isGesture = true;
+			start[0] = {
+				x:e.touches[0].pageX,
+				y:e.touches[0].pageY
+			};
+			start[1] = {
+				x:e.touches[1].pageX,
+				y:e.touches[1].pageY
+			}
+			startLeft = x;
+			startTop = y;
+			startW = imgW;
+			startH = imgH;
+		}
+		/*单指移动图片*/
+		if(e.touches.length < 2){
+			isDrag = true;
+			startPoint = {
+				x: e.changedTouches[0].pageX,
+				y: e.changedTouches[0].pageY
+			};
+			startLeft = x;
+			startTop = y;
+		}
+
+	});
+	touch.addEventListener('touchmove',function(e){
+		/*双指缩放图片*/
+		if(e.touches.length >= 2 && isGesture){
+			var startDis = getDis(start[0],start[1]);//手指按下时两根手指之间的距离
+			var now = [];
+			now[0] = {
+				x:e.touches[0].pageX,
+				y:e.touches[0].pageY
+			};
+			now[1] = {
+				x:e.touches[1].pageX,
+				y:e.touches[1].pageY
+			};
+			var nowDis = getDis(now[0],now[1]);
+			scale = nowDis/startDis;//新缩放比例
+			//根据手指缩放比例重新计算图片尺寸
+			imgW = startW*scale;
+			imgH = startH*scale;
+			//根据新的图片尺寸重新计算图片位置
+			x = startLeft + (startW -imgW)/2;
+			y = startTop + (startH -imgH)/2;
+
+			/*清除canvas原先的画面 */
+			cxt.clearRect(0,0,c.width,c.height);
+			cxt.drawImage(img,x,y,imgW,imgH);
+		}
+		/*单指移动图片*/
+		if(e.touches.length < 2 && isDrag ){
+			var nowPoint = {
+				x: e.changedTouches[0].pageX,
+				y: e.changedTouches[0].pageY
+			};
+			var disPoint = {//移动了多少距离
+				x: nowPoint.x - startPoint.x,
+				y: nowPoint.y - startPoint.y
+			};
+			x = startLeft + disPoint.x;
+			y = startTop + disPoint.y;
+			/*清除canvas原先的画面 */
+			cxt.clearRect(0,0,c.width,c.height);
+			cxt.drawImage(img,x,y,imgW,imgH);
+
+		}
+
+	});
+	touch.addEventListener('touchend',function(){
+		/*双指缩放图片*/
+		if(isGesture){
+			isGesture=false;//关闭多指操作
+		};
+		/*单指移动图片*/
+		if(isDrag){
+			isDrag = false;//关闭单指
+		};
+		
+	});
+	/*旋转图像*/
+	$('.rotate').click(function(){
+		cxt.clearRect(0,0,c.width,c.height);
+		cxt.translate(x+imgW/2,y+imgH/2);//移动画布中心点，移动到图像中心，默认（0,0）画布左上角
+		cxt.rotate(-Math.PI / 2);//旋转图像45deg
+		cxt.drawImage(img,-imgW/2,-imgH/2);
+		cxt.fillStyle='#FF0000';
+		cxt.fillRect(-5,-5,10,10);
+		//恢复设置(得到想要的效果后在设置回来，防止别的别的操作出现bug)
+		cxt.rotate(Math.PI / 2);
+		cxt.translate(-(x+imgW/2),-(y+imgH/2));
+		//以上是恢复操作
+		cxt.fillStyle='#FF0000';
+		cxt.fillRect(-5,-5,10,10);
+		img.src=c.toDataURL("image/png");//获取旋转后的画布上信息
+		img.onload=function(){
+			cxt.clearRect(0,0,c.width,c.height);
+			cxt.drawImage(img,0,0,img.width,img.height);
+			
+			//重新赋值
+			x=0;
+			y=0;
+			imgW=img.width;
+			imgH=img.height;
+		}
+	});
+	
+	
+	
+	//计算两个坐标点之间的距离
+	function getDis(point,point2){
+		var x = point.x - point2.x;
+		var y = point.y - point2.y;
+		return Math.sqrt((x*x + y*y));
+	}
+
+	/*保存裁切图像*/
+	$('.deposit').click(function(){
+		/*获取裁切框大小*/
+		var horn=$('.horn');
+		console.log(horn);
+		var hornW=horn[0].offsetWidth;//元素宽
+		var hornH=horn[0].offsetHeight;//元素高
+		var hornT=horn[0].offsetTop;//距离父级上边的距离
+		var hornL=horn[0].offsetLeft;//距离父级左边的距离
+		console.log('裁切区宽：'+hornW);
+		console.log('裁切区高：'+hornH);
+		console.log('裁切区X：'+hornL);
+		console.log('裁切区Y：'+hornT);
+		//getImageData(x,y,w,h) 获取canvas中的画面
+		var imgData = cxt.getImageData(hornL,hornT,hornW,hornH);//复制（获取）canvas中指定区域的图像
+		cxt.clearRect(0,0,c.width,c.height);
+		//清楚图像后设置canvas图像大小
+		c.width = hornW;
+		c.height = hornH;
+		cxt.putImageData(imgData,0,0);
+		var url = c.toDataURL("image/png");
+		console.log(url);
+	});
+	
+	
+
+
+</script>
+</body>
+</html>
