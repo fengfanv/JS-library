@@ -1,0 +1,342 @@
+//源码创建
+var http = require('http');
+var fs = require('fs');
+var util = require('util');
+var url = require('url');
+var path = require('path');
+var querystring = require('querystring')
+
+const PUBLIC_PATH = path.join(__dirname, "/\public\/"); //项目地址
+http.createServer(function(request, response) {
+	//response.setHeader("Access-Control-Allow-Origin", "*");
+	//response.setHeader("Access-Control-Allow-Headers", "X-Requested-With");
+	//response.setHeader("Access-Control-Allow-Methods", "PUT,POST,GET,DELETE,OPTIONS");
+	var pathname = url.parse(request.url).pathname;
+	var file_address = path.join(PUBLIC_PATH, decodeURI(pathname));
+	fs.stat(file_address, function(err, stat) {
+		if (err) {
+			if (pathname === '/api/uploadFiles') {
+				request.setEncoding('binary'); //设置接收数据的编码格式，这数据不能强转utf8，转后在转回来就用不了了，解决formdata数据乱码问题
+				var postData = '';
+				request.on('data', function(chunk) {
+					postData += chunk;
+				});
+				request.on('end', function() {
+					response.writeHead(200, {
+						'Content-Type': 'text/plain'
+					});
+
+					//console.log(postData);//这里就是浏览器表单或formdata处理后发过来的数据最原始状态
+
+					//.replace(/^\s\s*/, '')匹配空格
+					//1、找到处理后生成的hex值，已便定位formdata处理过的文件数据和其它数据在发送过来的那个位置
+					//hex值作用，用来标记数据位置（这个其实叫边界字符串）
+					//找上面那个hex值技巧，从尾部找找到\r\n停止
+					var len = postData.length;
+					var i = len;
+					var foundValue = '';
+					//console.log('开始找hex值');
+					while (foundValue !== '\r\n--') {
+						//console.log(foundValue);
+						//console.log(i);
+						i--;
+						foundValue = postData.substr(i, 4);
+
+					}
+					var hexname = postData.substring(i, len).replace(/[\r\n]/g, "");
+					hexname = hexname.substring(0, hexname.length - 2)
+					//console.log(hexname);
+					//至此hexname输出的后16为，为hex值
+
+					//2、根据上面找的hex值把数据切割，分出来
+					var Arr1 = postData.split(hexname + '\r\n');
+					var dataArr = Arr1.slice(1, Arr1.length);
+					var dataArrLen = dataArr.length;
+
+					//console.log(dataArr);
+					//console.log(dataArr.length);浏览器发过来几个数据，这个数组就有多长
+
+					//3、分析数据，把数据状态信息和数据本体提取出来
+					var dataBody = {}; //用来存数据
+
+					//dataArr.forEach(function(item, index) {
+					function dataArrFun(index) {
+						//2020年4月6日，出现问题，存文件好像出现了异步问题,尝试用回调的方法解决
+						if (index === dataArrLen) {
+							//数据处理完毕后返回上传的文件或数据信息
+							response.end(JSON.stringify(dataBody));
+							return false;
+						};
+						var item = dataArr[index];
+						var dataArrFunIndex = index;
+						dataArrFunIndex++;
+
+
+						//item现在是数据状态信息（数据名称）和数据值本身的结合体，
+						var valueData = item.toString();
+						var endzuobiao = valueData.search('\r\n\r\n');
+
+						//3.1、根据endzuobiao坐标之前为数据状态信息(数据名称什么的)
+						//console.log(valueData.substring(0, endzuobiao));//数据状态信息(数据名称什么的)
+
+						var paramArr = valueData.substring(0, endzuobiao).replace(/[\r\n]/g, ";").split(';'); //每个数据的参数信息的arr
+						//console.log(paramArr);
+						var param = {}; //存放每个数据的参数的对象
+						paramArr.forEach(function(paramArrItem, paramArrIndex) {
+							if (paramArrItem.length > 0) {
+								var fuhao = ":"
+								if (paramArrItem.search(":") !== -1) {
+									fuhao = ":";
+								} else {
+									fuhao = "=";
+								}
+								var paramArrItemkey = paramArrItem.split(fuhao)[0].replace(/\ +/g, "").replace(/['"]/g, "");
+								var paramArrItemvalue = paramArrItem.split(fuhao)[1].replace(/\ +/g, "").replace(/['"]/g, "");
+								param[paramArrItemkey] = paramArrItemvalue;
+							}
+						});
+
+
+						//3.2、根据endzuobiao坐标之后为数据本体
+						//console.log('start数据本体');
+						var data1 = valueData.substring(endzuobiao);
+						var data = data1.substring(4, data1.length - 4); //去除数据头尾的换行符
+						//console.log(data);
+						//console.log('end数据本体');
+						if (param['Content-Type'] !== undefined) {
+							//console.log('这应该是图片类数据');
+							/*
+							.png 正常解析保存
+							.jpg 正常解析保存
+							.mp4 正常解析保存
+							.mp3 正常解析保存
+							.txt 正常解析保存，txt内容有中文也会正常保存，
+							.word 正常保存，但是打开时说无法正常读取文件，需要修复，修复后可正常打开
+							*/
+							//把图片类数据写入文件
+							// var filename = Date.now() + param.filename.replace(/['"]/g, "")
+							// //console.log(filename);
+							// //创建可写为流文件
+							// let writerStream = fs.createWriteStream(__dirname + '/' + filename);
+							// writerStream.write(data, 'binary');
+							// // 标记文件末尾
+							// writerStream.end();
+							// // 处理流事件 ==> finish 事件
+							// writerStream.on('finish', () => {
+							// 	//finish所有数据已被写入到底层系统时触发。
+							// 	console.log('写入完成');
+							// 	param.data = filename; //图片类的文件写入文件地址
+							// });
+							// writerStream.on('error', (err) => {
+							// 	console.log('写入失败');
+							// 	console.log(err.stack);
+							// });
+
+							//web上传文件夹，4月05日添加
+							var filename = param.filename.replace(/['"]/g, "");
+							//1、分析文件地址
+							//上传的文件夹里面的文件经过处理后是的文件地址为：lpr/images/picture.jpg
+							var pathArr = filename.split('/');
+							var pathArrLen = pathArr.length;
+							if (pathArrLen >= 2) {
+								//有文件夹，检测文件夹是否存在，没有则创建
+								function ss(ssNumber) {
+									if (ssNumber === pathArrLen - 1) {
+										//写入文件
+										console.log('写入文件的地址');
+										let writerStream = fs.createWriteStream(PUBLIC_PATH + filename);
+										writerStream.write(data, 'binary'); // 标记文件末尾
+										writerStream.end();
+										writerStream.on('finish', () => {
+											console.log('写入完成' + filename);
+											param.data = filename;
+											dataArrFun(dataArrFunIndex); //执行回调
+										});
+										writerStream.on('error', (err) => {
+											console.log('写入失败' + filename);
+											console.log(err.stack);
+											dataArrFun(dataArrFunIndex); //执行回调
+										});
+										return false;
+									}
+									let testAddress = PUBLIC_PATH + pathArr.slice(0, ssNumber + 1).join('/');
+									let sz = ssNumber;
+									sz++;
+									fs.stat(testAddress, function(pathErr) {
+										if (pathErr) {
+											//没有文件夹则创建
+											fs.mkdir(testAddress, function(createDirErr) {
+												if (createDirErr) {
+													console.log('创建文件夹错误,' + testAddress);
+													console.log(createDirErr);
+													return false;
+												}
+												ss(sz);
+											});
+											return false;
+										}
+										//有文件夹，不用创建，直接检测下一个
+										ss(sz);
+									});
+								}
+								ss(0);
+							} else {
+								//没有文件夹，直接保存
+								let writerStream = fs.createWriteStream(PUBLIC_PATH + filename);
+								writerStream.write(data, 'binary'); // 标记文件末尾
+								writerStream.end();
+								writerStream.on('finish', () => {
+									console.log('写入完成');
+									param.data = filename;
+									dataArrFun(dataArrFunIndex); //执行回调
+								});
+								writerStream.on('error', (err) => {
+									console.log('写入失败');
+									console.log(err.stack);
+									dataArrFun(dataArrFunIndex); //执行回调
+								});
+							}
+
+						} else {
+							//普通数据,字符串型数据，啥的，object型数据会被formdata解析成[object object]所以obj要转换成字符串
+							//如果普通数据中有中文，则会在接收数据时解析成乱码
+							var data111 = data.replace(hexname, ""); //剔除尾部hex标识
+							var data222 = data111.replace(/[\r\n]/g, ""); //剔除换行符
+							param.data = data222; //普通数据写入数据本体
+							dataArrFun(dataArrFunIndex); //执行回调
+						}
+						//console.log(param);
+						dataBody[param.name] = param; //把所有数据存到dataBody中已方便使用
+						//console.log('paramArr----------');
+					};
+					dataArrFun(0);
+					//});
+					//response.end(JSON.stringify(dataBody));
+					//正常返回这个数据
+					// {
+					// 	"files": {//这个files是formdata时数据的名称
+					// 		"Content-Disposition": "form-data",
+					// 		"name": "files",
+					// 		"filename": "ç®å-MCçå¤©ä»»-6903224.mp3",//这个乱码是因为原文件名是中文的，接口接收数据时是已编码格式binary接收的数据，binary无法解析中文
+					// 		"Content-Type": "audio/mp3"//只有是图片类这种文件才有这个参数，普通数据没有这个参数
+					//		"data":""//这里正常没有data，这时因为writerStream.write()这个是异步的
+					// 	},
+					// 	"wangzhi": {//这个wangzhi是formdata时数据的名称
+					// 		"Content-Disposition": "form-data",
+					// 		"name": "wangzhi",//formdata时数据的名称
+					// 		"data": "1"//普通数据的数据本体
+					// 	}
+					// }
+					//
+				});
+			} else {
+				response.writeHead(404, {
+					'Content-Type': 'text/html'
+				})
+				response.end('状态：404，没有这样的文件或目录！');
+			}
+			//console.log(err);
+		} else {
+			let file_type = pathname.split('.')[1];
+			var MIME = ''
+			if (file_type == 'html' || file_type == 'htm') {
+				MIME = 'text/html'
+			} else if (file_type == 'css') {
+				MIME = 'text/css'
+			} else if (file_type == 'js') {
+				MIME = 'text/javascript'
+			} else if (file_type == 'png') {
+				MIME = 'image/png'
+			} else if (file_type == 'jpg' || file_type == 'jpeg') {
+				MIME = 'image/jpeg'
+			} else if (file_type == 'gif') {
+				MIME = 'image/gif'
+			}
+			fs.readFile(file_address, function(err, fileData) {
+				if (err) {
+					console.log(err);
+				}
+				response.writeHead(200, {
+					'Content-Type': MIME
+				})
+				response.end(fileData);
+			})
+		}
+	})
+
+
+}).listen(80);
+console.log('服务地址', 80);
+
+//fs.readFile(__dirname+'/public/uploadFiles/无标题.png',function(err,data){
+//if(err) console.log(err);
+//console.log(data);
+//console.log(data.toString('ascii'));
+//console.log(data.toString('utf8'));
+//})
+
+// fs.readFile(__dirname + '/public/uploadFiles/无标题.png', function(err, data) {
+// 	if (err) console.log(err);
+// 	//console.log(data.toString('ascii'));
+// 	//console.log(Buffer.from(data.toString('ascii')))
+// 	var data1 = data.toString('ascii');
+// 	var data2 = Buffer.from(data1,'ascii');
+// 	//数据转成字符串在转回来，在从新写入就不行了，所以接收数据时必须以二进制流的形式接收；
+// 	fs.writeFile(__dirname + '/' + Date.now() + '无标题.png', data2, function(err) {
+// 		if (err) {
+// 			console.log('写入错误');
+// 			console.log(err);
+// 		} else {
+// 			console.log('写入成功')
+// 		}
+// 	});
+// })
+
+
+//用node模拟web端formdata处理过得文件数据
+// var mkpic = function(pic, fn) {
+// 	var mimes = {
+// 		'.png': 'image/png',
+// 		'.gif': 'image/gif',
+// 		'.jpg': 'image/jpeg',
+// 		'.jpeg': 'image/jpeg'
+// 	};
+// 	var ext = path.extname(pic);
+// 	var mime = mimes[ext];
+// 	if (!mime) return;
+// 	fs.readFile(pic, function(err, data) {
+// 		content = util.format('Content-Disposition: form-data; name="pic"; filename="%s"\r\n', pic);
+// 		content += util.format('Content-Type: %s\r\n\r\n', mime);
+// 		content += data;
+// 		fn(content);
+// 	});
+// }
+// var mkfield = function(field, value) {
+// 	return util.format('Content-Disposition: form-data; name="%s"\r\n\r\n%s', field, value);
+// }
+// var post = function(param, onsuccess, onfailer) {
+// 	if (param.pic) {
+// 		mkpic(param.pic, function(pic) {
+// 			var data = [pic];
+// 			delete param.pic;
+// 			for (var i in param) {
+// 				data.push(mkfield(i, param[i]));
+// 			}
+// 			var BOUNDARYPREFIX = '------kangyang'
+// 			var max = 9007199254740992;
+// 			var dec = Math.random() * max;
+// 			var hex = dec.toString(36);
+// 			var boundary = BOUNDARYPREFIX + hex;
+
+// 			var body = util.format('Content-Type: multipart/form-data; boundary=%s\r\n\r\n', boundary) +
+// 				util.format('%s\r\n', boundary) +
+// 				data.join(util.format('\r\n--%s\r\n', boundary)) +
+// 				util.format('\r\n%s--', boundary);
+
+// 			console.log(body);
+// 		});
+// 	}
+// }
+// post({
+// 	"pic": __dirname + '/public/uploadFiles/无标题.png'
+// })

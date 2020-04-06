@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>上传文件夹测试</title>
+	</head>
+	<body>
+		<h1>Chrome上传文件夹</h1>
+		<input type="file" id="files" webkitdirectory mozdirectory />
+		<button type="button">上传</button>
+		<script src="./jquery.js" type="text/javascript" charset="utf-8"></script>
+		<script type="text/javascript">
+			$("button").click(function() {
+				var files = document.getElementById('files').files;
+				console.log(files);
+				if (files.length >= 1) {
+					var form = new FormData();
+					//form.append("files", files);
+					var filesLen = files.length;
+					for(var i=0;i<filesLen;i++){
+						form.append("files"+i, files[i]);
+					}
+					//form.append("wangzhi",JSON.stringify({"haha":1,"lala":"我是啦啦"}));
+					$.ajax({
+						type: "post",
+						url: "/api/uploadFiles",
+						data: form,
+						contentType: false, // 注意这里应设为false
+						processData: false, //false
+						cache: false, //缓存
+						success: function(data) {
+							console.log(data);
+						}
+					})
+				}
+			})
+		</script>
+	</body>
+</html>
