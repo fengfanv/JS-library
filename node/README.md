@@ -48,6 +48,92 @@
 
 ---
 
+### ajax上传文件查看上传进度
+
+只需配置前端就可以，后端不用配置
+
+```html
+<body>
+	<input type="file" id="files" />
+	<button type="button">上传文件</button>
+	<script src="./jquery.js" type="text/javascript" charset="utf-8"></script>
+	<script type="text/javascript">
+		$("button").click(function() {
+			var files = document.getElementById('files').files;
+			console.log(files);
+			if (files.length >= 1) {
+				var form = new FormData();
+				form.append("files", files[0]);
+				
+				//原生ajax实现上传文件显示上传进度--------------------------
+				var xhr = new XMLHttpRequest();
+				xhr.open('post', '/api/uploadFiles', true);
+				xhr.onreadystatechange = function() {
+					if (this.readyState == 4) {
+						//console.log(this.responseText);打印上传的数据信息
+					}
+				};
+				//1、progress事件：用来返回进度信息
+				//	下载的progress事件属于XMLHttpRequest对象//xhr.onprogress=function(){}
+				//	上传的progress事件属于XMLHttpRequest.upload对象xhr.upload.onprogress=function(){}
+				//2、load事件：传输成功完成。
+				//3、abort事件：传输被用户取消。
+				//4、error事件：传输中出现错误。
+				//5、loadstart事件：传输开始。
+				//6、loadEnd事件：传输结束，但是不知道成功还是失败。
+				xhr.upload.onprogress = function(ev) {
+					//console.log(ev);//控制台打印
+					/*progress { 
+						target: XMLHttpRequestUpload, 
+						isTrusted: true, 
+						lengthComputable: true,//可计算长度
+						loaded: 15020, //已上传的数据大小，单位字节B，1024B===1KB
+						total: 15020,//总大小，单位字节B，
+						eventPhase: 0, 
+						bubbles: false, 
+						cancelable: false, 
+						defaultPrevented: false, 
+						timeStamp: 1445144855459000, 
+						originalTarget: XMLHttpRequestUpload
+					}*/
+					if (ev.lengthComputable) {
+						var precent = 100 * ev.loaded / ev.total;
+						console.log(precent);
+					};
+				};
+				xhr.send(form);
+				
+				//jq,ajax实现上传文件显示上传进度---------------------------
+				$.ajax({
+					type: "post",
+					url: "/api/uploadFiles",
+					data: form,
+					contentType: false, //必须false才会自动加上正确的Content-Type
+					processData: false, //必须false才会避开jQuery对formdata的默认处理
+					cache: false, //缓存
+					xhr: function() {
+						//获取ajaxSettings中的xhr对象，为它的upload属性绑定progress事件的处理函数  
+						myXhr = $.ajaxSettings.xhr();
+						if (myXhr.upload) { //检查upload属性是否存在  
+							//绑定progress事件的回调函数  
+							myXhr.upload.addEventListener('progress', function(ev) {
+								if (ev.lengthComputable) {
+									var precent = 100 * ev.loaded / ev.total;
+									console.log(precent);
+								}
+							}, false);
+						};
+						return myXhr; //xhr对象返回给jQuery使用  
+					},
+					success: function(data) {
+						console.log(data);
+					};
+				});
+			};
+		});
+	</script>
+</body>
+```
 ### fs模块文件读写
 ```javascript
 var fs = require("fs");
