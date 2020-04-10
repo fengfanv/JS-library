@@ -48,6 +48,19 @@
 
 ---
 
+### package.json
+
+功能：
+
+1、用来保存工程元数据
+
+2、用来描述工程依赖项
+
+```
+
+
+```
+
 ### ajax上传文件查看上传进度
 
 只需配置前端就可以，后端不用配置
@@ -81,12 +94,13 @@
 				//4、error事件：传输中出现错误。
 				//5、loadstart事件：传输开始。
 				//6、loadEnd事件：传输结束，但是不知道成功还是失败。
+				//xhr.upload.onprogress要写在xhr.send方法前面，否则event.lengthComputable状态不会改变，只有在最后一次才能获得，也就是100%的时候
 				xhr.upload.onprogress = function(ev) {
 					//console.log(ev);//控制台打印
 					/*progress { 
 						target: XMLHttpRequestUpload, 
 						isTrusted: true, 
-						lengthComputable: true,//可计算长度
+						lengthComputable: true,//这是一个状态，表示发送的长度有了变化，可计算
 						loaded: 15020, //已上传的数据大小，单位字节B，1024B===1KB
 						total: 15020,//总大小，单位字节B，
 						eventPhase: 0, 
