@@ -13,7 +13,11 @@ class demo extends Component{
 	componentWillMount() {
 	    console.log('组件将要挂载到页面上-componentWillMount');
 		//这时已经能访问到this.state里数据
+		//子组件第一次挂载前在这里已经能访问到this.props里的数据
 		//组件将要更新（改变）时不执行这个函数，将要更新时执行componentWillUpdate
+		
+		//不管是子组件还是父组件，只要是组件不重新挂载不重新运行，只是组件更新数据改变都不重新运行这个函数，
+		//因为更新数据而改变组件前运行componentWillUpdate
 	}
 	render() {
 	    console.log('render-组件挂载中');
@@ -23,9 +27,16 @@ class demo extends Component{
 	componentDidMount() {
 		console.log('componentDidMount-组件挂载完成时执行');
 		//组件更新（改变）完成时不执行这个函数，更新（改变）完成执行componentDidUpdate
+		
+		//不管是子组件还是父组件，只要是组件不重新挂载不重新运行，只是组件更新数据改变都不重新运行这个函数，
+		//因为更新数据而改变组件渲染完运行componentDidUpdate
 	}
 	shouldComponentUpdate(nextProps, nextState) {
-	    console.log('询问组件是否需要改变-shouldComponentUpdate')
+	    console.log('Props或State发生改变询问组件是否需要变化-shouldComponentUpdate')
+		
+		//如果当前是子组件，发现Props发生改变，子组件会先执行componentWillReceiveProps函数，
+		//componentWillReceiveProps执行后再执行当前函数
+		
 		//在这里数组，对象类型新旧数据不做处理直接进比较是否不一样时，不管数据一样还是不一样都会按有变化执行
 		//如：this.props.data.testArr !== nextProps.data.testArr //不管这新旧数组是否一样都会返回true
 	    return true;
