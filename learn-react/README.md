@@ -1,7 +1,8 @@
 # React记事本
 **谨记：每个框架都有其自己的特点，这也是为什么有这么多优秀的框架出现的原因。正因为都有各自的特点，所以编程方式上会有一些区别。能利用好这些好的特点才能成为 好的程序员 加油！**
 
-## 解决之前react生命周期数据比较的坑
+## react的坑start
+#### 解决之前react生命周期及数据比较的坑
 ```javascript
 import React,{Component,Fragment} from 'react';
 class demo extends Component{
@@ -41,7 +42,8 @@ class demo extends Component{
 	    console.log('Props或State发生改变询问组件是否需要变化-shouldComponentUpdate');
 		
 		//1、如果当前是子组件，发现Props发生改变，子组件会先执行componentWillReceiveProps方法，
-		//子组件内接收到props新数据，componentWillReceiveProps方法执行后再执行当前函数
+		//子组件内接收到props新数据，componentWillReceiveProps方法执行后再执行当前函数，
+		//由数据改变而触发该方法，不管是否真有变化，react不会为我们做处理，需要我们自己进行处理判断
 		
 		//2、在这里数组，对象类型新旧数据不做处理直接进比较是否不一样时，不管数据一样还是不一样都会按有变化执行
 		//如：this.props.data.testArr !== nextProps.data.testArr //不管这新旧数组是否一样都会返回true
@@ -60,7 +62,8 @@ class demo extends Component{
 		
 		//1、子组件第一挂载到页面上时（也就是第一次接收数据时不执行），
 		//只有当父组件再次传过来的props才执行，
-		//子组件可以利用componentWillMount方法解决第一次接收到props时不执行的问题
+		//子组件可以利用componentWillMount方法解决第一次接收到props时不执行的问题，
+		//传来的数据新旧都一样，react不会帮我们进行分辨，都会触发该方法，所以在这里需要我们对传来数据做业务处理（做判断）
 		
 		//2、在这里数组，对象类型新旧数据不做处理直接进比较是否不一样时，不管数据一样还是不一样都会按有变化执行
 		//如：this.props.data.testArr !== nextProps.data.testArr //不管这新旧数组是否一样都会返回true
@@ -71,7 +74,7 @@ class demo extends Component{
 }
 export default App
 ```
-## react的坑start
+
 #### 1、react里模仿vue指令v-if时出现的问题
 ```javascript
 //这种方法目前有弊端，就是当你这个p标签是子组件时，当前为显示，关闭显示后，在打开，这个子组件里面的如果有数据需要动态渲染，那么打开后它也不报错，也不渲染数据，调各种生命周期都不行，这个问题待解决！！！
@@ -84,7 +87,7 @@ render(){
 	)
 }
 ```
-1.2、解决上面的坑出现上面的问题可能是因为在引用的 子组件 里面使用用了 componentWillReceiveProps 生命周期
+1.2、~~解决上面的坑出现上面的问题可能是因为在引用的 子组件 里面使用用了 componentWillReceiveProps 生命周期~~
 ```javascript
 //出现问题的子组件修改之前的写法
 
@@ -101,42 +104,13 @@ componentWillReceiveProps(nextPorps) {
     }
 }
 ```
-~~componentWillReceiveProps 执行的条件是 当组件接收到props数据时或接收到新数据（哪怕新旧数据都一样也执行）或 父组件render结果发生变化（即当前组件发生变化）则执行~~
+最新解释：之前出现上面的结论是因为当时对react还不熟悉，对js数据判断有误解造成的。最新解答看 [解决之前react生命周期及数据比较的坑](#解决之前react生命周期及数据比较的坑)
 
-componentWillReceiveProps 接收到新参数时 或 父组件render后执行
-```javascript
-//解决后的代码
-
-componentWillReceiveProps(nextPorps) {
-    var _this = this;
-    //当组件接收到props时执行
-    /*if (_this.props.data !=  nextPorps.data) {
-      _this.setState({
-        mapData: nextPorps.data
-      }, function () {
-        _this.loadMap();
-      });
-    }*/
-	//2020年02月修改
-	/*
-	修改成这样是因为这个里的data是对象和数组类型的,这样写会造成一些错误理解
-	//提示：{"name":1} !== {"name":1} ==>true
-	//提示：[1,2,3] !== [1,2,3] ==>true
-	//提示：[1,2,3] !== [] ==>true
-	*/
-	if(_this.props.data !== null && _this.props.data !== undefined){
-		_this.setState({
-			mapData: nextPorps.data
-		}, function () {
-			_this.loadMap();
-		});
-	}
-}
-```
 ----
 #### 2、解决react（版本：16.12.0）兼容ie11，ie10
 1、IE控制台报 “语法错误” 这种错
 !['语法错误'](images/react-bug02.png);
+
 1.2、进入项目package.json，在browserslist下分别给production和development内各添加一个这个值 "ie 11" 
 ```javascript
 "browserslist": {
