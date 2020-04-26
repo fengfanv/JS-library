@@ -1,6 +1,56 @@
 # React记事本
 **谨记：每个框架都有其自己的特点，这也是为什么有这么多优秀的框架出现的原因。正因为都有各自的特点，所以编程方式上会有一些区别。能利用好这些好的特点才能成为 好的程序员 加油！**
 
+## 解决之前react生命周期数据比较的坑
+```javascript
+import React,{Component,Fragment} from 'react';
+class demo extends Component{
+	constructor(props) {
+	    super(props)
+	        this.state = {}
+	    }
+	}
+	componentWillMount() {
+	    console.log('组件将要挂载到页面上-componentWillMount');
+		//这时已经能访问到this.state里数据
+		//组件将要更新（改变）时不执行这个函数，将要更新时执行componentWillUpdate
+	}
+	render() {
+	    console.log('render-组件挂载中');
+		//负责组件渲染，组件第一次，和改变都会执行
+	    return ()
+	}
+	componentDidMount() {
+		console.log('componentDidMount-组件挂载完成时执行');
+		//组件更新（改变）完成时不执行这个函数，更新（改变）完成执行componentDidUpdate
+	}
+	shouldComponentUpdate(nextProps, nextState) {
+	    console.log('询问组件是否需要改变-shouldComponentUpdate')
+		//在这里数组，对象类型新旧数据不做处理直接进比较是否不一样时，不管数据一样还是不一样都会按有变化执行
+		//如：this.props.data.testArr !== nextProps.data.testArr //不管这新旧数组是否一样都会返回true
+	    return true;
+	}
+	componentWillUpdate() {
+		//上一个shouldComponentUpdate返回true才会被执行
+		console.log('组件在改变之前执行-componentWillUpdate');
+	}
+	componentDidUpdate() {
+	    console.log('组件改变后执行-componentDidUpdate')
+	}
+	componentWillReceiveProps(nextProps) {
+	    console.log('子组件接收到props-componentWillReceiveProps')
+		//子组件第一挂载到页面上时（也就是第一次接收数据时不执行），
+		//只有当父组件再次传过来的props才执行
+		
+		//在这里数组，对象类型新旧数据不做处理直接进比较是否不一样时，不管数据一样还是不一样都会按有变化执行
+		//如：this.props.data.testArr !== nextProps.data.testArr //不管这新旧数组是否一样都会返回true
+	}
+	componentWillUnmount() {
+	    console.log('组件在卸载前执行-componentWillUnmount')
+	}
+}
+export default App
+```
 ## react的坑start
 #### 1、react里模仿vue指令v-if时出现的问题
 ```javascript
