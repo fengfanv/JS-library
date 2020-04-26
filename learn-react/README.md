@@ -12,52 +12,61 @@ class demo extends Component{
 	}
 	componentWillMount() {
 	    console.log('组件将要挂载到页面上-componentWillMount');
-		//这时已经能访问到this.state里数据
-		//子组件第一次挂载前在这里已经能访问到this.props里的数据
-		//组件将要更新（改变）时不执行这个函数，将要更新时执行componentWillUpdate
 		
-		//不管是子组件还是父组件，只要是组件不重新挂载不重新运行，只是组件更新数据改变都不重新运行这个函数，
-		//因为更新数据而改变组件前运行componentWillUpdate
+		//1、这时已经能访问到this.state里数据
+		
+		//2、子组件第一次挂载前在这里已经能访问到this.props里的数据，
+		//在这里可以利用该方法解决componentWillReceiveProps方法在第一次接收父组件数据不执行的问题
+		
+		//3、组件将要更新（改变）时不执行这个函数，组件因更新而改变前执行componentWillUpdate方法
+		
+		//4、不管是子组件还是父组件，只要是组件不重新挂载不重新运行，只是组件更新数据改变都不重新运行这个方法，
+		//由更新数据而改变组件，在渲染前运行componentWillUpdate方法
 	}
 	render() {
-	    console.log('render-组件挂载中');
-		//负责组件渲染，组件第一次，和改变都会执行
+	    console.log('组件正在渲染-render');
+		
+		//1、负责组件渲染，组件第一次，和改变都会执行
 	    return ()
 	}
 	componentDidMount() {
-		console.log('componentDidMount-组件挂载完成时执行');
-		//组件更新（改变）完成时不执行这个函数，更新（改变）完成执行componentDidUpdate
+		console.log('组件挂载完毕后-componentDidMount');
 		
-		//不管是子组件还是父组件，只要是组件不重新挂载不重新运行，只是组件更新数据改变都不重新运行这个函数，
-		//因为更新数据而改变组件渲染完运行componentDidUpdate
+		//1、组件更新（改变）完成时不执行这个方法，更新（改变）完成执行componentDidUpdate方法
+		
+		//2、不管是子组件还是父组件，只要是组件不重新挂载不重新运行，只是组件更新数据改变都不重新运行这个方法，
+		//由更新数据而改变组件，在渲染运行后componentDidUpdate方法
 	}
 	shouldComponentUpdate(nextProps, nextState) {
-	    console.log('Props或State发生改变询问组件是否需要变化-shouldComponentUpdate')
+	    console.log('Props或State发生改变询问组件是否需要变化-shouldComponentUpdate');
 		
-		//如果当前是子组件，发现Props发生改变，子组件会先执行componentWillReceiveProps函数，
-		//componentWillReceiveProps执行后再执行当前函数
+		//1、如果当前是子组件，发现Props发生改变，子组件会先执行componentWillReceiveProps方法，
+		//子组件内接收到props新数据，componentWillReceiveProps方法执行后再执行当前函数
 		
-		//在这里数组，对象类型新旧数据不做处理直接进比较是否不一样时，不管数据一样还是不一样都会按有变化执行
+		//2、在这里数组，对象类型新旧数据不做处理直接进比较是否不一样时，不管数据一样还是不一样都会按有变化执行
 		//如：this.props.data.testArr !== nextProps.data.testArr //不管这新旧数组是否一样都会返回true
 	    return true;
 	}
 	componentWillUpdate() {
-		//上一个shouldComponentUpdate返回true才会被执行
-		console.log('组件在改变之前执行-componentWillUpdate');
+		console.log('组件因更新改变，渲染前执行-componentWillUpdate');
+		
+		//1、上一个shouldComponentUpdate方法返回true才会被执行
 	}
 	componentDidUpdate() {
-	    console.log('组件改变后执行-componentDidUpdate')
+	    console.log('组件更新改变，渲染完成后执行-componentDidUpdate');
 	}
 	componentWillReceiveProps(nextProps) {
-	    console.log('子组件接收到props-componentWillReceiveProps')
-		//子组件第一挂载到页面上时（也就是第一次接收数据时不执行），
-		//只有当父组件再次传过来的props才执行
+	    console.log('子组件接收到props-componentWillReceiveProps');
 		
-		//在这里数组，对象类型新旧数据不做处理直接进比较是否不一样时，不管数据一样还是不一样都会按有变化执行
+		//1、子组件第一挂载到页面上时（也就是第一次接收数据时不执行），
+		//只有当父组件再次传过来的props才执行，
+		//子组件可以利用componentWillMount方法解决第一次接收到props时不执行的问题
+		
+		//2、在这里数组，对象类型新旧数据不做处理直接进比较是否不一样时，不管数据一样还是不一样都会按有变化执行
 		//如：this.props.data.testArr !== nextProps.data.testArr //不管这新旧数组是否一样都会返回true
 	}
 	componentWillUnmount() {
-	    console.log('组件在卸载前执行-componentWillUnmount')
+	    console.log('组件在卸载前执行-componentWillUnmount');
 	}
 }
 export default App
