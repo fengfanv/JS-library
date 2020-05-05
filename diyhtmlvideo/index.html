@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>视频测试</title>
+		<style type="text/css">
+			#jindutiao {
+				width: 100%;
+				height: 50px;
+				background: black;
+				position: relative;
+				overflow: hidden;
+			}
+
+			/*播放进度*/
+			#jindutiao h1 {
+				width: 0%;
+				height: 50px;
+				position: absolute;
+				left: 0px;
+				top: 0px;
+				background: rgb(255, 205, 68);
+				padding: 0px;
+				margin: 0px;
+				z-index: 2;
+			}
+
+			/*缓冲进度*/
+			#jindutiao ul {
+				width: 100%;
+				height: 50px;
+				position: relative;
+				left: 0px;
+				top: 0px;
+				margin: 0px;
+				padding: 0px;
+				list-style: none;
+			}
+
+			#jindutiao li {
+				width: 0%;
+				height: 50px;
+				position: absolute;
+				left: 0px;
+				top: 0px;
+				background: rgb(118, 114, 114);
+				padding: 0px;
+				margin: 0px;
+				z-index: 1;
+			}
+		</style>
+	</head>
+	<body>
+		<video id="video" preload="auto">
+			<source src="http://localhost:8080/files/gsl.mp4" type="video/mp4" />
+			<!-- <source src="files/gsl.mp4" type="video/mp4" /> -->
+		</video>
+		<!--播放按钮-->
+		<div>
+			<button id="playButton">播放</button>
+		</div>
+		<!--视频总长度及当前进度-->
+		<ul>
+			<li id="zongchangdu"></li>
+			<li id="dangqianjindu"></li>
+		</ul>
+		<!--进度条-->
+		<div id="jindutiao">
+			<h1></h1>
+			<ul id="huanchong"></ul>
+		</div>
+		<!--视频状态-->
+		<div id="zhuangtai"></div>
+		<script type="text/javascript">
+			var video = document.getElementById('video');
+			//*****************************************************暂停与播放按钮
+			var playButton = document.getElementById('playButton');
+			playButton.onclick = function() {
+				if (video.paused) {
+					//video.paused //视频是否暂停
+					video.play(); //播放视频方法
+					playButton.innerHTML = '暂停'
+				} else {
+					video.pause(); //暂停视频方法
+					playButton.innerHTML = '播放'
+				}
+			}
+			
+			//*****************************************************视频时间，及当前播放的时间
+			var zongchangdu = document.getElementById('zongchangdu');
+			var dangqianjindu = document.getElementById('dangqianjindu');
+			//监听视频是否准备就绪
+			video.addEventListener('canplay', function() {
+				//duration&video.duration //视频的总长度单位秒
+				//currentTime //当前播放的位置，单位秒
+				console.log(this.duration);
+				console.log(this.currentTime);
+				zongchangdu.innerHTML = '总长度：' + formatTime(this.duration);
+				dangqianjindu.innerHTML = '当前进度：' + formatTime(this.currentTime);
+			});
+			
+			//*****************************************************播放进度条
+			var jindutiao = document.getElementById('jindutiao');
+			var jindutiao_h1 = jindutiao.getElementsByTagName("h1")[0];
+			//监听监听播放进度
+			video.addEventListener('timeupdate', function() {
+				//currentTime //当前播放的位置，单位秒
+				//console.log(this.currentTime);
+				dangqianjindu.innerHTML = '当前进度：' + formatTime(this.currentTime);
+				//渲染进度条进度
+				jindutiao_h1.style.width = this.currentTime / this.duration * 100 + '%';
+			});
+			
+			//*****************************************************缓冲段进度条
+			var huanchong = document.getElementById('huanchong');
+			//监听视频缓冲进度，视频默认不会全部一下子都加载到浏览器上，会边播放边加载
+			//如果不想边播边加载，可以通过修改preload属性来修改video缓冲方式
+			//progress当浏览器正在下载视频时触发
+			video.addEventListener('progress', function() {
+				//console.log(video.buffered)
+				if (video.buffered.length >= 1) {
+					elementEmpty(huanchong);//清空缓冲进度条
+					let len = video.buffered.length;
+					//为什么会有不同的缓冲段，这是为了节省带宽，比如你点击进度条某个位置，
+					//视频就从你点击的那位位置继续加载了，视频开始到点击位置之前就不继续加载了，这样就新建了一个缓冲段
+					for (let i = 0; i < len; i++) {
+						//渲染缓冲每段缓冲条
+						let start = video.buffered.start(i);//每段缓冲开始的秒数
+						//console.log(video.buffered.end(i));
+						let end = video.buffered.end(i);//每段缓冲结束的秒数
+						let Ewidth = (end - start) / this.duration * 100 + '%';
+						let Eleft = (start / this.duration) * jindutiao.offsetWidth +'px';
+						createElement('li',{'width':Ewidth,'left':Eleft},'huanchong');//创建每段的缓冲条
+					}
+				}
+			});
+			//*****************************************************监听视频状态
+			//playing当视频在因缓冲而暂停或停止后已就绪时触发
+			var zhuangtai = document.getElementById('zhuangtai');
+			video.addEventListener('playing', function() {
+				if(video.readyState===0){
+					zhuangtai.innerHTML='状态：没有-关于-视频-是否-就绪的信息';
+				}else if(video.readyState===1){
+					zhuangtai.innerHTML='状态：关于视频就绪的元数据';
+				}else if(video.readyState===2){
+					zhuangtai.innerHTML='状态：关于当前播放位置的数据是可用的，但没有足够的数据来播放下一帧/毫秒';
+				}else if(video.readyState===3){
+					zhuangtai.innerHTML='状态：当前及至少下一帧的数据是可用的';
+				}else if(video.readyState===4){
+					zhuangtai.innerHTML='状态：可用数据足以开始播放';
+				}
+			});
+			
+			//清空子元素
+			function elementEmpty(element) {
+				while (element.hasChildNodes()) {
+					element.removeChild(element.firstChild);
+				}
+			}
+			//创建元素
+			function createElement(name, styleObj,faName) {
+				let element = document.createElement(name);
+				// element.style.cssText = 
+				for (let key in styleObj) {
+					//console.log(key + '---' + obj[key])
+					element.style[key] = styleObj[key]
+				}
+				document.getElementById(faName).appendChild(element)
+			}
+			//时间格式化方法
+			function formatTime(t) {
+				//将'秒'转换成'hh:mm:ss'格式
+				let hh = parseInt(t / 3600); //1小时等于60秒*60秒
+				hh = hh < 10 ? '0' + hh : hh;
+				let mm = parseInt(t % 3600 / 60); //一小时等于60分钟，1分钟等于60秒
+				//总秒数除以1小时的秒数（3600）的余，就是几小时的多少分钟的秒数如3650除3600商1余50,这1就是多少小时，50就是1小时多小分钟的秒数
+				mm = mm < 10 ? '0' + mm : mm;
+				let ss = parseInt(t % 60); //1分钟等于60秒
+				//总秒数/60获取有多少分钟，它的余就是多少分钟多少秒的秒，如3670除60商61余10,这就等于61分钟10秒
+				ss = ss < 10 ? '0' + ss : ss;
+				return hh + ':' + mm + ':' + ss;
+			}
+			
+			//*****************************************************进度条点击进度条跳跃播放,如果浏览器有缩放会定位准
+			var jindutiao_width = jindutiao.offsetWidth;
+			jindutiao.onclick = function(e) {
+				video.currentTime = (e.offsetX / jindutiao_width) * video.duration;
+			}
+		</script>
+	</body>
+</html>

@@ -74,3 +74,5 @@ Bread and butter
 28、[js选择地址方式2_jsxzdz2](https://github.com/fengfanv/JS-library/tree/master/jsxzdz2)
 
 29、[nginx配置案例_nginxpz](https://github.com/fengfanv/JS-library/tree/master/nginxpz)
+
+30、[自定义html Video标签_diyhtmlvideo](https://github.com/fengfanv/JS-library/tree/master/diyhtmlvideo)
