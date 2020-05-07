@@ -212,6 +212,7 @@ function parseFormData(formdata, configdata) {
 				writerStream.on('error', function (err) {
 					console.log(param.filename + '_写入失败');
 					//console.log(err.stack);
+					param.errMessage = '写入文件失败！';
 					if (addIndex !== dataArrLen) {
 						eachArr(addIndex);
 					}

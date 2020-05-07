@@ -7,227 +7,27 @@ var path = require('path');
 var querystring = require('querystring')
 
 const PUBLIC_PATH = path.join(__dirname, "/\public\/"); //项目地址
-http.createServer(function(request, response) {
-	//response.setHeader("Access-Control-Allow-Origin", "*");
-	//response.setHeader("Access-Control-Allow-Headers", "X-Requested-With");
-	//response.setHeader("Access-Control-Allow-Methods", "PUT,POST,GET,DELETE,OPTIONS");
+http.createServer(function (request, response) {
 	var pathname = url.parse(request.url).pathname;
 	var file_address = path.join(PUBLIC_PATH, decodeURI(pathname));
-	fs.stat(file_address, function(err, stat) {
+	fs.stat(file_address, function (err, stat) {
 		if (err) {
 			if (pathname === '/api/uploadFiles') {
-				request.setEncoding('binary'); //设置接收数据的编码格式，这数据不能强转utf8，转后在转回来就用不了了，解决formdata数据乱码问题
+				request.setEncoding('base64'); //设置接收数据的编码格式，这数据不能强转utf8，转后在转回来就用不了了，解决formdata数据乱码问题
 				var postData = '';
-				request.on('data', function(chunk) {
+				request.on('data', function (chunk) {
 					postData += chunk;
 				});
-				request.on('end', function() {
+				request.on('end', async function () {
 					response.writeHead(200, {
-						'Content-Type': 'text/plain'
+						'Content-Type': 'text/json'
 					});
-
-					//console.log(postData);//这里就是浏览器表单或formdata处理后发过来的数据最原始状态
-
-					//.replace(/^\s\s*/, '')匹配空格
-					//1、找到处理后生成的hex值，已便定位formdata处理过的文件数据和其它数据在发送过来的那个位置
-					//hex值作用，用来标记数据位置（这个其实叫边界字符串）
-					//找上面那个hex值技巧，从尾部找找到\r\n停止
-					var len = postData.length;
-					var i = len;
-					var foundValue = '';
-					//console.log('开始找hex值');
-					while (foundValue !== '\r\n--') {
-						//console.log(foundValue);
-						//console.log(i);
-						i--;
-						foundValue = postData.substr(i, 4);
-
-					}
-					var hexname = postData.substring(i, len).replace(/[\r\n]/g, "");
-					hexname = hexname.substring(0, hexname.length - 2)
-					//console.log(hexname);
-					//至此hexname输出的后16为，为hex值
-
-					//2、根据上面找的hex值把数据切割，分出来
-					var Arr1 = postData.split(hexname + '\r\n');
-					var dataArr = Arr1.slice(1, Arr1.length);
-					var dataArrLen = dataArr.length;
-
-					//console.log(dataArr);
-					//console.log(dataArr.length);浏览器发过来几个数据，这个数组就有多长
-
-					//3、分析数据，把数据状态信息和数据本体提取出来
-					var dataBody = {}; //用来存数据
-
-					//dataArr.forEach(function(item, index) {
-					function dataArrFun(index) {
-						//2020年4月6日，出现问题，存文件好像出现了异步问题,尝试用回调的方法解决
-						if (index === dataArrLen) {
-							//数据处理完毕后返回上传的文件或数据信息
-							response.end(JSON.stringify(dataBody));
-							return false;
-						};
-						var item = dataArr[index];
-						var dataArrFunIndex = index;
-						dataArrFunIndex++;
-
-
-						//item现在是数据状态信息（数据名称）和数据值本身的结合体，
-						var valueData = item.toString();
-						var endzuobiao = valueData.search('\r\n\r\n');
-
-						//3.1、根据endzuobiao坐标之前为数据状态信息(数据名称什么的)
-						//console.log(valueData.substring(0, endzuobiao));//数据状态信息(数据名称什么的)
-
-						var paramArr = valueData.substring(0, endzuobiao).replace(/[\r\n]/g, ";").split(';'); //每个数据的参数信息的arr
-						//console.log(paramArr);
-						var param = {}; //存放每个数据的参数的对象
-						paramArr.forEach(function(paramArrItem, paramArrIndex) {
-							if (paramArrItem.length > 0) {
-								var fuhao = ":"
-								if (paramArrItem.search(":") !== -1) {
-									fuhao = ":";
-								} else {
-									fuhao = "=";
-								}
-								var paramArrItemkey = paramArrItem.split(fuhao)[0].replace(/\ +/g, "").replace(/['"]/g, "");
-								var paramArrItemvalue = paramArrItem.split(fuhao)[1].replace(/\ +/g, "").replace(/['"]/g, "");
-								param[paramArrItemkey] = paramArrItemvalue;
-							}
-						});
-
-
-						//3.2、根据endzuobiao坐标之后为数据本体
-						//console.log('start数据本体');
-						var data1 = valueData.substring(endzuobiao);
-						var data = data1.substring(4, data1.length - 4); //去除数据头尾的换行符
-						//console.log(data);
-						//console.log('end数据本体');
-						if (param['Content-Type'] !== undefined) {
-							//console.log('这应该是图片类数据');
-							/*
-							.png 正常解析保存
-							.jpg 正常解析保存
-							.mp4 正常解析保存
-							.mp3 正常解析保存
-							.txt 正常解析保存，txt内容有中文也会正常保存，
-							.word 正常保存，但是打开时说无法正常读取文件，需要修复，修复后可正常打开
-							*/
-							//把图片类数据写入文件
-							// var filename = Date.now() + param.filename.replace(/['"]/g, "")
-							// //console.log(filename);
-							// //创建可写为流文件
-							// let writerStream = fs.createWriteStream(__dirname + '/' + filename);
-							// writerStream.write(data, 'binary');
-							// // 标记文件末尾
-							// writerStream.end();
-							// // 处理流事件 ==> finish 事件
-							// writerStream.on('finish', () => {
-							// 	//finish所有数据已被写入到底层系统时触发。
-							// 	console.log('写入完成');
-							// 	param.data = filename; //图片类的文件写入文件地址
-							// });
-							// writerStream.on('error', (err) => {
-							// 	console.log('写入失败');
-							// 	console.log(err.stack);
-							// });
-
-							//web上传文件夹，4月05日添加
-							var filename = param.filename.replace(/['"]/g, "");
-							//1、分析文件地址
-							//上传的文件夹里面的文件经过处理后是的文件地址为：lpr/images/picture.jpg
-							var pathArr = filename.split('/');
-							var pathArrLen = pathArr.length;
-							if (pathArrLen >= 2) {
-								//有文件夹，检测文件夹是否存在，没有则创建
-								function ss(ssNumber) {
-									if (ssNumber === pathArrLen - 1) {
-										//写入文件
-										console.log('写入文件的地址');
-										let writerStream = fs.createWriteStream(PUBLIC_PATH + filename);
-										writerStream.write(data, 'binary'); // 标记文件末尾
-										writerStream.end();
-										writerStream.on('finish', () => {
-											console.log('写入完成' + filename);
-											param.data = filename;
-											dataArrFun(dataArrFunIndex); //执行回调
-										});
-										writerStream.on('error', (err) => {
-											console.log('写入失败' + filename);
-											console.log(err.stack);
-											dataArrFun(dataArrFunIndex); //执行回调
-										});
-										return false;
-									}
-									let testAddress = PUBLIC_PATH + pathArr.slice(0, ssNumber + 1).join('/');
-									let sz = ssNumber;
-									sz++;
-									fs.stat(testAddress, function(pathErr) {
-										if (pathErr) {
-											//没有文件夹则创建
-											fs.mkdir(testAddress, function(createDirErr) {
-												if (createDirErr) {
-													console.log('创建文件夹错误,' + testAddress);
-													console.log(createDirErr);
-													return false;
-												}
-												ss(sz);
-											});
-											return false;
-										}
-										//有文件夹，不用创建，直接检测下一个
-										ss(sz);
-									});
-								}
-								ss(0);
-							} else {
-								//没有文件夹，直接保存
-								let writerStream = fs.createWriteStream(PUBLIC_PATH + filename);
-								writerStream.write(data, 'binary'); // 标记文件末尾
-								writerStream.end();
-								writerStream.on('finish', () => {
-									console.log('写入完成');
-									param.data = filename;
-									dataArrFun(dataArrFunIndex); //执行回调
-								});
-								writerStream.on('error', (err) => {
-									console.log('写入失败');
-									console.log(err.stack);
-									dataArrFun(dataArrFunIndex); //执行回调
-								});
-							}
-
-						} else {
-							//普通数据,字符串型数据，啥的，object型数据会被formdata解析成[object object]所以obj要转换成字符串
-							//如果普通数据中有中文，则会在接收数据时解析成乱码
-							var data111 = data.replace(hexname, ""); //剔除尾部hex标识
-							var data222 = data111.replace(/[\r\n]/g, ""); //剔除换行符
-							param.data = data222; //普通数据写入数据本体
-							dataArrFun(dataArrFunIndex); //执行回调
-						}
-						//console.log(param);
-						dataBody[param.name] = param; //把所有数据存到dataBody中已方便使用
-						//console.log('paramArr----------');
-					};
-					dataArrFun(0);
-					//});
-					//response.end(JSON.stringify(dataBody));
-					//正常返回这个数据
-					// {
-					// 	"files": {//这个files是formdata时数据的名称
-					// 		"Content-Disposition": "form-data",
-					// 		"name": "files",
-					// 		"filename": "ç®å-MCçå¤©ä»»-6903224.mp3",//这个乱码是因为原文件名是中文的，接口接收数据时是已编码格式binary接收的数据，binary无法解析中文
-					// 		"Content-Type": "audio/mp3"//只有是图片类这种文件才有这个参数，普通数据没有这个参数
-					//		"data":""//这里正常没有data，这时因为writerStream.write()这个是异步的
-					// 	},
-					// 	"wangzhi": {//这个wangzhi是formdata时数据的名称
-					// 		"Content-Disposition": "form-data",
-					// 		"name": "wangzhi",//formdata时数据的名称
-					// 		"data": "1"//普通数据的数据本体
-					// 	}
-					// }
-					//
+					var dataBody = await parseFormData(postData, {
+						"storageFilePath": __dirname+'/',//文件存放到哪里，如果上传的数据中有文件必须设置
+					});//解析formdata数据
+					console.log(dataBody);
+					response.end(JSON.stringify(dataBody));
+					
 				});
 			} else {
 				response.writeHead(404, {
@@ -252,7 +52,7 @@ http.createServer(function(request, response) {
 			} else if (file_type == 'gif') {
 				MIME = 'image/gif'
 			}
-			fs.readFile(file_address, function(err, fileData) {
+			fs.readFile(file_address, function (err, fileData) {
 				if (err) {
 					console.log(err);
 				}
@@ -267,6 +67,233 @@ http.createServer(function(request, response) {
 
 }).listen(80);
 console.log('服务地址', 80);
+
+//解析formdata数据
+function parseFormData(formdata, configdata) {
+	return new Promise(function (resolve, reject) {
+		var config = configdata;
+		//2020年5月6日通过接收编码为base64的数据在转换成binary编码数据实现文件上传
+		var postData = Buffer.from(formdata, 'base64').toString('binary');//将编码为base64的字符串转换为buffer实体再转换为编码为binary的字符串
+
+		var postData_utf8 = Buffer.from(formdata, 'base64').toString();
+
+		//.replace(/^\s\s*/, '')匹配空格
+		//1、找到处理后生成的hexname值，已便定位formdata处理过的文件数据和其它参数在那个位置
+		//hexname值作用，用来标记数据位置（这个其实叫边界字符串）
+		//找上面那个hexname值技巧，从尾部找找到\r\n停止
+		var postDataLen = postData.length;
+		var i = postDataLen;
+		var foundValue = '';
+		//console.log('开始找hexname值');
+		while (foundValue !== '\r\n--') {
+			//console.log(foundValue);
+			//console.log(i);
+			i--;
+			foundValue = postData.substr(i, 4);
+		}
+		var hexname = postData.substring(i, postDataLen).replace(/[\r\n]/g, "");
+		hexname = hexname.substring(0, hexname.length - 2);
+		//console.log(hexname);
+		//至此hexname输出的后16为，为hex值
+
+
+		//2、根据上面找的hexname值把每一个formdata中每个参数切割，分出来
+
+		//处理编码为binary
+		var Arr1 = postData.split(hexname + '\r\n');
+		var dataArr = Arr1.slice(1, Arr1.length);
+
+		//处理编码为utf8
+		var Arr1_utf8 = postData_utf8.split(hexname + '\r\n');
+		var dataArr_utf8 = Arr1_utf8.slice(1, Arr1_utf8.length);
+
+		//通过hexname切割并把formdata中的参数转到数组后，在过滤一下，防止在不上传文件时，防止切割后的参数体中还有hexname的情况
+		dataArr.forEach(function (item, index) {
+			//处理编码为binary
+			dataArr[index] = item.replace(hexname, "");
+
+			//处理编码为utf8
+			dataArr_utf8[index] = dataArr_utf8[index].replace(hexname, "");
+		});
+		var dataArrLen = dataArr.length;
+
+
+		//3、分析数据，把formdata中每一个参数的数据状态信息(数据名称,数据类型什么的)和数据本体提取出来
+		var dataBody = {}; //dataBody用来存放处理后formdata中每一个参数状态信息和数据体的容器
+		console.log('FormData 参数数量：' + dataArrLen);
+		function eachArr(index) {
+			//item现在是formdata中某一个参数的数据状态信息(数据名称,数据类型什么的)和数据值本身的结合体
+			let item = dataArr[index];
+			let addIndex = index + 1;
+
+			//处理编码为binary
+			let valueData = item;
+
+			//处理编码为utf8
+			let valueData_utf8 = dataArr_utf8[index];
+
+			//寻找formdata中某一个参数的数据状态信息(数据名称,数据类型什么的)和数据本体中间的位置
+			let endzuobiao = valueData.search('\r\n\r\n');
+
+			//3.1、根据endzuobiao坐标之前为数据状态信息(数据名称,数据类型什么的)（3.1、提取参数的数据状态信息）
+			//console.log(valueData.substring(0, endzuobiao));
+
+			//把参数的数据状态信息字符串转换成arr，因为一个参数的状态信息不光有数据名称,还有别的数据说明属性，所以要把它换成arr
+			//处理编码为binary
+			let paramArr = valueData.substring(0, endzuobiao).replace(/[\r\n]/g, ";").split(';');
+
+			//处理编码为utf8
+			let paramArr_utf8 = valueData_utf8.substring(0, endzuobiao).replace(/[\r\n]/g, ";").split(';');
+
+			//把参数的数据状态的信息提分别提取到对象中
+			//提取参数 数据状态信息用utf8编码的，这样可以防止上传文件时，如果文件名称是中文的话无法识别中文的问题
+			let param = {};//用于临时存放某个已处理好参数（已处理好的数据状态信息和对象和数据体）的容器
+			paramArr.forEach(function (paramArrItem, paramArrIndex) {
+				if (paramArrItem.length > 0) {
+					var fuhao = ":";
+					if (paramArrItem.search(":") !== -1) {
+						fuhao = ":";
+					} else {
+						fuhao = "=";
+					}
+					//处理编码为binary
+					// var paramArrItemkey = paramArrItem.split(fuhao)[0].replace(/\ +/g, "").replace(/['"]/g, "");
+					// var paramArrItemvalue = paramArrItem.split(fuhao)[1].replace(/\ +/g, "").replace(/['"]/g, "");
+
+					//处理编码为utf8
+					var paramArrItemkey = paramArr_utf8[paramArrIndex].split(fuhao)[0].replace(/\ +/g, "").replace(/['"]/g, "");
+					var paramArrItemvalue = paramArr_utf8[paramArrIndex].split(fuhao)[1].replace(/\ +/g, "").replace(/['"]/g, "");
+					param[paramArrItemkey] = paramArrItemvalue;
+				}
+			});
+
+
+			//3.2、根据endzuobiao坐标之后为数据本体（3.2、提取参数的数据本体）
+			//根据提取的数据状态信息，分别用不同编码方式的数据来提取数据体
+			if (param['Content-Type'] !== undefined) {
+
+				//提取文件类数据体，文件类数据用binary编码的，防止数据写入文件后，文件无法使用
+				//处理编码为binary
+				let dataBody = valueData.substring(endzuobiao);
+				let data = dataBody.substring(4, dataBody.length - 4); //去除数据头尾的换行符
+
+				//console.log('这应该是图片类数据');
+				/*
+				.png 正常解析保存
+				.jpg 正常解析保存
+				.mp4 正常解析保存
+				.mp3 正常解析保存
+				.txt 正常解析保存，txt内容有中文也会正常保存，
+				.word 正常保存，但是打开时说无法正常读取文件，需要修复，修复后可正常打开
+				*/
+				//把图片类数据写入文件
+
+
+				//web上传文件夹，4月05日添加
+				//config.storageFilePath  用户配置的存放文件的地址
+				var filename = param.filename.replace(/['"]/g, "");
+				//跟据用户config设置文件存放地址
+				let filePath = config.storageFilePath + '/' + filename;
+				//1、分析文件地址
+				//上传的文件夹里面的文件经过处理后是的文件地址为：lpr/images/picture.jpg
+				var pathArr = filename.split('/');
+				var pathArrLen = pathArr.length;
+				if (pathArrLen >= 2) {
+					//有文件夹，检测文件夹是否存在，没有则创建
+					function ss(ssNumber) {
+						if (ssNumber === pathArrLen - 1) {
+							//写入文件
+							let writerStream = fs.createWriteStream(filePath);
+							writerStream.write(data, 'binary'); // 标记文件末尾
+							writerStream.end();
+							writerStream.on('finish', function(){
+								console.log('写入完成_' + filename);
+								param.data = filename;
+								//执行回调
+								if (addIndex !== dataArrLen) {
+									eachArr(addIndex);
+								}
+							});
+							writerStream.on('error', function(err){
+								console.log('写入失败_' + filename);
+								param.errMessage = '写入文件失败！';
+								//console.log(err.stack);
+								//执行回调
+								if (addIndex !== dataArrLen) {
+									eachArr(addIndex);
+								}
+							});
+							return false;
+						}
+						//检测文件夹是否存在
+						let sz = ssNumber + 1;
+						let testAddress = config.storageFilePath + '/' + pathArr.slice(0, sz).join('/');
+						fs.stat(testAddress, function (pathErr) {
+							if (pathErr) {
+								//没有文件夹则创建
+								fs.mkdir(testAddress, function (createDirErr) {
+									if (createDirErr) {
+										console.log('创建文件夹错误_' + testAddress);
+										console.log(createDirErr);
+										return false;
+									}
+									ss(sz);
+								});
+								return false;
+							}
+							//有文件夹，不用创建，直接检测下一个
+							ss(sz);
+						});
+					}
+					ss(0); 
+				} else {
+					//没有文件夹，直接保存
+					let writerStream = fs.createWriteStream(filePath);
+					writerStream.write(data, 'binary'); // 标记文件末尾
+					writerStream.end();
+					writerStream.on('finish', function(){
+						console.log('写入完成_' + filename);
+						param.data = filename;
+						//执行回调
+						if (addIndex !== dataArrLen) {
+							eachArr(addIndex);
+						}
+					});
+					writerStream.on('error', function(err){
+						console.log('写入失败_' + filename);
+						param.errMessage = '写入文件失败！';
+						//console.log(err.stack);
+						//执行回调
+						if (addIndex !== dataArrLen) {
+							eachArr(addIndex);
+						}
+					});
+				}
+			} else {
+				//提取普通数据体，普通数据用utf8编码的，防止出现中文字无法识别
+				//处理编码为utf8
+				let dataBody_utf8 = valueData_utf8.substring(endzuobiao);
+				let data_utf8 = dataBody_utf8.replace(/[\r\n]/g, "").replace(/--$/, ""); //除去空格和结尾的--
+				//普通数据,字符串型数据，啥的，object型数据会在浏览器上formdata解析成[object object]所以obj在传输前要转换成字符串
+
+				//处理编码为utf8,直接将数据存入
+				param.data = data_utf8; //将处理好的普通数据体写入到param中
+				if (addIndex !== dataArrLen) {
+					eachArr(addIndex);
+				}
+			}
+			dataBody[param.name] = param; //将这个整理好的formdata参数存入到dataBody中
+
+			if (index === dataArrLen - 1) {
+				//formData中所有参数处理完成
+				resolve(dataBody);
+			};
+		};
+		eachArr(0);
+	});
+}
+
+
 
 //fs.readFile(__dirname+'/public/uploadFiles/无标题.png',function(err,data){
 //if(err) console.log(err);
