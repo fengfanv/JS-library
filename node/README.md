@@ -4,7 +4,6 @@
 
 案例文件 videoServerDemo
 
-
 ### node实现文件上传
 
 案例文件 uploadFiles
@@ -50,6 +49,10 @@
 代理服务器转发请求到服务器
 
 案例文件 daili_server.js
+
+### node扫描文件案例
+
+案例文件 wenjiansaomiao
 
 ---
 
