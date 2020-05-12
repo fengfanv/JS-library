@@ -190,9 +190,9 @@ Vue.component('peng-input',{
     },
     props:["value"],
     template:`
-        <input 
-			v-bind:value="value"
-			v-on:input="$emit('input',$event.target.value)"
+		<input
+		v-bind:value="value"
+		v-on:input="$emit('input',$event.target.value)"
 		/>`
 })
 ```
@@ -229,7 +229,11 @@ css样式
 vue init webpack 项目名称
 ```
 ## 项目里安装模块
-"-g"安装到全局，"--save"表示在package.json文件中（dependencies）记录下载包的版本信息，-"--save-dev"下载开发依赖包，上一条命令是下载生产依赖包**一般项目中安装依赖包时都必须加“--save”**
+"-g"安装到全局，
+
+"--save"表示在package.json文件中（dependencies）记录下载包的版本信息，**一般项目中安装依赖包时都必须加“--save”**
+
+"--save-dev"下载开发依赖包，上一条命令是下载生产依赖包
 ```
 npm install 模块名
 ```
@@ -474,25 +478,24 @@ Vue.use(Vuex)
 
 const store = new Vuex.Store({
 	//数据存在里面
-    state: {
-        count: 0
-    },
-    getters:{
-        getStateCount:function(state){
-            return state.count+1;
-        }
-    },
-    mutations: {
-        addCount(state, n = 0) {
-            state.count += n;
-        }
+	state: {
+		count: 0
+	},
+	getters:{
+		getStateCount:function(state){
+			return state.count+1;
+		}
+	},
+	mutations: {
+		addCount(state, n = 0) {
+			state.count += n;
+		}
 	},
 	actions:{
-	    addFun:function(context){
-	        context.commit("addCount",1);
-	    }
+		addFun:function(context){
+			context.commit("addCount",1);
+		}
 	}
-
 })
 
 export default store;
@@ -525,7 +528,27 @@ this.$store.commit("addCount",1);
 //调用actions下方法
 this.$store.dispatch("addFun");
 ```
-
+## 在methods的方法内改变data里面object类型数据
+```javascript
+export default {
+	name: "test",
+	data() {
+		return {
+			username:'Ian',
+			id:1,
+			check: {
+				account: "",
+				password: ""
+			}
+		}
+	},
+	methods: {
+		change() {
+			this.$set(this.check, "account", "");//改变check下account的值
+		}
+	}
+}
+```
 ## 利用Vue.extend实现一个插件
 1、在目录下创建一个plugin文件夹
 
