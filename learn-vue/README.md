@@ -375,6 +375,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 
 import home from '@/components/home'
+import index from '@/components/index'
 import frame from '@/components/frame'
 
 import a from '@/components/a'
@@ -384,7 +385,8 @@ import d from '@/components/d'
 
 Vue.use(Router)
 
-export default new Router({
+
+const router = new Router({
   routes: [
 	//重定向的地址
     { path: '/', redirect: '/home' },
@@ -395,6 +397,12 @@ export default new Router({
       name: 'home',
       component: home
     },
+	//跳转到index组件
+	{
+	  path: '/index/:id',//:id配置路由匹配的参数
+	  name: 'index',
+	  component: index
+	},
 	//子路由案例
     {
       path: '/pages',
@@ -433,6 +441,29 @@ export default new Router({
   ]
 })
 
+//全局导航守卫
+router.beforeEach((to, from, next) => {
+  console.log('to:');//要到哪里去
+  console.log(to);
+  
+  console.log('from:');//从什么地方来
+  console.log(from);
+  
+  if(to.path==='/index'){//当地址为/index时做处理
+    if(to.query.id!==undefined){
+        console.log('有id值，继续');
+        next();
+    }else{
+        console.log('无id值，跳转login页面');
+        next('/login');
+    }
+  }else{
+    next();
+  }
+})
+
+export default router
+
 ```
 vue main.js
 ```javascript
@@ -458,6 +489,11 @@ this.$router.go(-1);//和JavaScript里的history.go(-1)功能基本一样
 
 //跟 router.push 很像，唯一的不同就是，它不会向 history 添加新记录，而是跟它的方法名一样 —— 替换掉当前的 history 记录
 this.$router.replace("/home");
+
+this.$router.push({"path":'/index',params:{"id","dad"}});//地址    /home/dad   ,使用这种需要预先配置好，才能使用
+
+this.$route.params  //获取params里面传过来的值
+
 ```
 ## vuex使用
 1、在项目内创建一个文件夹store
