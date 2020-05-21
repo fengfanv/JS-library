@@ -71,11 +71,26 @@ console.log(Vue.config.devtools);
 //true:开发环境
 //false:生产环境
 ```
+## 绑定行内样式
+```html
+<h1 :style="{'background':background,'font-size':'100px'}">I am Index</h1><!--绑定样式 不包引号则为data里属性-->
+<h1 :style="h1Style">I am Index</h1><!--绑定样式 不包引号则为data里属性,,,
+data:{
+	h1Style:{
+		'background':'red'
+	}
+}-->
+```
+## 绑定className样式
+```html
+<h1 :class="'normalWeight'">I am Index</h1> <!--有引号，为className，style样式名-->
+<h1 :class="normalWeight">I am Index</h1> <!--没有有引号，为数据的属性名，需要data里有normalWeight这个属性-->
+```
 ## 三元运算符和绑定多个样式
 ```html
-<div v-bind:class="[isActive ? activeClass : '', errorClass,content]"></div>
+<div v-bind:class="[isActive ? activeClass : '', 'errorClass','content']"></div>
 <!--
-	渲染结果：如果isActive为true则渲染 activeClass errorClass content这三个样式
+	渲染结果：如果isActive为true则渲染 activeClass(外面不包引号则为数据属性) 'errorClass'(包引号为style样式名) 'content'这三个样式
 			如果isActive为false则渲染 errorClass content这两个样式
 -->
 ```

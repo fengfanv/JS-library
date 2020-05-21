@@ -57,8 +57,8 @@ function goPage(pno) {
 		} else {
 			tempStr += "<a class='btn' onclick=\"goPage(" + pageIndex + ")\"><span>" + pageIndex + "</span></a>";
 		}
-
 	}
+	
 
 	if (currentPage < totalPage) {
 		tempStr += "<span class='btn' onClick=\"goPage(" + (currentPage + 1) + ")\">下一页</span>";
