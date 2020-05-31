@@ -15,6 +15,8 @@ Bread and butter
 
 6、[koa_learn-koa](https://github.com/fengfanv/JS-library/blob/master/learn-koa)
 
+7、[微信小程序和云开发_learn-wechat](https://github.com/fengfanv/JS-library/blob/master/learn-wechat)
+
 --
 
 1、[H5app支付案例_h5apppay](https://github.com/fengfanv/JS-library/tree/master/h5apppay)
@@ -78,3 +80,5 @@ Bread and butter
 30、[自定义html Video标签_diyhtmlvideo](https://github.com/fengfanv/JS-library/tree/master/diyhtmlvideo)
 
 31、[媒体查询 rem计算案例_htmlMediaRemDemo](https://github.com/fengfanv/JS-library/tree/master/htmlMediaRemDemo)
+
+32、[清楚浮动_clearfix](https://github.com/fengfanv/JS-library/tree/master/clearfix)

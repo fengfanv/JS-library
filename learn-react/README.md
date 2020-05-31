@@ -5,6 +5,8 @@
 #### 解决之前react生命周期及数据比较的坑
 ```javascript
 import React,{Component,Fragment} from 'react';
+//const Component = React.Component
+//const Fragment = React.Fragment
 class demo extends Component{
 	constructor(props) {
 	    super(props)
@@ -260,6 +262,9 @@ npm config set prefix [地址]             //设置地址
 //引入react
 import React,{Component,Fragment} from 'react';
 			//ES6语法解构
+//const Component = React.Component
+//const Fragment = React.Fragment
+
 //引入样式
 import './style.css'
 //引入子组件
