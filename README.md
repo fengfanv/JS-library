@@ -17,6 +17,8 @@ Bread and butter
 
 7、[微信小程序和云开发_learn-wechat](https://github.com/fengfanv/JS-library/blob/master/learn-wechat)
 
+8、[promise运行案例_promise](https://github.com/fengfanv/JS-library/blob/master/promise)
+
 --
 
 1、[H5app支付案例_h5apppay](https://github.com/fengfanv/JS-library/tree/master/h5apppay)
