@@ -2,6 +2,18 @@
 
 ## 微信小程序
 
+#### 绑定多个class或style
+```html
+<view class="login_view1 button {{isLogin?'login_button':''}}">
+<view style="font-size:18px;{{'color:'+dataColor}};">
+```
+#### 动态设置导航栏背景色及文字颜色（API -> 界面 -> 导航栏）
+```javascript
+wx.setNavigationBarColor({
+  frontColor: '#ffffff',//文字颜色只能是黑（#000000）或白（#ffffff）
+  backgroundColor: '#ff0000'
+});
+```
 #### 使用 wx:if（框架 -> WXML语法参考）
 ```html
 <view class="login_view" wx:if="{{login}}">
