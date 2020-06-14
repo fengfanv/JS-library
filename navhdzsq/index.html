@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>滑动指示器Demo</title>
+    <style>
+        *{
+            padding: 0;
+            margin: 0;
+        }
+        nav{
+            position: relative;
+            display: flex;
+        }
+        nav a{
+            position: relative;
+            margin:0 20px;
+            font-size: 2em;
+            color:#000;
+            text-decoration: none;
+        }
+        #line{
+            position: absolute;
+            left: 0;
+            bottom: -5px;
+            width: 0;
+            height: 4px;
+            background: black;
+            transition: 0.5s;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div id="line"></div>
+        <a href="javascript:;">第一个</a>
+        <a href="javascript:;">第二个</a>
+        <a href="javascript:;">第三个</a>
+        <a href="javascript:;">第四个</a>
+        <a href="javascript:;">第五个</a>
+    </nav>
+    <script src="./jquery.js"></script>
+    <script>
+        $('nav>a').on('click',function(e){
+            console.log($(this));
+            $('#line').css({
+                "width":$(this)[0].offsetWidth+'px',
+                "left":$(this)[0].offsetLeft+'px'
+            });
+            return false;
+        });
+        $('nav>a').eq(0).click()
+    </script>
+</body>
+</html>

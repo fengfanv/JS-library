@@ -84,3 +84,6 @@ Bread and butter
 31、[媒体查询 rem计算案例_htmlMediaRemDemo](https://github.com/fengfanv/JS-library/tree/master/htmlMediaRemDemo)
 
 32、[清楚浮动_clearfix](https://github.com/fengfanv/JS-library/tree/master/clearfix)
+
+33、[nav滑动指示器_navhdzsq](https://github.com/fengfanv/JS-library/tree/master/navhdzsq)
+
