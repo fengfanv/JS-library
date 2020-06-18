@@ -7,12 +7,30 @@
 <view class="login_view1 button {{isLogin?'login_button':''}}">
 <view style="font-size:18px;{{'color:'+dataColor}};">
 ```
-#### 动态设置导航栏背景色及文字颜色（API -> 界面 -> 导航栏）
+#### 动态设置导航栏背景色及文字颜色1（API -> 界面 -> 导航栏）
 ```javascript
 wx.setNavigationBarColor({
   frontColor: '#ffffff',//文字颜色只能是黑（#000000）或白（#ffffff）
   backgroundColor: '#ff0000'
 });
+```
+#### 设置导航栏背景色及文字颜色2
+```javascript
+//1、设置项目app.json文件
+{
+    "pages": [],
+    "window": {
+        "navigationBarBackgroundColor": "#F6F6F6",
+        "navigationBarTitleText": "",
+        "navigationBarTextStyle": "black"
+    }
+}
+//2、设置页面下页面的json文件
+{
+  "navigationBarTitleText": "Change",
+  "navigationBarBackgroundColor": "#ffffff",
+  "navigationBarTextStyle": "black"
+}
 ```
 #### 使用 wx:if（框架 -> WXML语法参考）
 ```html
@@ -122,6 +140,7 @@ page({
 	}
 })
 ```
+#### 页面之间使用
 后端代码（服务端 -> 登录 -> auth.code2Session）
 
 [后端api文档](https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/login/auth.code2Session.html)
@@ -239,6 +258,146 @@ wx.chooseImage({
 
 //详细见文档，有通过事件方法传值的案例
 
+#### 页面间使用事件监听相互传数据
+
+##### 当前为a页面
+```javascript
+wx.navigateTo({
+  url: 'b?id=1',//通过地址传参
+  events: {
+    // 为指定事件添加一个监听器，获取被打开页面传送到当前页面的数据
+    'b页面发送给a页面的数据的方法名': function(data) {
+      console.log(data)
+    }
+    ...
+  },
+  success: function(res) {
+    // 通过eventChannel向被打开页面传送数据
+    res.eventChannel.emit('a页面发送给b页面的数据的方法名', { data: 'test' })
+  }
+})
+```
+##### 当前为b页面
+```javascript
+Page({
+  onLoad: function(option){
+    console.log(option.query)//打印a页面通过地址传过来的参数
+    const eventChannel = this.getOpenerEventChannel()
+	//向a页面发送数据
+    eventChannel.emit('b页面发送给a页面的数据的方法名', {data: 'test'});
+    // 监听’a页面发送给b页面的数据的方法名‘事件，获取上一页面通过eventChannel传送到当前页面的数据
+    eventChannel.on('a页面发送给b页面的数据的方法名', function(data) {
+      console.log(data)
+    })
+  }
+})
+```
+#### 自定义组件开发（开发 -> 指南 -> 自定义组件）
+[自定义组件-官方文档](https://developers.weixin.qq.com/miniprogram/dev/framework/custom-component/)
+
+[浏览器书签里的组件案例](http://caibaojian.com/app-components.html)
+##### 组件的html文件
+```html
+<view class="showState {{animationName}}">
+    <view class="icon color1" wx:if="{{state==1}}"></view>
+    <view class="icon color2" wx:if="{{state==2}}"></view>
+    <view class="icon color3" wx:if="{{state==3}}"></view>
+    <view class="text">{{text}}</view>
+	
+</view>
+```
+##### 组件的js文件
+```javascript
+Component({
+    /**
+     * 组件的属性列表
+     */
+    properties: {
+        state: {
+            type: 'Number',
+            value: 0,//默认值
+            observer(newValue, oldValue) {
+                console.log('state新值：' + newValue);
+                console.log('state旧值：' + oldValue);
+                this.setData({
+                    state: newValue
+                });
+            }
+        },
+        text: {
+            type: 'String',
+            value: '成功',//默认值
+            observer(newValue, oldValue) {
+                console.log('text新值：' + newValue);
+                console.log('text旧值：' + oldValue);
+                this.setData({
+                    text: newValue
+                });
+                this.toShow();
+            }
+        }
+    },
+    data: {
+        state: 0,//0不显示，1成功，2失败，3异常
+        text: '成功',
+        animationName: ''
+    },
+    methods: {
+        setValue(state,text){
+            let _this = this;
+            console.log('设置value值');
+            _this.setData({
+                state,
+                text
+            })
+            this.toShow();
+        },
+        toShow() {
+            let _this = this;
+            _this.setData({
+                animationName: 'toShow'
+            })
+            setTimeout(() => {
+                console.log('执行关闭');
+                _this.toHide();
+            }, 2000)
+        },
+        toHide() {
+            let _this = this;
+            _this.setData({
+                animationName: 'toHide'
+            });
+            // 所有要带到主页面的数据，都装在eventDetail里面
+            var eventDetail = {
+                name: 'sssssssss',
+                test: [1, 2, 3]
+            }
+            // 触发事件的选项 bubbles是否冒泡，composed是否可穿越组件边界，capturePhase 是否有捕获阶段
+            var eventOption = {
+                composed: true
+            }
+            this.triggerEvent('hide', eventDetail, eventOption)
+        }
+    }
+})
+
+```
+##### 在项目中使用
+```html
+<!--使用properties中的属性state，text-->
+<!--监听methods的toHide方法里this.triggerEvent触发的自定义组件事件-->
+<showState state="3" text="更新异常" onhide="onhide" id="showState"/>
+```
+
+```javascript
+Page({
+    data: {},
+    onLoad: function (options) {
+		this.$showState = this.selectComponent('#showState')
+		this.$showState.setValue(1,'更新成功')//使用showState中的方法
+    }
+});
+```
 ## 云开发
 
 #### 云数据库基本操作（增删改查）
