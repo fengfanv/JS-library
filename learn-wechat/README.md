@@ -1,7 +1,81 @@
 # 微信小程序及云开发
 
 ## 微信小程序
+#### 小程序页面配置
+[指南 -> 小程序框架 -> 逻辑层 -> 注册页面](https://developers.weixin.qq.com/miniprogram/dev/framework/app-service/page.html)
+[框架 -> 框架接口 -> 页面 -> page](https://developers.weixin.qq.com/miniprogram/dev/reference/api/Page.html)
+```javascript
+Page({
+  data: {
+    text: "This is page data."
+  },
+  onLoad: function(options) {
+    // 页面创建时执行
+  },
+  onShow: function() {
+    // 页面出现在前台时执行
+  },
+  onReady: function() {
+    // 页面首次渲染完毕时执行
+  },
+  onHide: function() {
+    // 页面从前台变为后台时执行
+  },
+  onUnload: function() {
+    // 页面销毁时执行
+  },
+  onPullDownRefresh: function() {
+    // 触发下拉刷新时执行
+  },
+  onReachBottom: function() {
+    // 页面触底时执行
+  },
+  onShareAppMessage: function () {
+    // 页面被用户分享时执行
+  },
+  onPageScroll: function() {
+    // 页面滚动时执行
+  },
+  onResize: function() {
+    // 页面尺寸变化时执行
+  },
+  onTabItemTap(item) {
+    // tab 点击时执行
+    console.log(item.index)
+    console.log(item.pagePath)
+    console.log(item.text)
+  },
+  // 事件响应函数
+  viewTap: function() {
+    this.setData({
+      text: 'Set some data for updating view.'
+    }, function() {
+      // this is setData callback
+    })
+  },
+  // 自由数据
+  customData: {
+    hi: 'MINA'
+  }
+})
+```
+#### 使用下拉刷新
+```javascript
+//1、在页面json文件里添加"enablePullDownRefresh":true开启下拉刷新
+//2、在页面内使用onPullDownRefresh生命周期函数，监听页面下拉操作
+//wx.stopPullDownRefresh()更新完毕，关闭下拉
+```
+#### 在电脑端设置大屏，或手机端设置横屏
+```javascript
+//设置pc大屏，在项目的app.json中设置"resizable": true属性，pc端打开时会已横向窗口显示，
+//屏幕大小为1024*768,在按下全屏按钮会已全屏显示
 
+//设置手机横屏，在项目app.json中window中设置"pageOrientation":"auto"，
+//不过这里的横屏需要用户打开旋转锁后才能看到
+```
+#### 小程序全局配置(app.json)和页面配置(pagename.json)
+[框架 -> 小程序配置 -> 全局配置](https://developers.weixin.qq.com/miniprogram/dev/reference/configuration/app.html)
+[框架 -> 小程序配置 -> 页面配置](https://developers.weixin.qq.com/miniprogram/dev/reference/configuration/page.html)
 #### 绑定多个class或style
 ```html
 <view class="login_view1 button {{isLogin?'login_button':''}}">
@@ -30,6 +104,14 @@ wx.setNavigationBarColor({
   "navigationBarTitleText": "Change",
   "navigationBarBackgroundColor": "#ffffff",
   "navigationBarTextStyle": "black"
+}
+```
+#### app.json设置背景注意事项
+```javascript
+backgroundColor //设置的是小程序背景色，这个是下拉刷新时能看到的那个背景色
+要是设置页面背景色那个背景色，则需要设置css，如下：
+page {
+  background-color: #f7f7f7;
 }
 ```
 #### 使用 wx:if（框架 -> WXML语法参考）
@@ -294,8 +376,11 @@ Page({
 ```
 #### 自定义组件开发（开发 -> 指南 -> 自定义组件）
 [自定义组件-官方文档](https://developers.weixin.qq.com/miniprogram/dev/framework/custom-component/)
-
-[浏览器书签里的组件案例](http://caibaojian.com/app-components.html)
+##### 项目内使用自定组件
+```javascript
+//1、在项目里创建组件页面，在这个组件内的json文件里添加 "component": true 用于声明组件
+//2、组件编写完成后，在项目中使用
+```
 ##### 组件的html文件
 ```html
 <view class="showState {{animationName}}">
@@ -303,12 +388,17 @@ Page({
     <view class="icon color2" wx:if="{{state==2}}"></view>
     <view class="icon color3" wx:if="{{state==3}}"></view>
     <view class="text">{{text}}</view>
-	
+	<slot></slot><!--用于承载组件引用时提供的子节点-->
 </view>
 ```
+##### 什么是slot
+[指南 -> 自定义组件 -> 组件模板和样式](https://developers.weixin.qq.com/miniprogram/dev/framework/custom-component/wxml-wxss.html)
 ##### 组件的js文件
 ```javascript
 Component({
+	options: {
+	    multipleSlots: true // 在组件定义时的选项中启用多slot支持
+	 },
     /**
      * 组件的属性列表
      */
@@ -382,11 +472,21 @@ Component({
 })
 
 ```
-##### 在项目中使用
+##### 组件在项目中使用
+```javascript
+//在需要引入组件的页面内json文件中添加，如下：
+"usingComponents": {
+    "showState": "/components/showState/showState"
+}
+//添加完毕后方可使用
+```
+
 ```html
 <!--使用properties中的属性state，text-->
 <!--监听methods的toHide方法里this.triggerEvent触发的自定义组件事件-->
-<showState state="3" text="更新异常" onhide="onhide" id="showState"/>
+<showState state="3" text="更新异常" onhide="onhide" id="showState">
+	<view>使用slot</view>
+</showState>
 ```
 
 ```javascript
