@@ -59,6 +59,19 @@ Page({
   }
 })
 ```
+#### 检测当前是否为pc电脑端
+```javascript
+wx.getSystemInfo({
+    success(res) {
+        let system = res.system;
+        if (/(windows|mac|win)/i.test(system)) {
+			_this.setData({
+				isPc: true
+			})
+        }
+    }
+})
+```
 #### 使用下拉刷新
 ```javascript
 //1、在页面json文件里添加"enablePullDownRefresh":true开启下拉刷新
