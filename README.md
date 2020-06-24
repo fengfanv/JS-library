@@ -19,6 +19,8 @@ Bread and butter
 
 8、[promise运行案例_promise](https://github.com/fengfanv/JS-library/blob/master/promise)
 
+9、[TypeScript_learn-typescript](https://github.com/fengfanv/JS-library/blob/master/learn-typescript)
+
 --
 
 1、[H5app支付案例_h5apppay](https://github.com/fengfanv/JS-library/tree/master/h5apppay)
