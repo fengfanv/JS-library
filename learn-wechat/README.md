@@ -512,7 +512,34 @@ Page({
 });
 ```
 ## 云开发
+#### 配置云开发
 
+**在小程序里使用云数据库，云存储，云函数需要现在app.js键入以下内容**
+
+```javascript
+//
+//app.js
+App({
+  onLaunch: function () {
+    
+    if (!wx.cloud) {
+      console.error('请使用 2.2.3 或以上的基础库以使用云能力')
+    } else {
+      wx.cloud.init({
+        // env 参数说明：
+        //   env 参数决定接下来小程序发起的云开发调用（wx.cloud.xxx）会默认请求到哪个云环境的资源
+        //   此处请填入环境 ID, 环境 ID 可打开云控制台查看
+        //   如不填则使用默认环境（第一个创建的环境）
+        // env: 'my-env-id',
+        traceUser: true,
+      })
+    }
+
+    this.globalData = {}
+  }
+})
+
+```
 #### 云数据库基本操作（增删改查）
 ```javascript
 // miniprogram/pages/index/index.js
@@ -765,6 +792,28 @@ exports.main = async (event, context) => {
         })
     })
 }
+```
+#### 小程序里使用云函数
+```javascript
+Page({
+    data: {},
+    onLoad: function (options) {},
+    shiyong() {
+		//使用运方法
+        wx.cloud.callFunction({
+            name: 'dellist',
+            data: {
+                _id: data.data._id
+            },
+            success: function (res) {
+				//成功
+            },
+            fail: function (err) {
+				//失败
+            }
+        });
+    }
+});
 ```
 #### 云函数里http请求数据(这里是node环境，以前怎么在node里引用模块，写方法，在这里就怎么写)
 ```javascript

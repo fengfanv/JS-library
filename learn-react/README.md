@@ -210,13 +210,29 @@ console.log(arr3 == arr7)
 //=>false
 ```
 
-安装react脚手架
+安装react脚手架（旧）
 ```
-cnpm install -g create-react-app
+//这个命令已作废
+npm install -g create-react-app
 ```
-创建一个react项目
+创建一个react项目（旧）
 ```
+//这个命令已作废
 create-react-app 项目名称
+```
+卸载react脚手架（旧）
+```
+npm uninstall -g create-react-app
+```
+初始化一个react项目（新）
+```
+//直接使用，npx会自动安装，和下载项目模板
+npx create-react-app my-app
+```
+初始化一个typescript的react项目
+```
+//直接使用，npx会自动安装，和下载项目模板
+npx create-react-app my-app --typescript
 ```
 设置npm镜像源地址
 ```
@@ -272,7 +288,7 @@ import Zzj from './zzj'
 //引入其它类型的功能件,如axios
 import Axios from 'axios'
 
-class demo extends Component{
+class App extends Component{
 	constructor(props) {
 		//构造器
 	    super(props)//调用父类的构造函数，固定写法
@@ -411,7 +427,6 @@ class demo extends Component{
 demo.defaultProps  = {
     "aaa":"我是aaa的默认值"
 }
-
 export default demo
 ```
 ## 使用react-transition-group动画
