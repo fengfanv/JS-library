@@ -600,16 +600,20 @@ export default {
 	}
 }
 ```
-## 利用Vue.extend实现一个插件
+## vue中自定义插件（利用Vue.extend实现一个插件）
+文件目录
+
+![](/images/img-1.png)
+
 1、在目录下创建一个plugin文件夹
 
 2、把写完的.vue格式的文件放到里面
 
-![](/images/img-1.png)
-
 3、创建一个index.js文件
 
 4、写代码
+
+**插件配置文件（/plugin/index.js）**
 ```javascript
 //javascript
 
@@ -629,18 +633,59 @@ export default{
 		document.body.appendChild(loading_content.$el);
 		//在vue原型上写方法，调用使
 		Vue.prototype.loading_main = {
-		    showLoading:function(){
+		    showLoading:function(callback){
 		        loading_content.isShow = true;
+				//给插件模板里绑一个回调函数，
+				//可利用callback向使用的地方返回参数
+				//可利用callback执行一些业务操作
+				loading_content.callback = callback;
 		    },
-		    hideLoading:function(){
+		    hideLoading:function(callback){
 		        loading_content.isShow = false;
+				loading_content.callback = callback;
 		    }
 		}
 	}
 }
 ```
-5、在程序里调用时
+**插件模板（/plugin/alert.vue）**
+```html
+<template>
+  <div v-if="isShow">
+	组件
+	<button @click="onButtonOk()">确认</button>
+  </div>
+</template>
+
+<script>
+export default {
+  name: "alert",
+  data() {
+    return {
+      isShow:false,
+    }
+  },
+  methods:{
+	onButtonOk(){
+		this.callback&&this.callback('你单击了确定按钮');
+		//给调用的地方返回一个提示。
+	}
+    callback(){}//代绑定的callback
+  }
+};
+</script>
+<style scoped>
+
+</style>
+```
+在程序里调用时
 ```javascript
 //javascript
-Vue.loading_main.showLoading();
+Vue.loading_main.showLoading(function(data){
+	//通过绑定callback，返回某些操作后需要返回的信息
+	
+	//也可以利用callback，执行某些操作
+	//比如这是个弹窗插架，你需要在单击插架ok按钮后执行某些操作
+	//这时，你可以利用callback来执行这些操作。
+});
 ```
