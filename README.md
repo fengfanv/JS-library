@@ -89,3 +89,5 @@ Bread and butter
 
 33、[nav滑动指示器_navhdzsq](https://github.com/fengfanv/JS-library/tree/master/navhdzsq)
 
+34、[css加载动画_loading](https://github.com/fengfanv/JS-library/tree/master/loading)
+

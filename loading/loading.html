@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>圆形加载</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+        .loader{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+        }
+        .loader>.ring{
+            width: 45px;
+            height: 45px;
+            position: relative;
+            border:5px solid #ddd;
+            border-radius: 50%;
+            align-items: center;
+            justify-content: center;
+        }
+        .loader>.ring:after{
+            position: absolute;
+            content:"";
+            width: 100%;
+            height: 100%;
+            border:5px solid #ff3d00;
+            border-radius: 50%;
+            left: -5px;
+            top: -5px;
+            border-top-color: transparent;
+            animation: rotate 1.5s linear infinite;
+        }
+        @keyframes rotate{
+            100%{
+                transform:rotate(360deg)
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="loader">
+        <div class="ring"></div>
+    </div>
+</body>
+</html>
