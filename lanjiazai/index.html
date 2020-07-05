@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>懒加载案例</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        ul,
+        li {
+            width: 100%;
+            height: auto;
+            min-height: 80vh;
+            text-align: center;
+        }
+
+        li {
+            border: 1px solid #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+
+<body>
+    <ul id="ulFa">
+        <!-- <li></li> -->
+    </ul>
+    <script>
+        var ulFa = document.getElementById('ulFa');
+        var images = [
+            './images/0.jpg',
+            './images/1.jpg',
+            './images/2.jpg',
+            './images/3.jpg',
+            './images/4.jpg',
+            './images/5.jpg',
+            './images/6.jpg',
+            './images/7.jpg',
+            './images/8.jpg',
+            './images/9.jpg',
+            './images/10.jpg',
+        ];
+        var imagesLen = images.length;
+        var li_list = null;
+        var img_list = null;
+        window.onload = function () {
+            for (let i = 0; i < imagesLen; i++) {
+                let li = document.createElement('li');
+                let img = document.createElement('img');
+                img.src = './images/loading.gif';
+                img.setAttribute('img_url', images[i])
+                li.appendChild(img);
+                ulFa.appendChild(li);
+            }
+            li_list = ulFa.querySelectorAll('li');
+            img_list = ulFa.querySelectorAll('img');
+        }
+        window.onscroll = function () {
+            // 可视区域高度
+            var windowHeight = window.innerHeight;
+            //滚动区域高度
+            var scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+            for (let i = 0; i < imagesLen; i++) {
+                let liTop = li_list[i].offsetTop;
+                if (scrollTop + windowHeight > liTop) {
+                    (function (i) {
+                        setTimeout(function () {
+                            var temp = new Image();
+                            temp.src = img_list[i].getAttribute('img_url');
+                            temp.onload = function () {
+                                img_list[i].src = img_list[i].getAttribute('img_url')
+                            }
+                        }, 500)
+                    })(i)
+                }
+            }
+        }
+
+    </script>
+</body>
+
+</html>
