@@ -21,6 +21,8 @@ Bread and butter
 
 9、[TypeScript_learn-typescript](https://github.com/fengfanv/JS-library/blob/master/learn-typescript)
 
+10、[jquery常用语法_jquery](https://github.com/fengfanv/JS-library/blob/master/jquery)
+
 --
 
 1、[H5app支付案例_h5apppay](https://github.com/fengfanv/JS-library/tree/master/h5apppay)
