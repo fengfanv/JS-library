@@ -95,3 +95,5 @@ Bread and butter
 
 35、[懒加载案例_lanjiazai](https://github.com/fengfanv/JS-library/tree/master/lanjiazai)
 
+36、[自定义input单选及多选样式_diyradiocheckbox](https://github.com/fengfanv/JS-library/tree/master/diyradiocheckbox)
+

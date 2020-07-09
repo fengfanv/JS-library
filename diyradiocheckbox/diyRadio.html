@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+        /*radio自定义样式*/
+        input[type="radio"]+label::before {
+            content: "\a0";
+            /*不换行空格*/
+            display: inline-block;
+            vertical-align: middle;
+            font-size: 18px;
+            width: 1em;
+            height: 1em;
+            margin-right: .4em;
+            border-radius: 50%;
+            border: 1px solid #01cd78;
+            text-indent: .15em;
+            line-height: 1;
+        }
+
+        input[type="radio"]:checked+label::before {
+            background-color: #01cd78;
+            background-clip: content-box;
+            padding: .2em;
+        }
+
+        input[type="radio"] {
+            display: none;
+        }
+        /*checkbox自定义样式*/
+        input[type="checkbox"]+label::before {
+            content: "\a0";
+            /*不换行空格*/
+            display: inline-block;
+            vertical-align: middle;
+            font-size: 18px;
+            width: 1em;
+            height: 1em;
+            margin-right: .4em;
+            border: 1px solid #01cd78;
+            text-indent: .15em;
+            line-height: 1;
+        }
+
+        input[type="checkbox"]:checked+label::before {
+            background-color: #01cd78;
+            background-clip: content-box;
+            padding: .2em;
+        }
+
+        input[type="checkbox"] {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>自定义input的checkbox（多选）和radio（单选）样式</h1>
+    <h3>radio</h3>
+    <div>
+        <input type="radio" id="radio1" name="sex" />
+        <label for="radio1">女</label>
+    </div>
+    <div>
+        <input type="radio" id="radio2" name="sex" />
+        <label for="radio2">男</label>
+    </div>
+    <h3>checkbox</h3>
+    <div>
+        <input type="checkbox" id="checkbox1" name="sex" />
+        <label for="checkbox1">有车</label>
+    </div>
+    <div>
+        <input type="checkbox" id="checkbox2" name="sex" />
+        <label for="checkbox2">有房</label>
+    </div>
+    <div>
+        <input type="checkbox" id="checkbox3" name="sex" />
+        <label for="checkbox3">有钱</label>
+    </div>
+</body>
+
+</html>
