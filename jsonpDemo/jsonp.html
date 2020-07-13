@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <h1>JsonpDemo</h1>
+    <button id="anniu">请求</button>
+    <script src="../jquery.js"></script>
+    <script>
+
+        function jsonp(config) {
+            /**
+             * config.url 请求地址，必须
+             * config.funName 接收请求结果方法，必须
+             * config.data 请求数据，可选
+             */
+            let url = config.url;
+            let funName = config.funName;
+            //数据转url格式
+            var objToStr = function (dataObj) {
+                let params = '';
+                for (key in dataObj) {
+                    if (Object.prototype.toString.call(dataObj[key]).search(/string/i) != -1) {
+                        params += key + '=' + dataObj[key] + '&';
+                    } else if (Object.prototype.toString.call(dataObj[key]).search(/number/i) != -1) {
+                        params += key + '=' + dataObj[key] + '&';
+                    } else if (Object.prototype.toString.call(dataObj[key]).search(/array/i) != -1) {
+                        for (index in dataObj[key]) {
+                            if (Object.prototype.toString.call(dataObj[key][index]).search(/(string|number)/i) != -1) {
+                                params += key + '=' + dataObj[key][index] + '&';
+                            } else {
+                                params += key + '=&';
+                            }
+                        }
+                    } else {
+                        params += key + '=&';
+                    }
+                }
+                return params.slice(0, -1);
+            }
+            if (config.data != undefined) {
+                url += '?' + objToStr(config.data) + '&callback=' + funName;
+            } else {
+                url += '?callback=' + funName;
+            }
+            var script = document.createElement("script");
+            script.type = "text/javascript";
+            script.src = url;
+            var head = document.getElementsByTagName("head")[0];
+            head.insertBefore(script, head.firstChild);
+        }
+
+        document.getElementById('anniu').onclick = function () {
+            jsonp({
+                "url": "http://localhost:8000/api",
+                "funName": "getapi",
+                "data": {
+                    "name": 'kangyupeng'
+                }
+            });
+        }
+        function getapi(res) {
+            console.log(res)
+        }
+
+        //使用jquery请求
+        // $.ajax({
+        //     type:'get',
+        //     url:"http://localhost:8000/api",
+        //     dataType:'jsonp',
+        //     success:function(data){
+        //         console.log(data);
+        //     }
+        // });
+
+    </script>
+
+</body>
+
+</html>
