@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        /*适配大于640px尺寸*/
+        @media screen and (min-width: 640px) {
+            h2 {
+                color: red;
+            }
+        }
+
+        /*适配小于340px的尺寸*/
+        @media screen and (max-width: 340px) {
+            h2 {
+                color: blue;
+            }
+        }
+
+        /*适配大于340px且小于640px的尺寸*/
+        @media screen and (min-width: 340px) and (max-width: 640px) {
+            
+        }
+
+        /*viewprot详解*/
+        /*
+        <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+
+        width=device-width ：表示宽度是设备屏幕的宽度
+        initial-scale=1.0：表示初始的缩放比例
+        minimum-scale=0.5：表示最小的缩放比例
+        maximum-scale=2.0：表示最大的缩放比例
+        user-scalable=yes：表示用户是否可以调整缩放比例
+
+        为什么会有viewport
+        1、为了让手机也能获得良好的网页浏览体验
+        2、为网页能以缩放的形式正常的显示在手机屏幕上
+        */
+    </style>
+</head>
+
+<body>
+    <h1>css里使用媒体查询</h1>
+    <h2>啦啦</h2>
+</body>
+
+</html>
