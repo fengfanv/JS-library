@@ -23,6 +23,8 @@ Bread and butter
 
 10、[jquery常用语法_jquery](https://github.com/fengfanv/JS-library/blob/master/jquery)
 
+11、[uniapp基本使用_uniapp](https://github.com/fengfanv/JS-library/blob/master/uniapp)
+
 --
 
 1、[H5app支付案例_h5apppay](https://github.com/fengfanv/JS-library/tree/master/h5apppay)
