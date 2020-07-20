@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        #main {
+            position: relative;
+            margin: 0 auto;
+        }
+
+        .imgBox {
+            width: 300px;
+            font-size: 0;
+            height: auto;
+            float: left;
+        }
+
+        .imgBox>img {
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>瀑布流案例</h1>
+    <div id="main">
+        <!-- <div class="imgBox">
+            <img src="./images/0.jpg" alt="">
+        </div> -->
+    </div>
+    <script src="../jquery.js"></script>
+    <script>
+        var imgs = [];//图片数组
+        var len = 37;
+        for (let i = 0; i < len; i++) {
+            imgs.push('./images/' + i + '.jpg');
+        };
+        var mainWidth = $("#main").width();
+        var imgBoxWidth = 300;//每个imgbox的宽度
+        var rowCount = Math.floor(mainWidth / imgBoxWidth);//一行显示几个
+        $("#main").css("width", rowCount * imgBoxWidth + 'px');
+        console.log('显示列数：' + rowCount)
+        var rowHeightArr = [];//用来存每列的高
+        var rowLeftArr = [];//用来存每列据左边的距离
+        //初始化第一行，第一行不用定位，要用浮动的，然后记录第一行的元素高，到时候第二及以后的行回根据第一行的高度位置设置图片位置
+        for (let i = 0; i < rowCount; i++) {
+            (function (index) {
+                $("#main").append(`
+                <div class="imgBox">
+                    <img src="./images/${index}.jpg" alt="">
+                </div>`
+                );
+
+                let img = new Image();
+                img.src = `./images/${index}.jpg`;
+                img.onload = function () {
+                    let imgWidth = img.width;
+                    let imgHeight = img.height;
+                    let newImgHeight = imgHeight / imgWidth * 300;
+
+                    rowHeightArr[index] = newImgHeight;//将第一行的元素高存进数组里
+                    rowLeftArr[index] = index * 300;//将第一行的元素据里左边的距离存进数组里
+                    //更新main的元素高度
+                    $("#main").css("height", min(rowHeightArr) + 'px');
+                    if (index === rowCount - 1) {
+                        let appendNumber = rowCount - 1;
+                        window.timeFor = window.setInterval(function () {
+                            if (min(rowHeightArr) < window.innerHeight) {
+                                ++appendNumber;
+                                addimg(appendNumber);
+                            } else {
+                                window.clearInterval(timeFor);
+                            }
+                        }, 100);
+                    }
+                };
+            })(i)
+        };
+
+        //添加图片方法
+        function addimg(imgNumber) {
+            let minIndex = rowHeightArr.indexOf(min(rowHeightArr));
+            let height = rowHeightArr[minIndex];//最小列的高
+            let left = rowLeftArr[minIndex];//最小列的的left值
+
+            let img = new Image();
+            img.src = `./images/${imgNumber}.jpg`;
+            img.onload = function () {
+                let imgWidth = img.width;
+                let imgHeight = img.height;
+                let newImgHeight = imgHeight / imgWidth * 300;//等比例新元素高
+                rowHeightArr[minIndex] = height + newImgHeight;//将第一行的元素高存进数组里
+                //更新main的元素高度
+                $("#main").css("height", Math.max.apply(Math, rowHeightArr) + 'px');
+            };
+
+            $("#main").append(`
+                    <div class="imgBox" style="position:absolute;left:${left}px;top:${height}px;">
+                        <img src="./images/${imgNumber}.jpg" alt="">
+                    </div>`
+            );
+        }
+
+        //找最小
+        function min(arr) {
+            let len = arr.length;
+            let value = arr[0];
+            for (let i = 0; i < len; i++) {
+                if (arr[i] < value) {
+                    value = arr[i];
+                }
+                if (i === len - 1) {
+                    return value;
+                }
+            }
+        }
+
+        //滚动滚动条，动态加载
+        let load = true;//是否可以加载
+        let showCount = rowCount;//每页显示几个，我这里一行就算一页
+        let pageIndex = 1;//当前为第几页
+        let pageCount = imgs.length / showCount > parseInt(imgs.length / showCount) ? parseInt(imgs.length / showCount) + 1 : parseInt(imgs.length / showCount);//一共能分多少页的数
+        console.log("每页显示："+showCount+"；共分："+pageCount+"页")
+        window.onscroll = function () {
+            if ($(document).scrollTop() + window.innerHeight > $("body").height() - 100 && load == true && pageIndex <= pageCount) {
+                let showStart = (pageIndex - 1) * showCount;//每页开始时的坐标
+                let showEnd = pageIndex * showCount;//每页结束时的坐标
+                if (showEnd >= imgs.length) {
+                    showEnd = imgs.length;
+                };
+                console.log('加载第' + pageIndex + '页');
+
+                let i = showStart;
+                window.timeFor = window.setInterval(function () {
+                    if (i < showEnd) {
+                        addimg(i);
+                        i++;
+                    } else {
+                        window.clearInterval(timeFor);
+                    };
+                }, 100)
+                pageIndex++;
+                load = false;
+                window.setTimeout(function () {
+                    load = true;
+                }, 100 * showCount);
+            }
+            if (pageIndex > pageCount) {
+                console.log('没有数据可加载了');
+            }
+        }
+    </script>
+</body>
+
+</html>
