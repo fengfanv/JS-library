@@ -100,3 +100,5 @@ Bread and butter
 36、[自定义input单选及多选样式_diyradiocheckbox](https://github.com/fengfanv/JS-library/tree/master/diyradiocheckbox)
 
 37、[利用script标签jsonp跨域案例_jsonpDemo](https://github.com/fengfanv/JS-library/tree/master/jsonpDemo)
+
+38、[商城sku商品规格选择_scguige](https://github.com/fengfanv/JS-library/tree/master/scguige)

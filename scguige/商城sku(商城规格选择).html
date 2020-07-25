@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
+  <title>vue的sku前端实现(商城选择规格)</title>
+  <style>
+    #app {
+      width: 100%;
+      background: #f5f5f5;
+      position: relative;
+      box-sizing: border-box;
+      overflow: hidden;
+      padding-top: 3rem;
+      height: 100%;
+      padding-bottom: 0;
+    }
+
+    #app .now_page_head {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 3rem;
+      text-align: center;
+      font-size: 1.27rem;
+      line-height: 3rem;
+      z-index: 11;
+      transition: all 0.5s ease;
+      background: #fff;
+    }
+
+    #app .now_page_head .back {
+      height: 1rem;
+      position: absolute;
+      left: 1rem;
+      top: 1rem;
+    }
+
+    #app .now_page_head .seting {
+      height: 1.2rem;
+      position: absolute;
+      right: 1rem;
+      top: 0.9rem;
+    }
+
+    #app .now_page_head .share {
+      position: absolute;
+      right: 1rem;
+      top: 0rem;
+      line-height: 3rem;
+      font-size: 1rem;
+    }
+
+    #app .content {
+      background: #ededed;
+      height: 100%;
+      padding-bottom: 0;
+      width: 100%;
+      overflow-x: hidden;
+      overflow-y: auto;
+    }
+
+    #app .content .wrap-sku .product-box {
+      width: 100%;
+      display: block;
+      margin: 0 auto;
+    }
+
+    #app .content .wrap-sku .product-box .stock_box {
+      padding: 30px 0 0 10px;
+    }
+
+    #app .content .wrap-sku .product-box .stock_box .stock_box_title {
+      color: #323232;
+      font-size: 26px;
+    }
+
+    #app .content .wrap-sku .product-box .stock_box .stock_info {
+      font-size: 14px;
+      line-height: 20px;
+    }
+
+    #app .content .wrap-sku .product-content {
+      margin-bottom: 100px;
+    }
+
+    #app .content .wrap-sku .product-delcom {
+      color: #323232;
+      font-size: 26px;
+      border-bottom: 1px solid #EEEEEE;
+      padding: 30px 0 0 10px;
+    }
+
+    #app .content .wrap-sku .product-footerlist {
+      margin-top: 10px;
+      overflow: hidden;
+    }
+
+    #app .content .wrap-sku .product-footerlist li {
+      border: 1px solid #606060;
+      border-radius: 5px;
+      color: #606060;
+      text-align: center;
+      padding: 10px 30px;
+      float: left;
+      margin-right: 20px;
+      margin-bottom: 20px;
+      cursor: pointer;
+      list-style: none;
+    }
+
+    #app .content .wrap-sku .product-footerlist li.productActive {
+      background-color: #1A1A29;
+      color: #fff;
+      border: 1px solid #1A1A29;
+    }
+
+    #app .content .wrap-sku .product-footerlist li.noneActive {
+      background-color: #ccc;
+      opacity: 0.4;
+      color: #000;
+      pointer-events: none;
+    }
+
+    #app .content .wrap-sku .product-footer {
+      background-color: #1A1A29;
+      text-align: center;
+    }
+
+    #app .content .wrap-sku .product-footer a {
+      color: #fff;
+      text-decoration: none;
+      height: 88px;
+      line-height: 88px;
+      font-size: 28px;
+    }
+
+    #app .content .wrap-sku .price {
+      font-size: 30px;
+      height: 60px;
+      line-height: 60px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app">
+    <!-- 头部 -->
+    <div class="now_page_head">
+      vue的sku前端实现(商城选择规格)
+    </div>
+    <!-- 页面的主要内容 -->
+    <section class="content">
+      <div class="wrap wrap-sku">
+        <div class="product-box">
+
+          <div>
+            库存保有单位 （Stock keeping Unit 或者SKU）是对每一个产品和服务的唯一标示符，该系统的使用SKU的值根于数据管理，使公司能够跟踪系统，如仓库和零售商店或产品的库存情况。
+            在开发商城时，我们需要对商品的sku进行判断，当用户选择完一个规格后，去判断剩下的未选规格是否继续选择，可提高用户体验。
+          </div>
+          <!-- 库存 -->
+          <div class="stock_box">
+            <p class="stock_box_title">库存状态</p>
+            <p class="stock_info" v-for="(item,index) in serverData.difference">
+              <span>{{item.difference}}：</span>
+              <span>{{item.stock}}</span>
+            </p>
+          </div>
+
+
+          <!-- 规格选择区 -->
+          <div class="product-content">
+            <div class="product-delcom" v-for="(ProductItem,ProductIndex) in serverData.specifications"
+              :key="ProductIndex">
+              <p>{{ProductItem.name}}</p>
+              <ul class="product-footerlist clearfix">
+                <li v-for="(oItem,oIndex) in ProductItem.item" :key="oIndex"
+                  v-on:click="specificationBtn(oItem.name,ProductIndex,oIndex)"
+                  v-bind:class="[oItem.isShow?'':'noneActive',selectIndexArr[ProductIndex] == oIndex?'productActive':'']">
+                  {{oItem.name}}
+                </li>
+              </ul>
+            </div>
+
+            <!--价格-->
+            <p v-if="price" class="price">¥{{price}}</p>
+          </div>
+
+          <div class="product-footer">
+            <a href="javascript:;">立即购买</a>
+          </div>
+
+        </div>
+      </div>
+    </section>
+    <!-- 页面结束 -->
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <script>
+    var vm = new Vue({
+      el: '#app',
+      data: {
+        serverData: {
+          //模拟后台返回的数据 多规格
+          difference: [
+            //所有的规格可能情况都在这个数组里
+            {
+              id: "19",
+              price: "200.00",
+              stock: "19", //库存
+              difference: "100,白色"//此规格的属性键值
+            },
+            {
+              id: "20",
+              price: "100.00",
+              stock: "29",
+              difference: "200,白色"
+            },
+            {
+              id: "21",
+              price: "300.00",
+              stock: "10",
+              difference: "100,黑色"
+            },
+            {
+              id: "22",
+              price: "900.00",
+              stock: "0",
+              difference: "200,黑色"
+            },
+            {
+              id: "25",
+              price: "90.00",
+              stock: "0",
+              difference: "100,蓝色"
+            },
+            {
+              id: "26",
+              price: "40.00",
+              stock: "20",
+              difference: "200,蓝色"
+            }
+          ],
+          //展示给用户看的规格
+          specifications: [
+            {
+              //这里是要被渲染字段
+              name: "尺寸",
+              item: [
+                {
+                  name: "100"
+                },
+                {
+                  name: "200"
+                }
+              ]
+            },
+            {
+              name: "颜色",
+              item: [
+                {
+                  name: "白色"
+                },
+                {
+                  name: "蓝色"
+                },
+                {
+                  name: "黑色"
+                }
+              ]
+            }
+          ]
+        },
+        selectValueArr: [], //存放被选中的值
+        selectIndexArr: [], //是否选中 因为不确定是多规格还是单规格，所以这里定义数组来判断
+        shopItemInfo: {}, //存放要和选中的值进行匹配的数据
+        price: "" //选中规格的价钱
+      },
+      created() {
+
+        let obj = {};
+        //便利sku
+        for (var i in this.serverData.difference) {
+          //修改数据结构格式，改成键值对的方式，以方便和选中之后的值进行匹配
+          //键：由属性拼接而成，值：相对应sku的信息
+          obj[this.serverData.difference[i].difference] = this.serverData.difference[i];
+        }
+        console.log(obj);
+        //赋值给全局变量
+        this.shopItemInfo = obj;
+        this.checkItem();
+
+      },
+      methods: {
+        //手动点击选择
+        specificationBtn: function (item, n, index) { //属性值、规格项、
+          var _this = this;
+          if (_this.selectValueArr[n] != item) {
+            _this.selectValueArr[n] = item; //当前规格选中,赋值为小项的名字(蓝色，黑色)
+            _this.selectIndexArr[n] = index; //设置此项为选中
+          } else {
+            _this.selectValueArr[n] = "";
+            _this.selectIndexArr[n] = -1; //去掉选中的颜色
+          }
+          console.log(_this.selectIndexArr);
+          _this.checkItem();
+        },
+        //处理已选择列表
+        checkItem: function () {
+          var _this = this;
+          var option = _this.serverData.specifications;
+          var result = []; //定义数组储存被选中的值
+          for (var i in option) {
+            //初始化被选中的数组，如果此类别没被选中，则赋值为空，如果有3个类别，则数组长度为3
+            result[i] = _this.selectValueArr[i] ? _this.selectValueArr[i] : "";
+          }
+          //便利每个类别的每个小项
+          for (var i in option) {
+
+            var last = result[i]; //把选中的值存放到字符串last去
+
+            for (var k in option[i].item) {
+              result[i] = option[i].item[k].name; //获取每个小项的值(如：红色、蓝色)，并临时存放于result[i]，存在直接覆盖，不存在往里面添加name值
+              option[i].item[k].isShow = _this.isShow(result); //result数组每一次修改都将计算一次是否可以选择，添加字段isShow来判断是否可以选择
+            }
+
+            console.log(result[i]);
+            result[i] = last; //还原，目的是记录点下去那个值，避免下一次执行循环时被覆盖
+
+          }
+
+          //如果可获取sku，则显示当前sku价格
+          if (this.shopItemInfo[result]) {
+            this.price = this.shopItemInfo[result].price || "";
+          }
+
+          _this.$forceUpdate(); //重绘
+          console.log(JSON.parse(JSON.stringify(this.serverData.specifications)));
+        },
+        //判断每个小项是否可以选择
+        isShow: function (result) {
+          for (var i in result) {
+            if (result[i] == "") {
+              return true; //如果数组里有为空的值，则表示未被全部选择，无法获取sku，直接返回true
+              break;
+            }
+          }
+          //result选满，可获取sku，根据初始化时shopItemInfo的difference[i].difference键值对(200,蓝色)可获取sku信息
+          return this.shopItemInfo[result].stock == 0 ? false : true; //匹配选中的数据的库存，若不为空返回true反之返回false
+        }
+      }
+    })
+  </script>
+</body>
+
+</html>
