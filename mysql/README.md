@@ -17,7 +17,7 @@ var pool = mysql.createPool({
 exports.query = function(sql, arr, callback){
     // 建立链接
     pool.getConnection(function(err,connection){
-        if(err){throw err;return;}
+        if(err){throw err;}
         connection.query(sql,arr,function(error,results,fields){
 			// Results代表是查询的结果，如果是插入修改等操作，则返回影响数据库信息的对象
 			// fields代表查询的字段信息
@@ -54,6 +54,10 @@ net start mysql
 > windows关闭服务
 ```
 net stop mysql
+```
+> 命令行登入mysql
+```
+mysql -u用户名 -p
 ```
 > 显示所有数据库
 ```
@@ -121,13 +125,17 @@ mysqldump -uroot -p123456 map > D:\map.sql
 ---
 
 ### 修改表结构
-> 添加新字段
+> 重命名表名
 ```
-ALTER TABLE 表名 ADD 新增字段名 字段类型(长度);
+ALTER TABLE 旧表名 rename 新表名;
+```
+> 添加新字段（列）
+```
+ALTER TABLE 表名 ADD COLUMN 新增字段名 字段类型(长度);
 ```
 > 修改字段类型
 ```
-ALTER TABLE 表名 ALTER 字段名 字段类型(长度);
+ALTER TABLE 表名 MODIFY 字段名 字段类型(长度);
 ```
 > 设置字段默认值
 ```
@@ -148,6 +156,10 @@ ALTER TABLE 表名 RENAME COLUMN 旧字段名 TO 新字段名;
 > 删除表
 ```
 DROP TABLE 表名;
+```
+> 自增id恢复到从0开始（前提，数据已清空）
+```
+ALTER TABLE 表名 AUTO_INCREMENT=1；
 ```
 ### 查询
 > 简单查询

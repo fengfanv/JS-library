@@ -24,3 +24,16 @@ exports.query = function(sql, arr, callback){
         });
     });
 };
+
+//使用案例
+/*
+var sql = 'SELECT * FROM user where account = ?;
+var account = 'xiaowang'
+mysql.query(sql,account,function(err, result){
+	if(err){
+		console.log('[SELECT ERROR] - ',err.message);
+		return;
+	}
+    //console.log(result);
+});
+*/
