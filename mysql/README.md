@@ -93,16 +93,20 @@ quit;
 ```
 > 创建数据表
 ```
-create table 表名(
-	字段名 类型[(长度)] not null auto_increment,
-	字段名 varchar(30) not null,
-	primary key (id)
+create table `表名`(
+	`字段名` 类型[(长度)] not null auto_increment,
+	`字段名` varchar(30) not null,
+	primary key (`id`)
 )charset=utf8;
 ## auto_increment ==> 自增主键
 ```
 > 数据表插入数据
 ```
 insert into 表名 (字段名1,字段名2, 字段名...) values (字段名1的值,字段名2的值, 字段名...的值);
+```
+> 更新数据表数据
+```
+update 表名 set 字段名='要变得值'[,字段名='要变得值'] where 条件;
 ```
 > 删除数据表里数据
 ```
@@ -136,6 +140,10 @@ ALTER TABLE 表名 ADD COLUMN 新增字段名 字段类型(长度);
 > 修改字段类型
 ```
 ALTER TABLE 表名 MODIFY 字段名 字段类型(长度);
+```
+> 修改字段为非空
+```
+ALTER TABLE 表名 MODIFY 字段名 字段类型(长度) not null;
 ```
 > 设置字段默认值
 ```
