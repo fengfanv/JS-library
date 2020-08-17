@@ -116,6 +116,12 @@ export default {
 		//这时整个vue实例已经初始化完毕，此时组件已经脱离创建阶段进入到运行阶段
 		console.log("mounted");
 	},
+	beforeUpdate(){
+		//这时页面中的数据还是旧的，但data中的数据是最新的
+	},
+	updated(){
+		//这时页面中的数据和data中的数据都是最新的
+	},
 	beforeDestroy(){
 		//这时vue实例已从运行阶段，进入到销毁阶段
 		//这时data和methods以及过滤器，指令等都处在可用状态

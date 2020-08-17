@@ -76,14 +76,15 @@ wx.getSystemInfo({
 ```javascript
 //1、在页面json文件里添加"enablePullDownRefresh":true开启下拉刷新
 //2、在页面内使用onPullDownRefresh生命周期函数，监听页面下拉操作
-//wx.stopPullDownRefresh()更新完毕，关闭下拉
+//wx.startPullDownRefresh();//api调用下拉生命周期函数
+//wx.stopPullDownRefresh();//更新完毕，关闭下拉
 ```
 #### 在电脑端设置大屏，或手机端设置横屏
 ```javascript
-//设置pc大屏，在项目的app.json中设置"resizable": true属性，pc端打开时会已横向窗口显示，
+//设置pc大屏，在项目的app.json中设置"resizable": true（使iPad屏幕旋转的方法）属性，pc端打开时会已横向窗口显示，
 //屏幕大小为1024*768,在按下全屏按钮会已全屏显示
 
-//设置手机横屏，在项目app.json中window中设置"pageOrientation":"auto"，
+//设置手机横屏，在项目app.json中window中设置"pageOrientation":"auto"（屏幕旋转设置），
 //不过这里的横屏需要用户打开旋转锁后才能看到
 ```
 #### 小程序全局配置(app.json)和页面配置(pagename.json)
