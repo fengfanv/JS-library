@@ -357,7 +357,7 @@ class App extends React.Component {
         {
           this.state.list.map(function(item, index){
             return (
-              <li>{item}</li>
+              <li key={index}>{item}</li>
             )
           })
         }

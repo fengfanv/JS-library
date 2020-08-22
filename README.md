@@ -3,15 +3,15 @@
 Bread and butter
 
 ### 目录
-1、[排序算法_paixu](https://github.com/fengfanv/JS-library/blob/master/paixu/README.md)
+1、[排序算法_paixu](https://github.com/fengfanv/JS-library/blob/master/paixu)
 
-2、[mysql_mysql](https://github.com/fengfanv/JS-library/blob/master/mysql/README.md)
+2、[mysql_mysql](https://github.com/fengfanv/JS-library/blob/master/mysql)
 
-3、[node_node](https://github.com/fengfanv/JS-library/blob/master/node/README.md)
+3、[node_node](https://github.com/fengfanv/JS-library/blob/master/node)
 
-4、[vue_learn-vue](https://github.com/fengfanv/JS-library/blob/master/learn-vue/README.md)
+4、[vue_learn-vue](https://github.com/fengfanv/JS-library/blob/master/learn-vue)
 
-5、[react_learn-react](https://github.com/fengfanv/JS-library/blob/master/learn-react/README.md)
+5、[react_learn-react](https://github.com/fengfanv/JS-library/blob/master/learn-react)
 
 6、[koa_learn-koa](https://github.com/fengfanv/JS-library/blob/master/learn-koa)
 
