@@ -1,26 +1,41 @@
 # 学习Vue
 vue-cli，vuex，vue-router
 
-## 安装cnpm
+## MVVM模式
 ```
-npm install -g cnpm --registry=https://registry.npm.taobao.org
+MVVM 是 Model-View-ViewModel 的缩写
+Model 代表数据模型，用来定义数据修改和操作的业务逻辑。
+View 代表UI组件，用来把数据模型转化成UI 展现出来。
+ViewModel 监听模型数据的改变和控制视图行为、处理用户交互，简单理解就是一个同步View 和 Model的对象，连接Model和View。
 ```
-## 获取npm安装全局库的地址
+## Vue响应式原理
 ```
-npm config get prefix
+用 Object.defineProperty 方法赋予data里各个属性getter/setter来监听数据。当属性发生变动时 通知 订阅者 变化。
+
+Observer：数据监听器，能够对数据对象的所有属性进行监听，如有变动可拿到最新值并通知订阅者，内部采用Object.defineProperty的getter和Setter来实现的。
+
+Compile：模板编译，它的作用对每个元素节点的指令和文本节点进行扫描和解析，根据指令模板替换数据，以及绑定相应的更新函数。
+
+Watcher：订阅者，作为连接Observer和Compile的桥梁，能够订阅并收到每个属性变动的通知，执行指令绑定的相应回调函数。
+
+Dep：消息订阅器，内部定义了一个数组，用来收集订阅者（Watcher），数据变动触发notify函数，再调用订阅者的update方法。
 ```
-## 设置cnpm安装全局库的地址
+## Vue双向数据绑定原理
 ```
-cnpm config set prefix [地址]
+采用 数据劫持 结合 发布者-订阅者模式 的方式
+通过Object.defineProperty()来劫持data里各个属性的setter，getter，在数据变动时 发布消息 给 订阅者。
+
+如：当把一个普通js对象传给 Vue 实例来作为vue data 时，Vue 将遍历它的属性，
+用 Object.defineProperty 方法赋予data里各个属性getter/setter来监听数据。当属性发生变动时 通知 订阅者 变化。
+```
+## 安装脚手架
+```
+cnpm install vue-cli -g
 ```
 ## 卸载脚手架
 如果是全局安装的脚手架，卸载时后面跟“-g”
 ```
 npm uninstall vue-cli -g
-```
-## 安装脚手架
-```
-cnpm install vue-cli -g
 ```
 ## v-if和v-show
 v-if,在html中是否加载（创建）元素
@@ -694,4 +709,16 @@ Vue.loading_main.showLoading(function(data){
 	//比如这是个弹窗插架，你需要在单击插架ok按钮后执行某些操作
 	//这时，你可以利用callback来执行这些操作。
 });
+```
+## 安装cnpm
+```
+npm install -g cnpm --registry=https://registry.npm.taobao.org
+```
+## 获取npm安装全局库的地址
+```
+npm config get prefix
+```
+## 设置cnpm安装全局库的地址
+```
+cnpm config set prefix [地址]
 ```
