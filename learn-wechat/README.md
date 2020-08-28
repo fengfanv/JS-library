@@ -388,6 +388,34 @@ Page({
   }
 })
 ```
+#### 使用 app.js 内 globaldata（全局变量）
+```javascript
+//app.js
+App({
+	onLaunch: function () {
+		
+		//...
+		
+		this.globalData = {
+			name:"Ian"
+		}
+	}
+})
+```
+
+```javascript
+//index/index.js
+//获取应用实例
+const app = getApp();//这是使用全局变量的关键
+Page({
+	onLoad: function (options) {
+		console.log(app.globalData.name);//"Ian"
+		app.globalData.name = "Lee";
+		console.log(app.globalData.name);//"Lee"
+	}
+});
+
+```
 #### 自定义组件开发（开发 -> 指南 -> 自定义组件）
 [自定义组件-官方文档](https://developers.weixin.qq.com/miniprogram/dev/framework/custom-component/)
 ##### 项目内使用自定组件
@@ -512,13 +540,13 @@ Page({
     }
 });
 ```
+
 ## 云开发
 #### 配置云开发
 
 **在小程序里使用云数据库，云存储，云函数需要现在app.js键入以下内容**
 
 ```javascript
-//
 //app.js
 App({
   onLaunch: function () {
@@ -539,7 +567,6 @@ App({
     this.globalData = {}
   }
 })
-
 ```
 #### 云数据库基本操作（增删改查）
 ```javascript
