@@ -1,12 +1,25 @@
 # 学习Vue
 vue-cli，vuex，vue-router
 
+## jquery与vue区别
+```
+vue数据操作dom
+jquery直接修改dom
+```
+
 ## MVVM模式
 ```
 MVVM 是 Model-View-ViewModel 的缩写
-Model 代表数据模型，用来定义数据修改和操作的业务逻辑。
-View 代表UI组件，用来把数据模型转化成UI 展现出来。
-ViewModel 监听模型数据的改变和控制视图行为、处理用户交互，简单理解就是一个同步View 和 Model的对象，连接Model和View。
+
+Model 代表数据模型，业务逻辑相关的数据对象
+View 代表UI组件，它负责将数据模型转化成UI展现出来
+ViewModel 是一个同步 View 和 Model 的对象
+
+在MVVM架构下，View 和 Model 之间并没有直接的联系，
+而是通过 ViewModel 进行交互，
+Model 和 ViewModel 之间的交互是双向的， 
+因此 View 数据的变化会同步到 Model 中，
+而 Model 数据的变化也会立即反应到 View 上。
 ```
 ## Vue响应式原理
 ```
@@ -19,6 +32,18 @@ Compile：模板编译，它的作用对每个元素节点的指令和文本节�
 Watcher：订阅者，作为连接Observer和Compile的桥梁，能够订阅并收到每个属性变动的通知，执行指令绑定的相应回调函数。
 
 Dep：消息订阅器，内部定义了一个数组，用来收集订阅者（Watcher），数据变动触发notify函数，再调用订阅者的update方法。
+
+当执行 new Vue() 时，Vue 就进入了初始化阶段，
+一方面 Vue 会遍历 data 选项中的属性，
+并用 Object.defineProperty 赋予它们 getter/setter，实现数据变化监听功能；
+另一方面，Vue 的指令编译器 Compile 对元素节点的指令进行扫描和解析，
+初始化视图，并订阅 Watcher 来更新视图， 
+此时 Wather 会将自己添加到消息订阅器中(Dep)，初始化完毕。
+当数据发生变化时，Observer 中的 setter 方法被触发，
+setter 会立即调用 Dep.notify()，
+Dep 开始遍历所有的订阅者，
+并调用订阅者的 update 方法，
+订阅者收到通知后对视图进行相应的更新。
 ```
 ## Vue双向数据绑定原理
 ```
@@ -30,7 +55,7 @@ Dep：消息订阅器，内部定义了一个数组，用来收集订阅者（Wa
 ```
 ## 安装脚手架
 ```
-cnpm install vue-cli -g
+npm install vue-cli -g
 ```
 ## 卸载脚手架
 如果是全局安装的脚手架，卸载时后面跟“-g”
@@ -642,7 +667,7 @@ export default {
 import loadingFrom from './loading'
 import alertFrom from './alert'
 
-export default{
+export default {
     install:function(Vue,options){
 		// 利用扩展实例构造器生成一个Vue的子类
 		const loading = Vue.extend(loadingFrom);

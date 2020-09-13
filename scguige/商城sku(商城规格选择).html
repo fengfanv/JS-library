@@ -274,7 +274,7 @@
           ]
         },
         selectValueArr: [], //存放被选中的值
-        selectIndexArr: [], //是否选中 因为不确定是多规格还是单规格，所以这里定义数组来判断
+        selectIndexArr: [], //是否选中 因为不确定是多规格还是单规格，所以这里定义数组来判断，
         shopItemInfo: {}, //存放要和选中的值进行匹配的数据
         price: "" //选中规格的价钱
       },
@@ -290,8 +290,8 @@
         console.log(obj);
         //赋值给全局变量
         this.shopItemInfo = obj;
-        this.checkItem();
 
+        this.checkItem();
       },
       methods: {
         //手动点击选择

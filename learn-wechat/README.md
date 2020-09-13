@@ -2,8 +2,12 @@
 
 ## 微信小程序
 #### 小程序页面配置
-[指南 -> 小程序框架 -> 逻辑层 -> 注册页面](https://developers.weixin.qq.com/miniprogram/dev/framework/app-service/page.html)
+[框架 -> 小程序配置](https://developers.weixin.qq.com/miniprogram/dev/reference/configuration/app.html)
+
+#### 小程序生命周期
 [框架 -> 框架接口 -> 页面 -> page](https://developers.weixin.qq.com/miniprogram/dev/reference/api/Page.html)
+
+[指南 -> 小程序框架 -> 逻辑层 -> 注册页面](https://developers.weixin.qq.com/miniprogram/dev/framework/app-service/page.html)
 ```javascript
 Page({
   data: {
@@ -76,6 +80,7 @@ wx.getSystemInfo({
 ```javascript
 //1、在页面json文件里添加"enablePullDownRefresh":true开启下拉刷新
 //2、在页面内使用onPullDownRefresh生命周期函数，监听页面下拉操作
+
 //wx.startPullDownRefresh();//api调用下拉生命周期函数
 //wx.stopPullDownRefresh();//更新完毕，关闭下拉
 ```
@@ -108,6 +113,7 @@ wx.setNavigationBarColor({
 {
     "pages": [],
     "window": {
+		"navigationStyle":"default",//default 默认样式。custom 自定义导航栏，只保留右上角胶囊按钮。
         "navigationBarBackgroundColor": "#F6F6F6",
         "navigationBarTitleText": "",
         "navigationBarTextStyle": "black"
@@ -420,7 +426,7 @@ Page({
 [自定义组件-官方文档](https://developers.weixin.qq.com/miniprogram/dev/framework/custom-component/)
 ##### 项目内使用自定组件
 ```javascript
-//1、在项目里创建组件页面，在这个组件内的json文件里添加 "component": true 用于声明组件
+//1、在项目里创建组件页面，在这个页面内的json文件里添加 "component": true 用于声明组件
 //2、组件编写完成后，在项目中使用
 ```
 ##### 组件的html文件
@@ -514,7 +520,7 @@ Component({
 })
 
 ```
-##### 组件在项目中使用
+##### 组件在项目页面中使用
 ```javascript
 //在需要引入组件的页面内json文件中添加，如下：
 "usingComponents": {
