@@ -102,3 +102,5 @@ Bread and butter
 37、[利用script标签jsonp跨域案例_jsonpDemo](https://github.com/fengfanv/JS-library/tree/master/jsonpDemo)
 
 38、[商城sku商品规格选择_scguige](https://github.com/fengfanv/JS-library/tree/master/scguige)
+
+39、[swiper层叠轮播案例_swiper层叠轮播](https://github.com/fengfanv/JS-library/tree/master/swiper层叠轮播)

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<title>Swiper的切换</title>
+	<link rel="stylesheet" href="files/swiper.min.css">
+	<link rel="stylesheet" href="files/style.css">
+	<script src="files/swiper.min.js"></script>
+</head>
+
+<body>
+	<div id="certify">
+		<div class="swiper-container">
+			<div class="swiper-wrapper">
+				<div class="swiper-slide"><img src="files/image1.png" />
+					<p>Picture information 1</p>
+				</div>
+				<div class="swiper-slide"><img src="files/image2.png" />
+					<p>Picture information 2</p>
+				</div>
+				<div class="swiper-slide"><img src="files/image3.png" />
+					<p>Picture information 3</p>
+				</div>
+				<div class="swiper-slide"><img src="files/image4.png" />
+					<p>Picture information 4</p>
+				</div>
+				<div class="swiper-slide"><img src="files/image5.png" />
+					<p>Picture information 5</p>
+				</div>
+			</div>
+		</div>
+		<div class="swiper-pagination"></div>
+		<div class="swiper-button-prev"></div>
+		<div class="swiper-button-next"></div>
+	</div>
+	<script>
+		var certifySwiper = new Swiper('#certify .swiper-container', {
+			watchSlidesProgress: true,
+			slidesPerView: 'auto',
+			centeredSlides: true,
+			loop: true, autoplay: true,
+			loopedSlides: 5,
+			autoplay: true,
+			navigation: {
+				nextEl: '.swiper-button-next',
+				prevEl: '.swiper-button-prev',
+			},
+			pagination: {
+				el: '.swiper-pagination',
+				//clickable :true,
+			},
+			on: {
+				progress: function (progress) {
+					//vue里没有on这个参数对象，监听这个方法用onProgress(swiper, progress){},这时，这个方法里的this.xxx应替换成swiper.xxx
+					for (i = 0; i < this.slides.length; i++) {
+						var slide = this.slides.eq(i);
+						var slideProgress = this.slides[i].progress;
+						var modify = 1;
+						if (Math.abs(slideProgress) > 1) {
+							modify = (Math.abs(slideProgress) - 1) * 0.3 + 1;
+						}
+						//这里260是.swiper-slide宽度的一半，.swiper-slide宽度是520
+						//用时这里260一定得是.swiper-slide宽度的一半，要不会出现位置不正确
+						var translate = slideProgress * modify * 260 + 'px';
+						
+						var scale = 1 - Math.abs(slideProgress) / 5;
+						var zIndex = 999 - Math.abs(Math.round(10 * slideProgress));
+						slide.transform('translateX(' + translate + ') scale(' + scale + ')');
+						slide.css('zIndex', zIndex);
+						slide.css('opacity', 1);
+						if (Math.abs(slideProgress) > 3) {
+							slide.css('opacity', 0);
+						}
+					}
+				},
+				setTransition: function (transition) {
+					//vue里没有on这个参数对象，监听这个方法用onSetTransition(swiper, progress){},这时，这个方法里的this.xxx应替换成swiper.xxx
+					for (var i = 0; i < this.slides.length; i++) {
+						var slide = this.slides.eq(i)
+						slide.transition(transition);
+					}
+
+				}
+			}
+
+		})
+	</script>
+</body>
+
+</html>
