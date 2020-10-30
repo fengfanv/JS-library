@@ -170,6 +170,12 @@ fs.writeFile("文件地址", '要保存的数据', function (err) {
     console.log("保存成功！");
 });
 ```
+### 获取文件目录
+```javascript
+fs.readdir(path.join(__dirname, "public"),function(err,files){
+	console.log(files);
+});
+```
 ### http模块源码写服务
 ```javascript
 var http = require('http');

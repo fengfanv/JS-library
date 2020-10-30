@@ -425,6 +425,21 @@ export default {
   methods:{}
 }
 ```
+## 在vue里使用axios可能遇到的问题
+1、使用axios post方式请求后台接口，后台接收不到数据的问题
+```javascript
+解决办法：使用URLSearchParams包装参数
+
+import request from './index.js';
+let params = new URLSearchParams();
+params.append("orderid", orderid);
+request.post("http://localhost:5000/queryOrder", params)
+.then(function (res) {
+    return res;
+}).catch(function (err) {
+    return err;
+});
+```
 ## vue-router使用
 1、在项目内创建一个文件夹router
 

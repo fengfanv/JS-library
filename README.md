@@ -104,3 +104,5 @@ Bread and butter
 38、[商城sku商品规格选择_scguige](https://github.com/fengfanv/JS-library/tree/master/scguige)
 
 39、[swiper层叠轮播案例_swiper层叠轮播](https://github.com/fengfanv/JS-library/tree/master/swiper层叠轮播)
+
+40、[多张图片方式模拟3D_汽车全景](https://github.com/fengfanv/JS-library/tree/master/汽车全景)

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>汽车全景展示案例</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        /*
+        img 200*133
+        */
+        ul {
+            width: 300px;
+            height: 199.5px;
+            list-style: none;
+            position: relative;
+            margin: 0 auto;
+            border: 1px solid #ccc;
+            overflow: hidden;
+        }
+
+        ul li {
+            width: 100%;
+            height: 199.5px;
+            position: absolute;
+            left: 0;
+            top: 0;
+            font-size: 0;
+            background: white;
+        }
+
+        ul li img {
+            width: 100%;
+            height: auto;
+        }
+        .keyboard{
+            width: 300px;
+            height: auto;
+            margin-top: 20px;
+            margin: 0 auto;
+            overflow: hidden;
+        }
+        .keyboard p{
+            width: 4em;
+            color: white;
+            background: black;
+            font-size: 16px;
+            border-radius: 5px;
+            text-align: center;
+            
+        }
+        .keyboard .prev{
+            float: left;
+        }
+        .keyboard .next{
+            float: right;
+        }
+    </style>
+</head>
+
+<body>
+    <div>
+        <ul>
+
+        </ul>
+        <div class="keyboard">
+            <p class="prev">向左</p>
+            <p class="next">向右</p>
+        </div>
+    </div>
+    <script>
+        var len = 30;
+        var ul = document.getElementsByTagName("ul")[0];
+        for (var i = 0; i < len; i++) {
+            var li = document.createElement("li");
+            li.style.zIndex = (30 - i);
+            if(i==0){
+                li.style.display = "block";
+            }else{
+                li.style.display = "none";
+            }
+            var img = document.createElement("img");
+            img.src = "./images/" + (i + 1) + ".png";
+            li.appendChild(img);
+            ul.appendChild(li)
+        }
+        var currentIndex = 1;
+        var xStart = 0;
+        ul.addEventListener("touchstart", function (event) {
+            xStart = event.targetTouches[0].pageX;
+        });
+        ul.addEventListener("touchmove", function (event) {
+            var pageX = event.targetTouches[0].pageX;
+            if(pageX-xStart>=30){
+                currentIndex=currentIndex+1;
+                xStart = pageX;
+            }else if(pageX-xStart<=-30){
+                currentIndex=currentIndex-1;
+                xStart = pageX;
+            }
+
+            if(currentIndex<0){
+                currentIndex = 29;
+            }
+            if(currentIndex>29){
+                currentIndex = 0;
+            }
+            //console.log(currentIndex);
+            currentImg(currentIndex);
+        });
+        ul.addEventListener("touchend", function (event) {});
+        function currentImg(currentIndex){
+            var liList = document.getElementsByTagName("li");
+            var liListLen = liList.length;
+            for(var i=0;i<liListLen;i++){
+                liList[i].style.display="none";
+            }
+            var li = document.getElementsByTagName("li")[currentIndex];
+            li.style.display="block";
+        }
+        document.getElementsByClassName("prev")[0].addEventListener("click",function(){
+            currentIndex=currentIndex-1;
+            if(currentIndex<0){
+                currentIndex = 29;
+            }
+            if(currentIndex>29){
+                currentIndex = 0;
+            }
+            currentImg(currentIndex);
+        })
+
+        document.getElementsByClassName("next")[0].addEventListener("click",function(){
+            currentIndex=currentIndex+1;
+            if(currentIndex<0){
+                currentIndex = 29;
+            }
+            if(currentIndex>29){
+                currentIndex = 0;
+            }
+            currentImg(currentIndex);
+        })
+
+    </script>
+</body>
+
+</html>
