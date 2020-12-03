@@ -750,6 +750,61 @@ Vue.loading_main.showLoading(function(data){
 	//这时，你可以利用callback来执行这些操作。
 });
 ```
+## 使用vue遇到的问题
+1、想在data的某个属性下使用data中的某个数据
+```html
+<template>
+  <div>hahah</div>
+</template>
+<script>
+var vm = null;//设置
+export default {
+  name: "index",
+  created() {
+    vm = this;
+  },
+  data: function () {
+    return {
+		name:'aaa',
+		content:{
+			key:vm.name//通过使用全局变量方法，为content.key赋值
+		}
+	};
+  },
+  mounted(){},
+  methods:{}
+};
+</script>
+<style scoped>
+</style>
+```
+2、vue服务器渲染（ssr），区分当前是浏览器环境还是node环境
+```html
+<template>
+  <div>hahah</div>
+</template>
+<script>
+var vm = null;
+var node = true;
+if (process.browser) {
+  //浏览器环境
+  node = false;
+}
+export default {
+  name: "index",
+  created() {
+    vm = this;
+  },
+  data: function () {
+    return {};
+  },
+  mounted(){},
+  methods:{}
+};
+</script>
+<style scoped>
+</style>
+```
 ## 安装cnpm
 ```
 npm install -g cnpm --registry=https://registry.npm.taobao.org

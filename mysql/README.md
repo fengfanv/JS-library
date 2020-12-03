@@ -104,9 +104,13 @@ create table `表名`(
 ```
 insert into 表名 (字段名1,字段名2, 字段名...) values (字段名1的值,字段名2的值, 字段名...的值);
 ```
-> 更新数据表数据
+> 更新数据表数据1
 ```
 update 表名 set 字段名='要变得值'[,字段名='要变得值'] where 条件;
+```
+> 更新数据表数据2，对原数据进行累加
+```
+update 表名 set 字段名=字段名+1 where 条件;
 ```
 > 删除数据表里数据
 ```
@@ -240,4 +244,8 @@ select "20"+LEFT(学号,2) AS 入学年, AVG(入学成绩) from 学籍表 GROUP 
 
 如:当然，上面的也可以用where的方式查询出来
 select "20"+LEFT(学号,2) AS 入学年, AVG(入学成绩) from 学籍表 where 入学年="2011"
+```
+### 修改mysql密码
+```
+修改mysql密码（适用版本：5.7.11）：1、use mysql; //打开mysql库2、update user set authentication_string=password('123456') where user='root' and host='localhost'; //修改密码3、flush privileges; //刷新权限注意：如果按照上面的操作执行完之后密码没有变化，请尝试把host='localhost'中 'localhost' 改成 '%'
 ```
