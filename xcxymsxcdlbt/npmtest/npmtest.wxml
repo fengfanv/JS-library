@@ -1,0 +1,10 @@
+<!--pages/npmtest/npmtest.wxml-->
+<view class="line">
+    <view class="line2"></view>
+</view>
+<view class="selection_cards" bindtouchstart="touchstart" bindtouchmove="touchmove" bindtouchend="touchend">
+    <view class="selection_cards_item" wx:for="{{list}}" wx:key="index"
+        style="left:{{item.style.left}}px; z-index:{{item.style.zIndex}};transform:{{item.style.transform}};opacity:{{item.style.opacity}};transition:{{!isTouch?'0.1s':0}};">
+        {{item.option}}
+    </view>
+</view>

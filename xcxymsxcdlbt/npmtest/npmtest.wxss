@@ -1,0 +1,46 @@
+/*层叠轮播选牌，css*/
+.selection_cards{
+    width: 100%;
+    height: 400rpx;
+    position: relative;
+    margin-top: 200px;
+    z-index: 99;
+}
+
+.selection_cards_item{
+    width: 194rpx;/*188*/
+    height:350rpx;/*340*/
+    /* background: url("http://www.mlyxs.link/占卜项目/占占社区/card.jpg") no-repeat; */
+    background:green;
+    background-size: 100%;
+    /* overflow: hidden; */
+    border-radius: 16rpx;
+    position: absolute;
+    top: 0;
+    color: white;
+    font-size: 100rpx;
+    box-sizing: border-box;
+    border: 4rpx solid black;
+}
+
+.line{
+    width: 100%;
+    height: 420rpx;
+    border: 1rpx solid red;
+    position: fixed;
+    left: 0;
+    top: 434rpx;
+    z-index: 0;
+}
+.line2{
+    width: 213rpx;
+    height: 420rpx;
+    /* border: 1rpx solid red; */
+    border-left: 1rpx solid red;
+    position: absolute;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    top: 0;
+    z-index: 0;
+}

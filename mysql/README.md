@@ -34,8 +34,8 @@ exports.query = function(sql, arr, callback){
 //使用案例
 /*
 var sql = 'SELECT * FROM user where account = ?;
-var account = 'xiaowang'
-mysql.query(sql,account,function(err, result){
+var params = ['xiaowang']
+mysql.query(sql,params,function(err, result){
 	if(err){
 		console.log('[SELECT ERROR] - ',err.message);
 		return;
@@ -44,6 +44,42 @@ mysql.query(sql,account,function(err, result){
 });
 */
 
+// result => select 语句结果实例
+/*[
+    RowDataPacket {
+        id: 1,
+        access_token_update_time: 'xxxxxxxx',
+        access_token: 'xxxxxxx',
+        jsapi_ticket: 'sssssss'
+    }
+]*/
+
+// result => update 语句结果实例
+/*
+OkPacket {
+    fieldCount: 0,
+    affectedRows: 1,
+    insertId: 0,
+    serverStatus: 2,
+    warningCount: 0,
+    message: '(Rows matched: 1  Changed: 1  Warnings: 0',
+    protocol41: true,
+    changedRows: 1
+}
+*/
+// result => insert 语句结果实例
+/*
+OkPacket {
+    fieldCount: 0,
+    affectedRows: 1,
+    insertId: 1,
+    serverStatus: 2,
+    warningCount: 0,
+    message: '',
+    protocol41: true,
+    changedRows: 0
+}
+*/
 ```
 
 ### 基本命令
@@ -104,6 +140,10 @@ create table `表名`(
 ```
 insert into 表名 (字段名1,字段名2, 字段名...) values (字段名1的值,字段名2的值, 字段名...的值);
 ```
+> 批量插入数据
+```
+insert into 表名 (字段名1,字段名...) values (字段名1的值, 字段名...的值),(字段名1的值, 字段名...的值), ...;
+```
 > 更新数据表数据1
 ```
 update 表名 set 字段名='要变得值'[,字段名='要变得值'] where 条件;
@@ -111,6 +151,27 @@ update 表名 set 字段名='要变得值'[,字段名='要变得值'] where 条�
 > 更新数据表数据2，对原数据进行累加
 ```
 update 表名 set 字段名=字段名+1 where 条件;
+```
+> 批量更新数据1
+```
+update 表名
+    set 字段1 = (case id 
+        when 1 then 3 
+        when 2 then 4 
+        when 3 then 5 
+    end),
+    字段2 = (case id 
+        when 1 then 3 
+        when 2 then 4 
+        when 3 then 5 
+    end)
+where id in (1,2,3);
+//这里的id是字段
+```
+> 批量更新数据2
+```
+replace into 表名 (id,dr) values (1,'2'),(2,'3'),…(x,'y');
+//此语句不是 想修改那个字段就放那个字段，使用这个语句时，需要把不要修改的字段和需要修改的字段都放上，就是要修改的这个表的所有字段都放在语句上，不放的话就该清除这个字段的值，或sql语句报错
 ```
 > 删除数据表里数据
 ```

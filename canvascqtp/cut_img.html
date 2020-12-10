@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>裁切照片</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        #file {
+            display: none;
+        }
+
+        #canvas {
+            border: 4px solid black;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>照片裁切</h1>
+    <div>
+        <input type="file" id="file">
+        <canvas id="canvas" width="250px" height="250px"></canvas>
+        <br>
+        <button onclick="choiceFile()">选择文件</button>
+        <br>
+        <button onclick="cutImg()">确认</button>
+        <button onclick="bianda()">放大</button>
+        <button onclick="bianxiao()">缩小</button>
+    </div>
+    <script src="./jquery.js"></script>
+    <script>
+        var file = document.getElementById('file');
+        var canvas = document.getElementById('canvas');
+        var cxt = canvas.getContext("2d");
+        var scale = 1;//放大比例
+        var imgW = 0;
+        var imgH = 0;
+        var initial_imgW = 0;//图片真实高
+        var initial_imgH = 0;//图片真实高
+        var img = null;
+        var x = 0;
+        var y = 0;
+        file.onchange = function () {
+            if (file.files.length > 0) {
+                //将图片转base64码
+                var fileReader = new FileReader();
+                fileReader.readAsDataURL(file.files[0]);
+                fileReader.onload = function () {
+                    img = new Image();
+                    img.src = fileReader.result;
+                    img.onload = function () {
+                        imgW = img.width;
+                        imgH = img.height;
+                        initial_imgW = img.width;//图片真实高
+                        initial_imgH = img.height;//图片真实高
+                        x = 0;
+                        y = 0;
+                        var startLeft = 0;//按下时手指坐标
+                        var startTop = 0;//按下时手指坐标
+                        var isTouch = false;//是否按下
+                        var moveX = 0;//移动X的距离
+                        var moveY = 0;//移动的Y的距离
+                        /* 如果图片较大 超出了canvas的大小 */
+                        if (imgW > 100) {
+                            // scaleW = c.width / imgW;
+                            // scaleH = c.height / imgH;
+                            // //计算一个缩放比例
+                            // scale = Math.min(scaleW, scaleH);
+                            let newimgW = 250;
+                            let newimgH = imgH / imgW * newimgW
+                            imgW = newimgW;
+                            imgH = newimgH;
+                        }
+                        x = (250 - imgW) / 2;
+                        y = (250 - imgH) / 2;
+
+                        //缩放整张图片的尺寸，并且把图片居中显示了
+                        cxt.drawImage(img, x, y, imgW, imgH);
+
+                        canvas.onmousedown = function (e) {
+                            //pc端的touchstart事件
+                            //console.log(e);
+                            startLeft = e.pageX;
+                            startTop = e.pageY;
+                            isTouch = true;
+                        }
+                        canvas.onmousemove = function (e) {
+                            //pc端的touchmove事件
+                            //console.log(e);
+                            if (isTouch) {
+                                cxt.clearRect(0, 0, 250, 250);//清楚canvas画布
+                                moveX = e.pageX - startLeft;
+                                moveY = e.pageY - startTop;
+                                cxt.drawImage(img, x + moveX, y + moveY, imgW, imgH);
+                            }
+                        }
+
+                        canvas.onmouseup = function (e) {
+                            //pc端的touchend事件
+                            isTouch = false;
+                            cxt.clearRect(0, 0, 250, 250);//清楚canvas画布
+                            x = x + moveX;
+                            y = y + moveY;
+                            cxt.drawImage(img, x, y, imgW, imgH);
+
+                        }
+
+                    }
+                }
+            }
+        }
+        function choiceFile() {
+            file.click();
+        }
+
+        //变大
+        function bianda() {
+            if (scale + 1 < 5) {
+                scale++;
+                let newimgW = initial_imgW * scale;
+                let newimgH = initial_imgH / initial_imgW * newimgW
+                imgW = newimgW;
+                imgH = newimgH;
+
+                //居中
+                x = (250 - imgW) / 2;
+                y = (250 - imgH) / 2;
+
+                cxt.clearRect(0, 0, 250, 250);//清楚canvas画布
+                cxt.drawImage(img, x, y, imgW, imgH);
+            }
+
+
+        }
+
+        //变小
+        function bianxiao() {
+            if (scale - 1 >= 0) {
+                scale--;
+                let newimgW = 0
+                if (scale != 0) {
+                    newimgW = initial_imgW * scale;
+                } else {
+                    //0时就是和canvas一样宽时
+                    newimgW = 250;
+                }
+                let newimgH = initial_imgH / initial_imgW * newimgW
+                imgW = newimgW;
+                imgH = newimgH;
+
+                //居中
+                x = (250 - imgW) / 2;
+                y = (250 - imgH) / 2;
+
+                cxt.clearRect(0, 0, 250, 250);//清楚canvas画布
+                cxt.drawImage(img, x, y, imgW, imgH);
+            }
+        }
+
+        //截取出图片
+        function cutImg() {
+            // var imgData = cxt.getImageData(0,0,250,250);//从canvas画布上某个区域（位置），获取指定大小的画布内容
+            // cxt.putImageData(imgData,0,0);//在canvas里某个区域（位置）设置（画），从canvas里某个获取出来的内容（上面这句话就是获取内容的话）
+            var urlcc = canvas.toDataURL("image/png");
+            console.log(urlcc);
+
+            //window.postMessage({"data":urlcc},location.origin);
+            //window.localStorage.imgurl = urlcc;
+        }
+
+
+    </script>
+</body>
+
+</html>

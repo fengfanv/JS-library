@@ -1,5 +1,81 @@
 # node.js
 
+### node进程守护
+```javascript
+//进程守护
+const fork = require('child_process').fork;
+
+//保存被子进程实例数组
+var workers = [];
+//这里的被子进程理论上可以无限多
+var appsPath = ['./index.js'];
+var createWorker = function (appPath) {
+    //保存fork返回的进程实例
+    var worker = fork(appPath);
+    //监听子进程exit事件
+    worker.on('exit', function () {
+        console.log('worker:' + worker.pid + 'exited');
+        delete workers[worker.pid];
+        createWorker(appPath);
+    });
+    workers[worker.pid] = worker;
+    console.log('Create worker:' + worker.pid);
+};
+//启动所有子进程
+for (var i = appsPath.length - 1; i >= 0; i--) {
+    createWorker(appsPath[i]);
+}
+//父进程退出时杀死所有子进程
+process.on('exit', function () {
+    console.log(workers);
+    for (var pid in workers) {
+        workers[pid].kill();
+    }
+});
+```
+
+### https 使用ssl证书
+```javascript
+const https = require('https');
+const fs = require('fs');
+/*获取ssl证书物理地址*/
+const httpsOption = {
+    key: fs.readFileSync("./ssl证书/xxx.key"),
+    cert: fs.readFileSync("./ssl证书/xxx.crt")
+};
+http.createServer(httpsOption,function (request, response) {
+	// 发送 HTTP 头部 
+	// HTTP 状态值: 200 : OK
+	// 内容类型: text/plain
+	
+	//返回状态及内容类型1
+	response.writeHead(200, {'Content-Type': 'text/plain'});
+	
+	//返回状态及内容类型2
+	response.statusCode = 200;
+	response.setHeader('Content-Type', 'text/plain;charset=utf-8');
+	
+	// 发送响应数据 "Hello World"
+	response.end('Hello World\n');
+}).listen(443);
+```
+### node exports
+主文件 index.js
+```javascript
+//引入 public-function
+const { format, md5, sha1, isApple } = require('./public-function');
+```
+模块文件 public-function.js
+```javascript
+const crypto = require('crypto');
+
+//暴露一个 md5 方法
+exports.md5 = function (s) {
+    //注意参数需要为string类型，否则会报错
+    return crypto.createHash('md5').update(String(s)).digest('hex');
+}
+```
+
 ### node利用range头实现断点下载
 
 案例文件：[videoServerDemo](https://github.com/fengfanv/JS-library/tree/master/node/videoServerDemo)
