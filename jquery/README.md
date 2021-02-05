@@ -317,3 +317,20 @@ $('#a10').off("click change")
 $("elem").off()
 ```
 
+#### ajax中设置请求头
+```javascript
+$.ajax({
+    url: "地址",
+    type: "post",
+    beforeSend: function (XMLHttpRequest) {
+		//设置自定义请求头
+        XMLHttpRequest.setRequestHeader('accept-blacc', 'zhanbuwawa');
+    },
+    success: function (data) {
+        console.log(data);
+    }, error: function (err) {
+        console.log(err)
+    }
+})
+
+```
