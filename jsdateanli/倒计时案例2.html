@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        function countDown(times) {
+            //times 单位秒
+            var timer = null;
+            timer = setInterval(function () {
+                var day = 0,
+                    hour = 0,
+                    minute = 0,
+                    second = 0;//时间默认值
+                if (times > 0) {
+                    day = Math.floor(times / (60 * 60 * 24));
+                    hour = Math.floor(times / (60 * 60)) - (day * 24);//如：times/(60*60)获取到有多少小时，day*24这里提示一下一天是24小时
+                    minute = Math.floor(times / 60) - (day * 24 * 60) - (hour * 60);//如：times/60获取到有多少分钟，一分钟60秒。这里提示一下1天等于24小时，一小时等于60分钟，
+                    second = Math.floor(times) - (day * 24 * 60 * 60) - (hour * 60 * 60) - (minute * 60);//如：这里提示一下1天等于24小时，每小时等于60分钟，一分钟等于60秒
+                }
+                console.log(day + "天:" + hour + "小时：" + minute + "分钟：" + second + "秒");
+                times--;
+            }, 1000);
+            if (times <= 0) {
+                clearInterval(timer);
+            }
+        }
+        countDown((new Date('2021-2-23 18:00:00')-new Date())/1000);
+        //countDown(18204);
+    </script>
+</body>
+
+</html>
