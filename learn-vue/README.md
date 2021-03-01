@@ -53,6 +53,21 @@ Dep 开始遍历所有的订阅者，
 如：当把一个普通js对象传给 Vue 实例来作为vue data 时，Vue 将遍历它的属性，
 用 Object.defineProperty 方法赋予data里各个属性getter/setter来监听数据。当属性发生变动时 通知 订阅者 变化。
 ```
+## 设置npm镜像源地址
+```
+npm config set registry https://registry.npm.taobao.org   //设置npm镜像源地址
+npm config get registry //获取npm镜像源地址
+```
+## 获取和设置npm全局 npm_cache地址
+```
+npm config get cache			//获取地址
+npm config set cache [地址]		//设置地址
+```
+## 获取和设置npm全局 node_global地址
+```
+npm config get prefix			//获取地址
+npm config set prefix [地址]		//设置地址
+```
 ## 安装脚手架
 ```
 npm install vue-cli -g
@@ -640,6 +655,16 @@ this.$store.commit("addCount",1);
 //调用actions下方法
 this.$store.dispatch("addFun");
 ```
+## import from与import()区别是什么
+```
+import from 静态加载，在代码编译时就运行，不能在写在代码块里，因为export和import from命令只能在模块的顶层，不能在代码块之中
+如下是不对的，会报错（import xxx from 'xxx'命令会被JS引擎静态分析，先于模块内的其他语句执行，套在外面的if不会被执行）：
+if(true){
+	import xxx from 'xxx'
+}
+-----
+import() 动态加载，会返回一个Promise对象
+```
 ## 在methods的方法内改变data里面object类型数据
 ```javascript
 export default {
@@ -804,16 +829,4 @@ export default {
 </script>
 <style scoped>
 </style>
-```
-## 安装cnpm
-```
-npm install -g cnpm --registry=https://registry.npm.taobao.org
-```
-## 获取npm安装全局库的地址
-```
-npm config get prefix
-```
-## 设置cnpm安装全局库的地址
-```
-cnpm config set prefix [地址]
 ```
