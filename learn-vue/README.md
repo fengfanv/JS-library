@@ -189,7 +189,10 @@ export default {
 	data () {
 	    return {
 			aaa: 'home',
-			count:0
+			count:0,
+			obj:{
+				a:1
+			}
 	    }
 	},
 	methods:{
@@ -208,7 +211,15 @@ export default {
 			//当count发生变化时执行
 			//newValue最新的值
 			//oldValue旧的值
-			
+		},
+		//watch的一个特点是，最初绑定的时候是不会执行的，要等到属性改变时才执行监听
+		obj:{
+		    handler(newValue,oldValue){
+				console.log(newValue);
+		    },
+		    immediate:true,//初次绑定时，就执行handler方法
+		    deep:true,//实现深度监听,一般情况下，给obj重新赋值也就是obj的这个引用发生变化，watch才能监听到，
+		    //但开启deep后修改a的值也能监听到，因为vue也给obj.a加上了监听，但是如果obj有好多key，开启后，会损耗性能
 		}
 		
 	}
@@ -221,7 +232,18 @@ export default {
 编写
 ```javascript
 Vue.component('base-board', {
-  props: ['value'],
+  props: ['value'],//使用props方式1
+  props:{//使用props方式2
+	value:{
+	      type:String,//注意，这里String两边没有单引号啥的
+	      required:true,//是否必填
+	      default:'abc',//默认参数，当数据为 对象 或 数组 时，默认值需要以一个工厂函数返回，如: default:function(){return {"a":1}}
+	      validator(a){//自定义检验方法，上面type检验类型，这里可以在加一些自定义判断，如value制必须是‘abc’
+	        console.log(a);
+	        return a=='abc'
+	      }
+	}
+  },
   template: `
     <div>{{value}}</div>
   `
@@ -232,7 +254,7 @@ Vue.component('base-board', {
 <!--v-bind绑属性值-->
 <base-board v-bind:value="值"></base-board>
 ```
-## 子组件调用父组件绑定的方法$emit
+#### 子组件调用父组件绑定的方法$emit
 编写
 ```javascript
 Vue.component('base-button', {
@@ -440,20 +462,55 @@ export default {
   methods:{}
 }
 ```
-## 在vue里使用axios可能遇到的问题
-1、使用axios post方式请求后台接口，后台接收不到数据的问题
-```javascript
-解决办法：使用URLSearchParams包装参数
+#### 在vue里使用axios的小窍门
+1、把所有接口都写在一个文件内，方便管理接口
 
+1.1、在request文件夹下创建一个query.js文件，写下如下代码
+```javascript
+//query.js文件
 import request from './index.js';
-let params = new URLSearchParams();
-params.append("orderid", orderid);
-request.post("http://localhost:5000/queryOrder", params)
-.then(function (res) {
-    return res;
-}).catch(function (err) {
-    return err;
-});
+
+export function queryOrder() {
+	
+	let params = new URLSearchParams();//解决post方式后台接收不到参数问题
+	params.append("orderid", orderid);
+	
+	return request.post("http://localhost:5000/queryOrder", params)
+	.then(function (res) {
+		return Promise.resolve(res);
+	}).catch(function (err) {
+		return Promise.reject(err);
+	});
+}
+
+export function queryOrder2() {
+	//...
+}
+...
+```
+1.2、在项目中使用
+```html
+<template>
+  <div></div>
+</template>
+<script>
+import { queryOrder } from "../request/query.js";
+export default {
+  data: function () {
+    return {this.a:1};
+  },
+  mounted() {
+	  queryOrder(this.a).then((res)=>{
+		  console.log(res);
+	  }).catch((err)=>{
+		  console.log(err);
+	  })
+  },
+  methods: {},
+};
+</script>
+<style scoped>
+</style>
 ```
 ## vue-router使用
 1、在项目内创建一个文件夹router
@@ -655,37 +712,6 @@ this.$store.commit("addCount",1);
 //调用actions下方法
 this.$store.dispatch("addFun");
 ```
-## import from与import()区别是什么
-```
-import from 静态加载，在代码编译时就运行，不能在写在代码块里，因为export和import from命令只能在模块的顶层，不能在代码块之中
-如下是不对的，会报错（import xxx from 'xxx'命令会被JS引擎静态分析，先于模块内的其他语句执行，套在外面的if不会被执行）：
-if(true){
-	import xxx from 'xxx'
-}
------
-import() 动态加载，会返回一个Promise对象
-```
-## 在methods的方法内改变data里面object类型数据
-```javascript
-export default {
-	name: "test",
-	data() {
-		return {
-			username:'Ian',
-			id:1,
-			check: {
-				account: "",
-				password: ""
-			}
-		}
-	},
-	methods: {
-		change() {
-			this.$set(this.check, "account", "");//改变check下account的值
-		}
-	}
-}
-```
 ## vue中自定义插件（利用Vue.extend实现一个插件）
 文件目录
 
@@ -775,8 +801,50 @@ Vue.loading_main.showLoading(function(data){
 	//这时，你可以利用callback来执行这些操作。
 });
 ```
-## 使用vue遇到的问题
-1、想在data的某个属性下使用data中的某个数据
+## 其它问题
+#### import from与import()区别是什么
+```
+import from
+静态加载，
+在代码编译时就运行，
+所以不能在写在代码块里，
+因为export和import from命令只能在模块的顶层，
+如：以下代码，会报错，因为import xxx from 'xxx'命令会被JS引擎静态分析，先于模块内的其他语句执行，套在外面的if不会被执行，所以会报错
+if(true){
+	import xxx from 'xxx'
+}
+
+-----
+
+import() 
+动态加载，
+会返回一个Promise对象，
+一般用于组件懒加载
+如：const Index = () => import('../pages/index.vue');
+
+```
+#### 在methods的方法内改变data里面object类型数据
+```javascript
+export default {
+	name: "test",
+	data() {
+		return {
+			username:'Ian',
+			id:1,
+			check: {
+				account: "",
+				password: ""
+			}
+		}
+	},
+	methods: {
+		change() {
+			this.$set(this.check, "account", "");//改变check下account的值
+		}
+	}
+}
+```
+#### 想在data的某个属性下使用data中的某个数据
 ```html
 <template>
   <div>hahah</div>
@@ -803,7 +871,7 @@ export default {
 <style scoped>
 </style>
 ```
-2、vue服务器渲染（ssr），区分当前是浏览器环境还是node环境
+#### vue服务器渲染（ssr），区分当前是浏览器环境还是node环境
 ```html
 <template>
   <div>hahah</div>
