@@ -1,6 +1,11 @@
 # 学习koa
 koa-router,koa-bodyparser,koa-static,koa-views,ejs模板
 
+## 安装Koa2
+```
+npm install koa
+```
+
 ## 创建一个普通服务
 ```javascript
 const Koa = require('koa');
