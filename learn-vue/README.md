@@ -53,6 +53,7 @@ Dep 开始遍历所有的订阅者，
 如：当把一个普通js对象传给 Vue 实例来作为vue data 时，Vue 将遍历它的属性，
 用 Object.defineProperty 方法赋予data里各个属性getter/setter来监听数据。当属性发生变动时 通知 订阅者 变化。
 ```
+
 Object.defineProperty 方法会直接在一个对象上定义一个新属性，或者修改一个对象的现有属性，并返回此对象。
 ```javascript
 var obj = {}
