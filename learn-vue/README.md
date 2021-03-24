@@ -387,7 +387,6 @@ module.exports = {
 index.js
 ```javascript
 import axios from 'axios';
-import qs from 'qs';
 
 //import store from '@/store' //导入 vuex
 
@@ -416,7 +415,7 @@ axios.interceptors.request.use(function(config){
 	// console.log("请求");
 	return config;
 },function(error){
-	return Promise.error(error);
+	return Promise.reject(error);
 });
 
 // 响应拦截器
@@ -477,6 +476,50 @@ export default {
   },
   methods:{}
 }
+```
+#### axios自定义请求头参数
+
+注意：post方式自定义请求头信息，会触发**复杂请求**。复杂请求会在post请求之前，会向服务端发送一个opstions的请求权限信息的请求，来向服务端要服务端的请求权限信息。拿到服务端的请求权限信息后，浏览器会将这个与post方式的请求头，请求方式，请求域名进行检验。如果满足条件发送post请求，如不满足会触发跨域，不会进行post请求
+
+[Nodejs处理 复杂请求](https://github.com/fengfanv/JS-library/tree/master/node#node处理复杂请求)
+```javascript
+export default {
+  name: 'home',
+  mounted(){
+	//get请求
+    this.$request.get('http://localhost/abc',{
+      params:{
+        a:1
+      },
+	  headers:{
+		  token:"I_am_token"
+	  }
+    })
+    .then(function(data){
+      console.log(data)
+    }).catch(function(err){
+      console.log(err)
+    });
+	
+	//post请求
+    this.$request.post('http://localhost/testPost',
+	{
+      a:1
+    },
+	{
+		headers:{
+			token:"I_am_token"
+		}
+	})
+    .then(function(data){
+      console.log(data)
+    }).catch(function(err){
+      console.log(err)
+    })
+  }
+}
+
+
 ```
 #### 在vue里使用axios的小窍门
 1、把所有接口都写在一个文件内，方便管理接口

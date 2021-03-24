@@ -1,5 +1,59 @@
 # node.js
 
+### node处理复杂请求
+满足以下两种条件就是**简单请求**:
+
+1、请求方法是这三种方法之一（HEAD，GET，POST）
+
+2、HTTP的请求头信息不超出这几种字段（Accept，Accept-Language，Content-Language，Last-Event-ID，Content-Type），其中Content-Type字段只能是这几种方式之一（application/x-www-form-urlencoded，multipart/form-data，text/plain）
+
+不满上面两种条件就是**复杂请求**:
+
+如：自定义了请求头字段，就会触发复杂请求
+
+--
+
+触发**复杂请求**。会在正式请求之前发送一个预检请求，会向服务端发送一个opstions的请求权限信息的请求，来向服务端要服务端的请求权限信息。拿到服务端的请求权限信息后，客户端会将这个与正式请求的请求头，请求方式，请求域名进行检验。如果满足条件发送正式请求，如不满足会触发跨域，不会进行正式请求
+
+经测试，在post方式自定义请求头参数，会触发复杂请求。get方式自定义请求头不会触发
+
+[为什么会有简单请求与复杂请求？](http://www.ruanyifeng.com/blog/2016/04/cors.html)
+
+[那什么是CORS？CORS是一个W3C标准？](https://www.w3cschool.cn/javascript_guide/javascript_guide-z4jy26a3.html)
+```javascript
+const http = require('http')
+
+const fs = require('fs')
+const url = require('url')
+const path = require('path')
+const querystring = require('querystring')
+
+function app(request, response) {
+    response.setHeader('Access-Control-Allow-Origin', '*');
+    response.setHeader("Access-Control-Allow-Headers", "X-Requested-With");
+    response.setHeader("Access-Control-Allow-Methods", "PUT,POST,GET,DELETE,OPTIONS");
+    response.setHeader("Access-control-max-age", "1000");
+
+	//处理复杂请求的预检请求
+    if (request.method === 'OPTIONS') {
+        response.writeHead(200, {
+            'Content-Type': 'text/plain',
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Headers': 'Content-Type, Content-Length, Authorization, Accept, X-Requested-With , yourHeaderFeild, sessionToken ',
+            'Access-Control-Allow-Methods': 'PUT, POST, GET, DELETE, OPTIONS'
+        });
+        response.end();
+        return false;
+    };
+    
+	....
+}
+
+http.createServer(app).listen(80, () => {
+    console.log('端口：80，服务已启动！');
+});
+
+```
 ### node进程守护
 ```javascript
 //进程守护
