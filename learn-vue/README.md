@@ -84,14 +84,14 @@ npm config set cache [地址]		//设置地址
 npm config get prefix			//获取地址
 npm config set prefix [地址]		//设置地址
 ```
-## 安装脚手架
+## npm安装模块
+"-g"安装到全局，
+
+"--save"表示在package.json文件中（dependencies）记录下载包的版本信息，**一般项目中安装依赖包时都必须加“--save”**
+
+"--save-dev"下载开发依赖包，上一条命令是下载生产依赖包
 ```
-npm install vue-cli -g
-```
-## 卸载脚手架
-如果是全局安装的脚手架，卸载时后面跟“-g”
-```
-npm uninstall vue-cli -g
+npm install 模块名
 ```
 ## v-if和v-show
 v-if,在html中是否加载（创建）元素
@@ -104,7 +104,19 @@ v-show,为元素设置display属性
 ```
 ## v-for
 ```html
+for in 与 for of 区别：
+for in 可以渲染数组或对象
+for of 只能渲染数组
+
 <span v-for="(item,index) in arr">{{item}},{{index}}</span>
+
+<span v-for="(item,index) of 99" v-if="item!=2">{{item}}</span>
+<!--注意：这个循环是从1开始的。v-for 与 v-if 写在一个元素里，这时v-for的优先级高于v-if，在这里v-if会失效-->
+
+<!--解决上面的问题，v-for写在template模板标签上，这个template模板标签是个空的占位符，不会被渲染到页面上-->
+<template v-for="(item,index) of 99">
+	<span v-if="item!=2">{{item}}</span>
+</template>
 ```
 ## v-text和v-html
 因为使用{{data}}这种方式直接在页面内渲染数据，在网页加载慢的时候会出现会直接把{{}}直接渲染出来，所以为了避免这种问题推荐使用以下两种方式
@@ -122,12 +134,55 @@ v-on:click等于@click
 ```html
 <div v-on:click="name='新名字'">{{name}}</div>
 <div v-on:click="fun()">{{name}}</div>
+<div v-on:click="fun(),fun2()">{{name}}</div><!--绑定多个事件，方法名后面在这里必须加上括号-->
+```
+事件修饰符
+```html
+1、stop修饰符 阻止事件向父级事件冒泡
+<div @click="handle1">
+	<button @click.stop="handle">我是按钮</button>
+	<!--点击这个按钮只会触发handle方法，不会触发handle1方法-->
+</div>
+
+2、self修饰符 只有点击自己的时候才会被执行
+<div @click.self="handle1">
+	aaaaa
+	<!--点击aaa时只会触发handle1方法，不会触发handle方法-->
+	<button @click="handle">我是按钮</button>
+	<!--这时点击 我是按钮 handle1方法不会被触发-->
+</div>
+
+3、prevent修饰符 阻止元素默认行为
+<button type="submit" @click.prevent="handle">我是按钮</button>
+<!--这时点击 我是按钮 只会单纯触发handle方法。不会有form表单的提交行为-->
+
+4、capture修饰符 改成捕获模式，默认冒泡模式
+<div @click.capture="handle1">
+	<button @click="handle">我是按钮</button>
+	<!--这时点击我是按钮，会先触发handle1方法，然后在触发handle方法-->
+</div>
+
+5、once修饰符 事件只执行一次
+<button @click="handle">我是按钮</button>
+<!--这时点击我是按钮，会先触发一次handle1方法，在次点击就不会触发方法-->
 ```
 ## v-model 双向数据绑定
 ```html
 <input type="text" v-model="name">	//结果：输入的内容
 <input type="checkbox" v-model="thisValue">    //结果：true或false
 <input type="radio" value="我被选中了" v-model="thisValue">    //结果：value值
+```
+v-model修饰符
+```html
+1、lazy修饰符 用户按回车 或 失去焦点时才将数据写到data中
+<input type="text" v-model.lazy="text">
+<!--用户按回车 或 input框失去焦点时才将数据写入data-->
+
+2、number修饰符 将用户输入的数值字符串转成成数值
+<input type="text" v-model.number="num">
+
+3、trim修饰符 去除字符串两边多余的空格
+<input type="text" v-model.trim="text">
 ```
 ## v-bind 绑定元素属性
 v-bind:href等于:href
@@ -144,8 +199,10 @@ console.log(Vue.config.devtools);
 ```
 ## 绑定行内样式
 ```html
-<h1 :style="{'background':background,'font-size':'100px'}">I am Index</h1><!--绑定样式 不包引号则为data里属性-->
-<h1 :style="h1Style">I am Index</h1><!--绑定样式 不包引号则为data里属性,,,
+<h1 :style="{'background':background,'font-size':'100px'}">I am Index</h1>
+<!--绑定样式 不包引号则为data里属性-->
+<h1 :style="h1Style">I am Index</h1>
+<!--绑定样式 不包引号则为data里属性,
 data:{
 	h1Style:{
 		'background':'red'
@@ -159,11 +216,13 @@ data:{
 ```
 ## 三元运算符和绑定多个样式
 ```html
+方式1 通过数组
 <div v-bind:class="[isActive ? activeClass : '', 'errorClass','content']"></div>
-<!--
-	渲染结果：如果isActive为true则渲染 activeClass(外面不包引号则为数据属性) 'errorClass'(包引号为style样式名) 'content'这三个样式
-			如果isActive为false则渲染 errorClass content这两个样式
--->
+<!--渲染结果：如果isActive为true则渲染 activeClass(外面不包引号则为数据属性) 'errorClass'(包引号为style样式名) 'content'这三个样式。如果isActive为false则渲染 errorClass content这两个样式-->
+
+方式2 通过对象
+<div v-bind:class="{color1:true,background1:true}"></div>
+<!--这时这个div会被添加一个名为color1的class样式，和一个为名为background1的class样式。如果color1为false，则不会添加名为color1的样式-->
 ```
 ## vue代码结构
 ```javascript
@@ -202,6 +261,12 @@ export default {
 		//这时组件已经完全销毁，组件中的数据、方法、指令、过滤器等都已经不可用
 		console.log("destroyed");
 	},
+	beforeUnmount(){//vue3生命周期，用来代替2生命周期beforeDestroy，调用app.unmount()可触发该生命周期
+		console.log("beforeDestroy")
+	},
+	unmounted(){//vue3生命周期，用来代替2生命周期destroyed，调用app.unmount()可触发该生命周期
+		console.log("unmounted");
+	},
 	data () {
 	    return {
 			aaa: 'home',
@@ -237,14 +302,41 @@ export default {
 		    deep:true,//实现深度监听,一般情况下，给obj重新赋值也就是obj的这个引用发生变化，watch才能监听到，
 		    //但开启deep后修改a的值也能监听到，因为vue也给obj.a加上了监听，但是如果obj有好多key，开启后，会损耗性能
 		}
-		
 	}
-	
 }
+```
+## vue组件
+```javascript
+//vue2写法
+Vue.component('base-board', {
+  template: `<div>1111</div>
+  `
+});
 
-
+//vue3写法
+const app = Vue.createApp({
+	template:`
+		<h1>Vue3实例</h1>
+		<a1 /><!--全局组件-->
+		<base-board /><!--局部组件-->
+	`,
+	components:{
+		baseBoard //这里局部组件需要在这里绑定一下，才能使用。这里虽然是驼峰写法，但在html中使用时，需要转换成<base-board />这里因为在js变量中不能使用 “ - ”，html组件可以使用。这样做可以有个区分
+	}
+})
+//全局组件，只要定义了，处处可以使用，性能不高，但是使用起来简单。为什么性能不高，全局组件就是你一旦定义了，就会占用系统资源，不管你用不用
+//
+app.component('a1',{
+	template:`<h1>我是全局组件</h1>`
+});
+//局部组件，定义了，不占资源。只有使用了才占资源
+const baseBoard = {
+	template: `<div>局部组件</div>`
+};
+app.$mount('#app');//挂载vue3实例
 ```
 ## 父子传值props
+
 编写
 ```javascript
 Vue.component('base-board', {
@@ -270,7 +362,8 @@ Vue.component('base-board', {
 <!--v-bind绑属性值-->
 <base-board v-bind:value="值"></base-board>
 ```
-#### 子组件调用父组件绑定的方法$emit
+## 子组件调用父组件绑定的方法$emit
+
 编写
 ```javascript
 Vue.component('base-button', {
@@ -278,6 +371,12 @@ Vue.component('base-button', {
 		return {}
 	},
 	props: ['value'],
+	emits:['方法名1'],//vue3需要，vue3里不写会报警告。vue2不需要。vue2这里可以直接无视，毕竟这个是在vue2版本组件里声明的
+	emits:{//emits写法2，对子传父的值进行自定义校验，如果这时这个value小于10，则会被警告
+		'方法名1'(value){
+			return value>10?true:false
+		}
+	},
 	template: `
 		<div>{{value}}</div>
 		<button v-on:click="diaoyong">按钮</button>
@@ -293,6 +392,57 @@ Vue.component('base-button', {
 使用
 ```html
 <base-button v-on:方法名1="父组件里方法"></base-button>
+```
+## 组件slot（插槽）
+
+编写
+```javascript
+//一个插槽
+Vue.component('baseButton', {
+    template: `
+    <div>
+        <p>我是组件</p>
+        <slot></slot>
+    </div>`
+})
+
+//多个插槽
+Vue.component('baseButton', {
+    template: `
+    <div>
+        <p>我是组件</p>
+        <slot name="one"></slot> //多个插槽需要在slot标签上指定name来区分，
+        <slot name="two"></slot>
+    </div>`
+})
+```
+使用
+```html
+<!--一个插槽-->
+<base-button>
+	<input type="text" :value="inputValue">
+</base-button>
+
+<!--多个插槽-->
+<base-button>
+    <template v-slot:one>
+        <input type="text" :value="inputValue">
+    </template>
+    <template v-slot:two>
+        <input type="text" :value="inputValue+2">
+    </template>
+</base-button>
+```
+## 组件Non-props属性
+
+给子组件v-bind绑数据，子组件如果不props接收数据，绑的数据会变成子组件的属性，子组件接收了数据就不会变成子组件的属性。这也就是为什么可以给组件或标签绑定style样式。
+```html
+<!--假如value1这时是1，且组件没有接收这个index值，这时组件的跟标签是div-->
+<base-button :index="value1"></base-button>
+```
+渲染结果
+```html
+<div index="1"></div>
 ```
 ## 自定义部组件绑v-model属性
 编写
@@ -338,20 +488,32 @@ css样式
     <span v-if="isPageShow"></span>
 </transition>
 ```
-## 创建一个脚手架项目
+## 安装脚手架2版本
+```
+npm install vue-cli -g //安装脚手架2版本脚手架的命令
+```
+## 卸载脚手架2版本
+如果是全局安装的脚手架，卸载时后面跟“-g”
+```
+npm uninstall vue-cli -g //卸载脚手架2版本的命令
+```
+## 脚手架2版本创建一个项目
 ```
 vue init webpack 项目名称
 ```
-## 项目里安装模块
-"-g"安装到全局，
-
-"--save"表示在package.json文件中（dependencies）记录下载包的版本信息，**一般项目中安装依赖包时都必须加“--save”**
-
-"--save-dev"下载开发依赖包，上一条命令是下载生产依赖包
+## 脚手架3或更高版本安装
 ```
-npm install 模块名
+npm install -g @vue/cli
 ```
-## vue开发环境解决跨域问题
+## 脚手架3或更高版本卸载
+```
+npm uninstall @vue/cli -g
+```
+## 脚手架3或更高版本创建一个项目
+```
+vue create 项目名称
+```
+## 脚手架2版本开发环境解决跨域问题
 1、修改项目“config/index.js”文件
 ```javascript
 'use strict'
