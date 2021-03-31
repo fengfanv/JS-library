@@ -1,12 +1,52 @@
 # 学习Vue
-vue-cli，vuex，vue-router
+vue-cli，axios，vue-router，vuex
 
 ## jquery与vue区别
 ```
 vue数据操作dom
 jquery直接修改dom
 ```
+## 更新变化
+```
+//vue使用变化
+1、创建实例的方式不一样
+//vue2
+new Vue({
+	el:"#app",
+	data(){return {}}
+})
 
+//vue3
+Vue.createApp({
+	data(){return {}}
+}).$mount("#app");
+
+2、声明周期函数变化
+brforeDestroy -> beforeUnmount
+destroyed -> unmounted
+
+3、组件内新增一个emits定义方式
+可以用这个来验证子传父时，验证数据是否正确
+
+--
+
+4、脚手架2到最新脚手架变化
+
+4.1脚手架创建项目命令变化 
+2版本：vue init webpack 项目名
+最新版：vue create 项目名
+
+4.2启动项目的命令发生变化
+npm run dev -> npm run serve
+
+4.3脚手架项目 目录变化
+static -> public
+删除了config，build配置脚手架文件，用vue.config.js代替了
+
+5、vue3版本引用vue-router和vuex的创建方式发生变化
+vue3引用的vue-router创建是通过createRouter创建的，之前是直接new Router()
+vue3引用的vuex创建是通过createStore创建的，之前是vuex.store方法创建
+```
 ## MVVM模式
 ```
 MVVM 是 Model-View-ViewModel 的缩写
@@ -367,7 +407,7 @@ Vue.component('base-button', {
     return {}
   },
   props: ['value'],
-  emits: ['方法名1'],//vue3需要，vue3里不写会报警告。vue2不需要。vue2这里可以直接无视，毕竟这个是在vue2版本组件里声明的
+  emits: ['方法名1'],//vue3新增，也不是必须写，这是一个类似props的东西，主要是定义子传父事件的。vue2不需要。
   emits: {//emits写法2，对子传父的值进行自定义校验，如果这时这个value小于10，则会被警告
     '方法名1'(value) {
       return value > 10 ? true : false
@@ -639,7 +679,7 @@ export default {
 ```
 axios自定义请求头参数
 
-注意：post方式自定义请求头信息，会触发**复杂请求**。复杂请求会在post请求之前，会向服务端发送一个opstions的请求权限信息的请求，来向服务端要服务端的请求权限信息。拿到服务端的请求权限信息后，浏览器会将这个与post方式的请求头，请求方式，请求域名进行检验。如果满足条件发送post请求，如不满足会触发跨域，不会进行post请求
+注意：post方式自定义请求头信息，会触发**复杂请求**。复杂请求会在post请求之前，会向服务端发送一个OPTIONS的请求权限信息的请求，来向服务端要服务端的请求权限信息。拿到服务端的请求权限信息后，浏览器会将这个与post方式的请求头，请求方式，请求域名进行检验。如果满足条件发送post请求，如不满足会触发跨域，不会进行post请求
 
 [Nodejs处理 复杂请求](https://github.com/fengfanv/JS-library/tree/master/node#node处理复杂请求)
 ```javascript
@@ -647,15 +687,15 @@ export default {
   name: 'home',
   mounted() {
     //get请求
-    this.$request.get('http://localhost/abc', {
+    this.$request.get('http://localhost/abc', 
+	{
       params: {
         a: 1
       },
       headers: {
         token: "I_am_token"
       }
-    })
-      .then(function (data) {
+    }).then(function (data) {
         console.log(data)
       }).catch(function (err) {
         console.log(err)
@@ -670,8 +710,8 @@ export default {
         headers: {
           token: "I_am_token"
         }
-      })
-      .then(function (data) {
+      }
+	  ).then(function (data) {
         console.log(data)
       }).catch(function (err) {
         console.log(err)
