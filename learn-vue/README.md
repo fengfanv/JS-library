@@ -28,8 +28,6 @@ destroyed -> unmounted
 3、组件内新增一个emits定义方式
 可以用这个来验证子传父时，验证数据是否正确
 
---
-
 4、脚手架2到最新脚手架变化
 
 4.1脚手架创建项目命令变化 
@@ -41,11 +39,19 @@ npm run dev -> npm run serve
 
 4.3脚手架项目 目录变化
 static -> public
-删除了config，build配置脚手架文件，用vue.config.js代替了
+删除了config，build配置脚手架文件，可用vue.config.js代替了
 
 5、vue3版本引用vue-router和vuex的创建方式发生变化
 vue3引用的vue-router创建是通过createRouter创建的，之前是直接new Router()
 vue3引用的vuex创建是通过createStore创建的，之前是vuex.store方法创建
+
+6、新出了一个组合式api
+组合式api方式，主要就是已setup()方法实现，让我们不必向以前那样写代码，
+如：数据必须写在data里，操作data数据里方法得写在methods里的，
+这样写，操作的数据少还行，要是多了，会导致代码很难阅读，
+数据和方法没有写在一起，代码很不内聚，
+为了解决这个问题，出了这个组合式api，这个就是比较省事，在setup方法，
+里定义数据，定义方法，然后暴露出去，就可以可用
 ```
 ## MVVM模式
 ```
