@@ -22,7 +22,7 @@ Vue.createApp({
 }).$mount("#app");
 
 2、声明周期函数变化
-brforeDestroy -> beforeUnmount
+beforeDestroy -> beforeUnmount
 destroyed -> unmounted
 
 3、组件内新增一个emits定义方式
@@ -152,7 +152,7 @@ v-show,为元素设置display属性
 ```
 ## v-for
 ```html
-for in 与 for of 区别： for in 可以渲染数组或对象 for of 只能渲染数组
+for in 与 for of 区别： for in 可以渲染数组或对象 for of 只能渲染数组，for in遍历的是键或坐标，for of遍历的是值
 
 <span v-for="(item, index) in arr">{{ item }},{{ index }}</span>
 
@@ -179,7 +179,7 @@ v-html功能等于innerHTML
 v-on:click等于@click
 ```html
 <div v-on:click="name='新名字'">{{name}}</div>
-<div v-on:click="fun()">{{name}}</div>
+<div v-on:click="fun">{{name}}</div>
 <div v-on:click="fun(),fun2()">{{name}}</div>
 <!--绑定多个事件，方法名后面在这里必须加上括号-->
 ```
@@ -206,11 +206,12 @@ v-on:click等于@click
 4、capture修饰符 改成捕获模式，默认冒泡模式
 <div @click.capture="handle1">
   <button @click="handle">我是按钮</button>
-  <!--这时点击我是按钮，会先触发handle1方法，然后在触发handle方法-->
+  <!--经测试，点击我是按钮，会先触发handle1方法，然后在触发handle方法-->
+  <!--经测试，如果capture绑定在handle方法上，这时点击我是按钮，会先触发handle方法，然后在触发handle1方法-->
 </div>
 
 5、once修饰符 事件只执行一次
-<button @click="handle">我是按钮</button>
+<button @click.once="handle">我是按钮</button>
 <!--这时点击我是按钮，会先触发一次handle1方法，在次点击就不会触发方法-->
 ```
 ## v-model 双向数据绑定
@@ -579,6 +580,28 @@ module.exports = {
     //...
   }
   //...
+}
+```
+## 脚手架3或更高版本开发环境解决跨域问题
+1、最新版本脚手架不提供build、config等配置项目的文件夹，此版本用vue.config.js代替
+```javascript
+module.exports = {
+    publicPath: process.env.NODE_ENV === 'production'
+        ? './'
+        : '/',//解决打包后访问不到资源文件的问题
+		
+    devServer: {//解决跨域问题
+        open: true,
+        proxy: {
+            '/api': {
+                target: 'http://localhost:80/', //设置你调用的接口域名和端口号 别忘了加http
+                changeOrigin: true, //允许跨域
+                pathRewrite: {
+                    '^/api': '/' // 这里理解成用‘/api’代替target里面的地址，后面组件中我们掉接口时直接用api代替 比如我要调用'http://localhost:8090/users'，直接写‘/api/users’即可
+                }
+            }
+        }
+    }
 }
 ```
 ## Vue-API  Vue.config.devtools
