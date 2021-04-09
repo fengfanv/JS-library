@@ -436,6 +436,59 @@ Vue.component('base-button', {
 ```html
 <base-button v-on:方法名1="父组件里方法"></base-button>
 ```
+## 在父组件中使用子组件中的方法或数据
+
+子组件
+```html
+<template>
+  <div>子组件</div>
+</template>
+<script>
+export default {
+  props: ["value"],
+  data: function () {
+    return {
+      a: 120,
+    };
+  },
+  methods: {
+    alert(name, value) {
+      console.log("触发子组件中的方法");
+      console.log(name, value);
+    },
+  },
+};
+</script>
+<style scoped>
+</style>
+```
+父组件
+```html
+<template>
+  <div>父组件</div>
+  <baseButton ref="baseButton" />
+</template>
+<script>
+//引入子组件
+import baseButton from "./components/BaseButton.vue";
+export default {
+  data: function () {
+    return {};
+  },
+  components: {
+    baseButton,
+  },
+  mounted() {
+    this.$baseButton = this.$refs.baseButton;
+
+    this.$baseButton.alert("父组件", 1); //调用子组件里方法
+    console.log(this.$baseButton.a); //打印 120
+  },
+};
+</script>
+<style scoped>
+</style>
+```
 ## 组件slot（插槽）
 
 编写
@@ -605,7 +658,7 @@ module.exports = {
 }
 ```
 ## Vue-API  Vue.config.devtools
-获取vue环境当前是开发环境还是生产环境
+获取vue2环境当前是开发环境还是生产环境
 ```javascript
 //javascript
 console.log(Vue.config.devtools);
@@ -713,40 +766,46 @@ axios自定义请求头参数
 [Nodejs处理 复杂请求](https://github.com/fengfanv/JS-library/tree/master/node#node处理复杂请求)
 ```javascript
 export default {
-  name: 'home',
+  name: "home",
   mounted() {
     //get请求
-    this.$request.get('http://localhost/abc', 
-	{
-      params: {
-        a: 1
-      },
-      headers: {
-        token: "I_am_token"
-      }
-    }).then(function (data) {
-        console.log(data)
-      }).catch(function (err) {
-        console.log(err)
+    this.$request
+      .get("http://localhost/abc", {
+        params: {
+          a: 1,
+        },
+        headers: {
+          token: "I_am_token",
+        },
+      })
+      .then(function (data) {
+        console.log(data);
+      })
+      .catch(function (err) {
+        console.log(err);
       });
 
     //post请求
-    this.$request.post('http://localhost/testPost',
-      {
-        a: 1
-      },
-      {
-        headers: {
-          token: "I_am_token"
+    this.$request
+      .post(
+        "http://localhost/testPost",
+        {
+          a: 1,
+        },
+        {
+          headers: {
+            token: "I_am_token",
+          },
         }
-      }
-	  ).then(function (data) {
-        console.log(data)
-      }).catch(function (err) {
-        console.log(err)
+      )
+      .then(function (data) {
+        console.log(data);
       })
-  }
-}
+      .catch(function (err) {
+        console.log(err);
+      });
+  },
+};
 ```
 在vue里使用axios的小窍门
 

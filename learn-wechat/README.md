@@ -66,15 +66,15 @@ Page({
 #### 检测当前是否为pc电脑端
 ```javascript
 wx.getSystemInfo({
-    success(res) {
-        let system = res.system;
-        if (/(windows|mac|win)/i.test(system)) {
-			_this.setData({
-				isPc: true
-			})
-        }
+  success(res) {
+    let system = res.system;
+    if (/(windows|mac|win)/i.test(system)) {
+      _this.setData({
+        isPc: true,
+      });
     }
-})
+  },
+});
 ```
 #### 使用下拉刷新
 ```javascript
@@ -103,28 +103,28 @@ wx.getSystemInfo({
 #### 动态设置导航栏背景色及文字颜色1（API -> 界面 -> 导航栏）
 ```javascript
 wx.setNavigationBarColor({
-  frontColor: '#ffffff',//文字颜色只能是黑（#000000）或白（#ffffff）
-  backgroundColor: '#ff0000'
+  frontColor: "#ffffff", //文字颜色只能是黑（#000000）或白（#ffffff）
+  backgroundColor: "#ff0000",
 });
 ```
 #### 设置导航栏背景色及文字颜色2
 ```javascript
 //1、设置项目app.json文件
 {
-    "pages": [],
-    "window": {
-		"navigationStyle":"default",//default 默认样式。custom 自定义导航栏，只保留右上角胶囊按钮。
-        "navigationBarBackgroundColor": "#F6F6F6",
-        "navigationBarTitleText": "",
-        "navigationBarTextStyle": "black"
-    }
-}
+  pages: [],
+  window: {
+    navigationStyle: "default", //default 默认样式。custom 自定义导航栏，只保留右上角胶囊按钮。
+    navigationBarBackgroundColor: "#F6F6F6",
+    navigationBarTitleText: "",
+    navigationBarTextStyle: "black",
+  },
+};
 //2、设置页面下页面的json文件
 {
-  "navigationBarTitleText": "Change",
-  "navigationBarBackgroundColor": "#ffffff",
-  "navigationBarTextStyle": "black"
-}
+  navigationBarTitleText: "Change",
+  navigationBarBackgroundColor: "#ffffff",
+  navigationBarTextStyle: "black",
+};
 ```
 #### app.json设置背景注意事项
 ```javascript
@@ -141,9 +141,19 @@ page {
 #### 使用 wx:for（框架 -> WXML语法参考）
 [wx:for文档](https://developers.weixin.qq.com/miniprogram/dev/reference/wxml/list.html)
 ```html
+<!--默认情况下，不用指定wx:for-index 与 wx:for-item，默认下为item与index，想自定义可以指定-->
 <view wx:for="{{array}}" wx:for-index="idx" wx:for-item="itemName">
   {{idx}}: {{itemName.message}}
 </view>
+```
+#### 在标签内动态插入html元素 类似v-html的功能
+
+小程序里没有v-html这样的指令，需要借用 rich-text 标签
+```html
+<!--
+这时htmlData里数据为："我是<span style='color:red'>Fengfanv</span>"
+-->
+<rich-text nodes="{{htmlData}}"></rich-text>
 ```
 #### 使用 button 按钮（组件 -> 表单组件）
 [button微信文档](https://developers.weixin.qq.com/miniprogram/dev/component/button.html)
@@ -183,8 +193,7 @@ page {
 ```javascript
 Page({
 	handlerName(e){
-		console.log(e.currentTarget.dataset.keyname)
-		//11
+		console.log(e.currentTarget.dataset.keyname) //打印 11
 	}
 }
 ```
@@ -215,32 +224,34 @@ Page({
 
 ```javascript
 page({
-	//登录方法
-	onlogin(){
-		wx.login({
-	      success(res) {
-	        if (res.code) {
-	          //网络请求，请求后端接口
-	          wx.request({
-	            url: 'https://www.xxx.cn:1000/api/onlogin',
-	            method: "get",
-	            data: {
-	              code: res.code
-	            },
-	            success: function (data) {
-	              //后端请求成功
-	            },
-				fail:function(err){
-				  //后端请求失败
-				}
-	          })
-	        } else {
-	          //console.log('登录失败！' + res.errMsg);
-	        }
-	      }
-	    })
-	}
-})
+  //登录方法
+  onlogin() {
+	  
+    wx.login({
+      success(res) {
+        if (res.code) {
+          //网络请求，请求后端接口
+          wx.request({
+            url: "https://www.xxx.cn:1000/api/onlogin",
+            method: "get",
+            data: {
+              code: res.code,
+            },
+            success: function (data) {
+              //后端请求成功
+            },
+            fail: function (err) {
+              //后端请求失败
+            }
+          });
+        } else {
+          //console.log('登录失败！' + res.errMsg);
+        }
+      }
+    });
+	
+  },
+});
 ```
 #### 页面之间使用
 后端代码（服务端 -> 登录 -> auth.code2Session）
@@ -248,33 +259,36 @@ page({
 [后端api文档](https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/login/auth.code2Session.html)
 ```javascript
 //Node.js
-const https = require('https');
+const https = require("https");
 
 //微信用户登录，用code换openid
 function getUserOpenid(code) {
-    return new Promise(function (resolve, reject) {
-        const option = {
-            "hostname": "api.weixin.qq.com",
-            "protocol": "https:",
-            "port": 443,
-            "method": "GET",
-            "path": "https://api.weixin.qq.com/sns/jscode2session?appid=123456789&secret=123456789&js_code=" + code + "&grant_type=authorization_code"
-        };
-        const request = https.request(option, function (response) {
-            let data = '';
-            response.on('data', function (chunk) {
-                data += chunk;
-            });
-            response.on('end', function () {
-                resolve(data);
-            });
-        });
-        request.on('error', function (err) {
-            reject('换取 openid 失败！')
-        });
-        request.end();
-    })
-};
+  return new Promise(function (resolve, reject) {
+    const option = {
+      hostname: "api.weixin.qq.com",
+      protocol: "https:",
+      port: 443,
+      method: "GET",
+      path:
+        "https://api.weixin.qq.com/sns/jscode2session?appid=123456789&secret=123456789&js_code=" +
+        code +
+        "&grant_type=authorization_code",
+    };
+    const request = https.request(option, function (response) {
+      let data = "";
+      response.on("data", function (chunk) {
+        data += chunk;
+      });
+      response.on("end", function () {
+        resolve(data);
+      });
+    });
+    request.on("error", function (err) {
+      reject("换取 openid 失败！");
+    });
+    request.end();
+  });
+}
 
 ```
 #### 写入和读取本地缓存（API -> 数据缓存）
@@ -422,11 +436,12 @@ Page({
 });
 
 ```
+
 #### 自定义组件开发（开发 -> 指南 -> 自定义组件）
 [自定义组件-官方文档](https://developers.weixin.qq.com/miniprogram/dev/framework/custom-component/)
 ##### 项目内使用自定组件
 ```javascript
-//1、在项目里创建组件页面，在这个页面内的json文件里添加 "component": true 用于声明组件
+//1、在项目里创建组件页面，在这个组件页面内的json文件里添加 "component": true 用于声明组件
 //2、组件编写完成后，在项目中使用
 ```
 ##### 组件的html文件
@@ -436,7 +451,13 @@ Page({
     <view class="icon color2" wx:if="{{state==2}}"></view>
     <view class="icon color3" wx:if="{{state==3}}"></view>
     <view class="text">{{text}}</view>
-	<slot></slot><!--用于承载组件引用时提供的子节点-->
+	<!--slot用于承载组件引用时提供的子节点-->
+	<!--单个slot-->
+	<slot></slot>
+	
+	<!--多个slot-->
+	<slot name="one"></slot>
+	<slot name="two"></slot>
 </view>
 ```
 ##### 什么是slot
@@ -528,21 +549,31 @@ Component({
 }
 //添加完毕后方可使用
 ```
-
+在页面中使用
 ```html
 <!--使用properties中的属性state，text-->
 <!--监听methods的toHide方法里this.triggerEvent触发的自定义组件事件-->
 <showState state="3" text="更新异常" onhide="onhide" id="showState">
+	<!--单个slot使用，直接放进组件里就行-->
 	<view>使用slot</view>
 </showState>
-```
 
+<!--多个slot使用-->
+<showState>
+	<view slot="one">使用slot_one</view>
+	<view slot="two">使用slot_two</view>
+</showState>
+```
+使用组件中的方法
 ```javascript
 Page({
     data: {},
     onLoad: function (options) {
-		this.$showState = this.selectComponent('#showState')
+		
+		this.$showState = this.selectComponent('#showState');
+		
 		this.$showState.setValue(1,'更新成功')//使用showState中的方法
+		
     }
 });
 ```
