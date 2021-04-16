@@ -53,12 +53,17 @@ vue3引用的vuex创建是通过createStore创建的，之前是vuex.store方法
 为了解决这个问题，出了这个组合式api，这个就是比较省事，在setup方法，
 里定义数据，定义方法，然后暴露出去，就可以可用
 ```
-## MVVM模式
+## MVVM设计模式
 ```
+MVVM是一种框架设计模式（软件架构模式），vue，react都是基于这种设计模式
+
+MVVM把 UI用户界面 与 业务逻辑 分开，这样开发者只需关注
+业务逻辑，不需要操作dom
+
 MVVM 是 Model-View-ViewModel 的缩写
 
-Model 代表数据模型，业务逻辑相关的数据对象
-View 代表UI组件，它负责将数据模型转化成UI展现出来
+Model 业务逻辑相关的数据对象
+View 负责将数据转化成UI展现出来
 ViewModel 是一个同步 View 和 Model 的对象
 
 在MVVM架构下，View 和 Model 之间并没有直接的联系，
@@ -186,6 +191,7 @@ v-on:click等于@click
 事件修饰符
 ```html
 1、stop修饰符 阻止事件向父级事件冒泡
+e.stopPropagation()
 <div @click="handle1">
   <button @click.stop="handle">我是按钮</button>
   <!--点击这个按钮只会触发handle方法，不会触发handle1方法-->
@@ -200,6 +206,7 @@ v-on:click等于@click
 </div>
 
 3、prevent修饰符 阻止元素默认行为
+e.preventDefault()
 <button type="submit" @click.prevent="handle">我是按钮</button>
 <!--这时点击 我是按钮 只会单纯触发handle方法。不会有form表单的提交行为-->
 
@@ -599,7 +606,7 @@ vue init webpack 项目名称
 ```
 ## 脚手架3或更高版本安装
 ```
-npm install -g @vue/cli
+npm install @vue/cli -g
 ```
 ## 脚手架3或更高版本卸载
 ```
