@@ -77,6 +77,8 @@ String(function(){return 10}) //"function(){return 10}"
 
 
 //2、强制数据类型转换成 数值
+Number("") //0
+
 Number("1") //1
 
 Number("a") //NaN
@@ -293,4 +295,59 @@ console.log(a == a) //true
 console.log([] == ![]) //true
 //这里相当于创建了像个空数组比较，两个空数组，地址不一样，所以不相等
 console.log([] == []) //false
+```
+## 逻辑运算符（&&，||，!）
+```javascript
+//1、逻辑非（ ！），返回的一定是，布尔值
+//使用逻辑非（ ！）时，如果参数是布尔值，会取反。如果参数不是布尔值，是其它数据类型，会先调用Boolean()方法将参数强制转成 布尔值，然后在取反
+
+console.log(!true)  //false
+
+//!0 => !Boolean(0) => !false => true
+console.log(!0) //true
+
+//!2 => !Boolean(2) => !true => false
+console.log(!2) //false
+
+//!undefined => !Boolean(undefined) => !false => true
+console.log(!undefined) //true
+
+//!null => !Boolean(null) => !false => true
+console.log(!null) //true
+
+//!NaN => !Boolean(NaN) => !false => true
+console.log(!NaN) //true
+
+
+//2、逻辑运算符通常 使用布尔值，这种情况下，它们返回一个布尔值
+//逻辑与 和 逻辑或 运算符会返回一个指定 参数的值，因此，这些 逻辑运算符 也用于非布尔值，这时，它们也会返回一个非布尔型值
+
+//逻辑与（&&），参数1 && 参数2，若 参数1 可转换为 true，则返回 参数2；否则，返回 参数1
+//逻辑与，是从左往右计算的，运算时，是简便运算，即如果第一个参数决定了结果，就不再计算第二个运算数
+//undefined && {} => Boolean(undefined) && {} => false && {}
+console.log(undefined && {}) //undefined
+//{} && {a:1} => Boolean({}) && {a:1} => true && {a:1}
+console.log({} && {a:1}) //{a:1}
+
+//逻辑或（||），参数1 || 参数2，若 参数1 可转换为 true，则返回 参数1；否则，返回 参数2
+//逻辑或，是从左往右计算的，运算时，是简便运算，即如果第一个参数决定了结果，就不再计算第二个运算数
+//undefined || {} => Boolean(undefined) || {} => false || {}
+console.log(undefined || {}) //{}
+//{} || {a:1} => Boolean({}) || {a:1} => true || {a:1}
+console.log({} || {a:1}) //{}
+
+//实战应用1
+let a = function(){
+    console.log('I am A')
+}
+a && a() //'I am A'
+
+//实战应用2
+let c = 10
+let b = c || 20
+console.log(b) //10
+
+let c = undefined
+let b = c || 20
+console.log(b) //20
 ```
