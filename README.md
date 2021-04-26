@@ -26,6 +26,8 @@
 
 11、[uniapp使用_uniapp](https://github.com/fengfanv/JS-library/blob/master/uniapp)
 
+12、[a星寻路算法与强化学习算法_aStarAndQLearning](https://github.com/fengfanv/JS-library/blob/master/aStarAndQLearning)
+
 --
 
 1、[js分页案例_fenye](https://github.com/fengfanv/JS-library/tree/master/fenye)

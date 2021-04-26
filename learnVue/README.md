@@ -63,7 +63,7 @@ MVVM把 UI用户界面 与 业务逻辑 分开，这样开发者只需关注
 MVVM 是 Model-View-ViewModel 的缩写
 
 Model 业务逻辑相关的数据对象
-View 负责将数据转化成UI展现出来
+View 视图层，负责将数据转化成UI展现出来
 ViewModel 是一个同步 View 和 Model 的对象
 
 在MVVM架构下，View 和 Model 之间并没有直接的联系，
@@ -358,6 +358,20 @@ export default {
   },
 };
 ```
+## 父组件和子组件生命周期函数执行顺序
+```
+加载渲染过程：
+父 beforeCreate -> 父 created -> 父 beforeMount -> 子 beforeCreate -> 子 created -> 子 beforeMount -> 子 mounted -> 父 mounted
+
+子组件更新过程：
+父 beforeUpdate -> 子 beforeUpdate -> 子 updated -> 父 updated
+
+父组件更新过程：
+父 beforeUpdate -> 父 updated
+
+销毁过程：
+父 beforeDestroy -> 子 beforeDestroy -> 子 destroyed -> 父 destroyed
+```
 ## vue组件
 ```javascript
 //vue2写法
@@ -386,6 +400,13 @@ const baseBoard = {
   template: `<div>局部组件</div>`
 };
 app.$mount('#app');//挂载vue3实例
+```
+## 组件单向数据流
+```
+单向数据流概念：父级 prop 的更新会向下流动到子组件中，但是反过来则不行
+有单向数据流，可以防止从子组件意外改变父级组件的状态，从而防止你应用的 数据流 难以理解
+
+一个被多次复用的子组件，子组件改变了引用的父组件数据，没有单项数据流机制，其它子组件的数值也跟着变化，这会让页面内这个多次被复用的子组件的数据耦合在一起，没办法独立使用
 ```
 ## 父子传值props
 
