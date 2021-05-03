@@ -30,57 +30,59 @@
 
 2、[数据类型_dataType](https://github.com/fengfanv/JS-library/blob/master/dataType)
 
-3、[a星寻路算法与强化学习算法_aStarAndQLearning](https://github.com/fengfanv/JS-library/blob/master/aStarAndQLearning)
+3、[js继承_jsJC](https://github.com/fengfanv/JS-library/blob/master/jsJC)
 
-4、[js分页案例_fenye](https://github.com/fengfanv/JS-library/tree/master/fenye)
+4、[a星寻路算法与强化学习算法_aStarAndQLearning](https://github.com/fengfanv/JS-library/blob/master/aStarAndQLearning)
 
-5、[promise运行案例_promise](https://github.com/fengfanv/JS-library/blob/master/promise)
+5、[js分页案例_fenye](https://github.com/fengfanv/JS-library/tree/master/fenye)
 
-6、[html商城sku商品规格选择_storeSpecsChoice](https://github.com/fengfanv/JS-library/tree/master/storeSpecsChoice)
+6、[promise运行案例_promise](https://github.com/fengfanv/JS-library/blob/master/promise)
 
-7、[canvas裁切图片案例_canvasCutImage](https://github.com/fengfanv/JS-library/tree/master/canvasCutImage)
+7、[html商城sku商品规格选择_storeSpecsChoice](https://github.com/fengfanv/JS-library/tree/master/storeSpecsChoice)
 
-8、[js中bind、call、apply区别_jsCall](https://github.com/fengfanv/JS-library/tree/master/jsCall)
+8、[canvas裁切图片案例_canvasCutImage](https://github.com/fengfanv/JS-library/tree/master/canvasCutImage)
 
-9、[js操作时间案例_jsDateDemo](https://github.com/fengfanv/JS-library/tree/master/jsDateDemo)
+9、[js中bind、call、apply区别_jsCall](https://github.com/fengfanv/JS-library/tree/master/jsCall)
 
-10、[小程序照片裁切案例_xcxPhotoCut](https://github.com/fengfanv/JS-library/tree/master/xcxPhotoCut)
+10、[js操作时间案例_jsDateDemo](https://github.com/fengfanv/JS-library/tree/master/jsDateDemo)
 
-11、[小程序上下滑动切换页面_xcxSlideToSwitchPage](https://github.com/fengfanv/JS-library/tree/master/xcxSlideToSwitchPage)
+11、[小程序照片裁切案例_xcxPhotoCut](https://github.com/fengfanv/JS-library/tree/master/xcxPhotoCut)
 
-12、[网页上下滑动切换页面_htmlSlideToSwitchPage](https://github.com/fengfanv/JS-library/tree/master/htmlSlideToSwitchPage)
+12、[小程序上下滑动切换页面_xcxSlideToSwitchPage](https://github.com/fengfanv/JS-library/tree/master/xcxSlideToSwitchPage)
 
-13、[网页横向滑动切换页面_htmlSlideToSwitchPageX](https://github.com/fengfanv/JS-library/tree/master/htmlSlideToSwitchPageX)
+13、[网页上下滑动切换页面_htmlSlideToSwitchPage](https://github.com/fengfanv/JS-library/tree/master/htmlSlideToSwitchPage)
 
-14、[网页日历案例_htmlCalendar](https://github.com/fengfanv/JS-library/tree/master/htmlCalendar)
+14、[网页横向滑动切换页面_htmlSlideToSwitchPageX](https://github.com/fengfanv/JS-library/tree/master/htmlSlideToSwitchPageX)
 
-15、[网页touch事件案例_htmlTouchEvent](https://github.com/fengfanv/JS-library/tree/master/htmlTouchEvent)
+15、[网页日历案例_htmlCalendar](https://github.com/fengfanv/JS-library/tree/master/htmlCalendar)
 
-16、[canvas图像旋转_canvasImageRotation](https://github.com/fengfanv/JS-library/tree/master/canvasImageRotation)
+16、[网页touch事件案例_htmlTouchEvent](https://github.com/fengfanv/JS-library/tree/master/htmlTouchEvent)
 
-17、[jsCookie使用案例_jsCookie](https://github.com/fengfanv/JS-library/tree/master/jsCookie)
+17、[canvas图像旋转_canvasImageRotation](https://github.com/fengfanv/JS-library/tree/master/canvasImageRotation)
 
-18、[js获取屏幕参数_jsGetWindowParams](https://github.com/fengfanv/JS-library/tree/master/jsGetWindowParams)
+18、[jsCookie使用案例_jsCookie](https://github.com/fengfanv/JS-library/tree/master/jsCookie)
 
-19、[网页选择时间插件_htmlChoiceDatePlugin](https://github.com/fengfanv/JS-library/tree/master/htmlChoiceDatePlugin)
+19、[js获取屏幕参数_jsGetWindowParams](https://github.com/fengfanv/JS-library/tree/master/jsGetWindowParams)
 
-20、[js封装案例_jsfz](https://github.com/fengfanv/JS-library/tree/master/jsfz)
+20、[网页选择时间插件_htmlChoiceDatePlugin](https://github.com/fengfanv/JS-library/tree/master/htmlChoiceDatePlugin)
 
-21、[canvas字体背景颜色是图片_canvasFontBackground](https://github.com/fengfanv/JS-library/tree/master/canvasFontBackground)
+21、[js封装案例_jsfz](https://github.com/fengfanv/JS-library/tree/master/jsfz)
 
-22、[js选择地址方式1_jsChoiceAddressPlugin1](https://github.com/fengfanv/JS-library/tree/master/jsChoiceAddressPlugin1)
+22、[canvas字体背景颜色是图片_canvasFontBackground](https://github.com/fengfanv/JS-library/tree/master/canvasFontBackground)
 
-23、[js选择地址方式2_jsChoiceAddressPlugin2](https://github.com/fengfanv/JS-library/tree/master/jsChoiceAddressPlugin2)
+23、[js选择地址方式1_jsChoiceAddressPlugin1](https://github.com/fengfanv/JS-library/tree/master/jsChoiceAddressPlugin1)
 
-24、[js中利用标签src属性jsonp跨域案例_jsJsonpDemo](https://github.com/fengfanv/JS-library/tree/master/jsJsonpDemo)
+24、[js选择地址方式2_jsChoiceAddressPlugin2](https://github.com/fengfanv/JS-library/tree/master/jsChoiceAddressPlugin2)
 
-25、[swiper层叠轮播案例_swiper层叠轮播](https://github.com/fengfanv/JS-library/tree/master/swiper层叠轮播)
+25、[js中利用标签src属性jsonp跨域案例_jsJsonpDemo](https://github.com/fengfanv/JS-library/tree/master/jsJsonpDemo)
 
-26、[html多张图片方式模拟3D_汽车全景](https://github.com/fengfanv/JS-library/tree/master/汽车全景)
+26、[swiper层叠轮播案例_swiper层叠轮播](https://github.com/fengfanv/JS-library/tree/master/swiper层叠轮播)
 
-27、[小程序自写层叠轮播图_xcxSelfWriteSwiperDemo](https://github.com/fengfanv/JS-library/tree/master/xcxSelfWriteSwiperDemo)
+27、[html多张图片方式模拟3D_汽车全景](https://github.com/fengfanv/JS-library/tree/master/汽车全景)
 
-28、[echarts地图案例_echartsMapDemo](https://github.com/fengfanv/JS-library/tree/master/echartsMapDemo)
+28、[小程序自写层叠轮播图_xcxSelfWriteSwiperDemo](https://github.com/fengfanv/JS-library/tree/master/xcxSelfWriteSwiperDemo)
+
+29、[echarts地图案例_echartsMapDemo](https://github.com/fengfanv/JS-library/tree/master/echartsMapDemo)
 
 
 ### html与css
