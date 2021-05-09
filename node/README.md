@@ -129,6 +129,56 @@ exports.md5 = function (s) {
     return crypto.createHash('md5').update(String(s)).digest('hex');
 }
 ```
+### 模块数据使用
+
+1、引用的基本数据类型，是拷贝
+
+2、应用的引用类型数据，是引用
+
+index.js
+```javascript
+const b = require('./test_b.js');
+
+console.log(b);
+/*
+{
+  name: 'I am b',
+  skills: [ 'aaa', 'bbb', 'ccc' ],
+  say: [Function: say]
+}
+*/
+
+b.name = '123'
+b.skills.push('ddd')
+console.log(b);
+/*
+{
+  name: '123',
+  skills: [ 'aaa', 'bbb', 'ccc', 'ddd' ],
+  say: [Function: say]
+}
+*/
+
+b.say();
+/*
+I am b
+[ 'aaa', 'bbb', 'ccc', 'ddd' ]
+*/
+```
+b.js
+```javascript
+var name = 'I am b';
+var skills = ['aaa','bbb','ccc'];
+
+var say = function(){
+    console.log(name);
+    console.log(skills);
+}
+
+exports.name = name;
+exports.skills = skills;
+exports.say = say;
+```
 
 ### node利用range头实现断点下载
 

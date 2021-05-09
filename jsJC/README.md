@@ -29,8 +29,7 @@ let chinese_a = new Chinese('a',18);
 console.log(chinese_a.hasOwnProperty('skills')); //false ，通过 hasOwnProperty 方法检测skills属性是否为自身属性
 console.log(chinese_a.hasOwnProperty('name')); //true
 
-console.log(Chinese.prototype.isPrototypeOf(chinese_a));//true ，检测 Chinese.prototype 是否存在于 chinese_a
-的原型链中，存在则返回true，如果Chinese.prototype不为对象类型 或 不存在于原型链中 则返回false
+console.log(Chinese.prototype.isPrototypeOf(chinese_a));//true ，检测 Chinese.prototype 是否存在于 chinese_a 的原型链中，存在则返回true，如果Chinese.prototype不为对象类型 或 不存在于原型链中 则返回false
 console.log(Person.prototype.isPrototypeOf(chinese_a));//true
 
 console.log(chinese_a.skills);//["唱歌", "跳舞", "弹钢琴"]

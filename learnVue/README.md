@@ -750,10 +750,17 @@ export default axios;
 ```
 vue main.js
 ```javascript
+//vue2配置方式
 //引入request配置
 import a_request from './request'
 //创建一个vue原型方法
 Vue.prototype.$request = a_request;
+
+//vue3配置方式
+import a_request from './request'
+const app = createApp(App)
+app.config.globalProperties.$request = a_request
+app.use(router).mount('#app')
 ```
 项目中使用
 ```javascript
@@ -1175,27 +1182,71 @@ Vue.loading_main.showLoading(function (data) {
 });
 ```
 ## 其它问题
-#### import from与import()区别是什么
+#### import与import()区别是什么
 ```
-import from
-静态加载，
-在代码编译时就运行，
-所以不能在写在代码块里，
-因为export和import from命令只能在模块的顶层，
+1、import
+
+静态加载，在代码编译时就运行，不能在写在代码块里，export和import命令只能在模块的顶层
+
 如：以下代码，会报错，因为import xxx from 'xxx'命令会被JS引擎静态分析，先于模块内的其他语句执行，套在外面的if不会被执行，所以会报错
 if (true) {
   import xxx from 'xxx'
 }
 
------
 
-import() 
-动态加载，
-会返回一个Promise对象，
-一般用于组件懒加载
+2、import() 
+动态加载，会返回一个Promise对象，一般用于组件懒加载
+
 如：const Index = () => import('../pages/index.vue');
-
 ```
+#### export & import 数据引用
+
+1、基本数据类型，不能修改，是拷贝值
+
+2、引用类型数据，可以修改，是引用值
+
+a.js
+```javascript
+import * as b from './b.js';
+
+console.log(JSON.stringify(b));
+/*
+{
+	name: "I am b",
+	say: say(),
+	skills: ["aaa","bbb","ccc"]
+}
+*/
+
+b.name = 'bbb';//报错，报错内容就是不让改
+b.skills.push('ddd')
+
+console.log(JSON.stringify(b))
+/*
+{
+	name: "I am b",
+	say: say(),
+	skills: ["aaa","bbb","ccc","ddd"]
+}
+*/
+
+b.say()
+/*
+I am b
+["aaa", "bbb", "ccc", "ddd"]
+*/
+```
+b.js
+```javascript
+var name = 'I am b'
+var skills = ['aaa','bbb','ccc']
+var say = function(){
+    console.log(name);
+    console.log(skills);
+}
+export {name,skills,say}
+```
+
 #### 在methods的方法内改变data里面object类型数据
 ```javascript
 export default {
