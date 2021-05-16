@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<title></title>
+		<style type="text/css">
+			*{
+				margin: 0;
+				padding: 0;
+			}
+			
+			#downloadProgressBar,
+			#downloadProgressBar2 {
+				width: 100%;
+				height: 10px;
+				background-color: aliceblue;
+				position: relative;
+			}
+
+			#downloadProgressBar>div,
+			#downloadProgressBar2>div {
+				width: 0%;
+				height: 10px;
+				background-color: red;
+				position: absolute;
+				left: 0;
+				top: 0;
+			}
+			
+			.h11{
+				width: 100%;
+				background: #FF0000;
+				margin-top: 0;
+			}
+			
+			body{
+				width: 100%;
+				height: auto;
+				background-color: green;
+				/* overflow: hidden; */
+				
+			}
+		</style>
+
+		<script type="text/javascript">
+			let versonName = '空'; //版本号名称
+			let versonNumber = '空'; //版本号
+			document.addEventListener('plusready', function() {
+				// versonName = plus.runtime.version;
+				// versonNumber = plus.runtime.versionCode;
+
+				$.ajax({
+					url: './manifest.json',
+					type: 'GET',
+					dataType: 'json',
+					success: function(res) {
+						// console.log(JSON.stringify(res));
+						versonName = res.version.name;
+						versonNumber = res.version.code;
+
+						$('#versonName').text(versonName);
+						$('#versonNumber').text(versonNumber);
+					},
+					error: function(e) {
+						console.log('获取错误~');
+					},
+				})
+
+
+				plus.nativeUI.confirm("Are you sure ready?", function(e) {
+					console.log("Close confirm: " + e.index);
+
+				});
+
+				// plus.nativeUI.actionSheet({
+				// 		title: "Plus is ready!",
+				// 		cancel: "取消",
+				// 		buttons: [{
+				// 			title: "1"
+				// 		}, {
+				// 			title: "2"
+				// 		}]
+				// 	},
+				// 	function(e) {
+				// 		console.log("User pressed: " + e.index);
+				// 	}
+				// );
+
+				// plus.nativeUI.prompt("Input your name: ", function(e) {
+				// 	console.log(((e.index == 0) ? "OK: " : "Cancel") + e.value);
+				// }, "nativeUI", "your name", ["OK", "Cancel"]);
+
+				
+				
+
+
+			});
+
+			console.logJson = function(json) {
+				this.log(JSON.stringify(json))
+			}
+		</script>
+
+	</head>
+	<body>
+		<h1 class="h11">assss</h1>
+
+
+		<h1>
+			当前应用版本名称：<span id="versonName"></span>
+			<br>
+			当前应用版本号：<span id="versonNumber"></span>
+		</h1>
+
+		<!--跳转页面-->
+		<div id="buttonList">
+			<button type="button" id="page1">页面1</button>
+			<button type="button" id="page2">页面2</button>
+			<button type="button" id="page3">页面3</button>
+		</div>
+
+		<hr>
+
+		<!--检查app更新，方式下载apk文件-->
+
+		<h2>更新方式1，apk更新</h2>
+		<button type="button" id="downloadAppUpdateButton">下载apk文件</button>
+
+		<button type="button" id="installAppButton">安装apk文件</button>
+
+		<!--下载进度条-->
+		<div id="downloadProgressBar">
+			<div></div>
+		</div>
+
+		<hr>
+
+		<!--检查app更新，方式下载wgt文件-->
+		<!--注意事项，添加新模块，更新会失败，新增模块这种，建议使用apk更新-->
+		<h2>更新方式2，wgt文件更新</h2>
+		<button type="button" id="downloadAppUpdateButton2">下载wgt文件</button>
+
+		<button type="button" id="installAppButton2">安装wgt文件</button>
+
+		<!--下载进度条-->
+		<div id="downloadProgressBar2">
+			<div></div>
+		</div>
+
+		<hr>
+
+
+
+		<script src="./js/jquery.js"></script>
+		<script src="./public.js" type="text/javascript" charset="utf-8"></script>
+		<script type="text/javascript">
+			//跳页面测试
+			$('#buttonList > button').on('click', function(e) {
+				let targetId = $(this).attr("id");
+				console.log(targetId)
+				if (targetId == 'page1') {
+					createWebview('./pages/page1.html', 'page1', undefined, {'woshishui': "woshini1"})
+				} else {
+					console.logJson(plus.webview.all());
+				}
+			})
+
+			//更新app方式1，下载apk更新
+			let filename = ''; //下载的更新文件地址
+			$('#downloadAppUpdateButton').on('click', function() {
+
+				let download = plus.downloader.createDownload('http://192.168.8.62:8080/new_updata.apk', {
+					method: "GET",
+				})
+
+				download.addEventListener('statechanged', function(task, status) {
+					switch (task.state) {
+						case 1: // 开始
+							console.log("开始下载...");
+							break;
+						case 2: // 已连接到服务器
+							console.log("链接到服务器...");
+							break;
+						case 3: // 已接收到数据
+							console.log("下载数据更新:");
+
+							$('#downloadProgressBar > div').css('width', ((task.downloadedSize / task
+								.totalSize) * 100) + '%')
+
+							break;
+						case 4: // 下载完成
+							console.log("apk下载完成");
+							console.log(JSON.stringify(download));
+							console.log('apk文件地址：' + download.filename);
+							filename = download.filename;
+							break;
+					}
+				})
+				download.start()
+			})
+
+			$('#installAppButton').on('click', function() {
+				if (filename.length > 0) {
+					plus.runtime.install(filename)
+				} else {
+					alert('没有apk文件地址')
+				}
+			})
+
+
+			//更新app方式1，下载wgt更新
+			let filename2 = ''; //下载的更新文件地址
+			$('#downloadAppUpdateButton2').on('click', function() {
+
+				let download = plus.downloader.createDownload('http://192.168.8.62:8080/new_updata.wgt', {
+					method: "GET",
+				})
+
+				download.addEventListener('statechanged', function(task, status) {
+					switch (task.state) {
+						case 1: // 开始
+							console.log("开始下载...");
+							break;
+						case 2: // 已连接到服务器
+							console.log("链接到服务器...");
+							break;
+						case 3: // 已接收到数据
+							console.log("下载数据更新:");
+
+							$('#downloadProgressBar2 > div').css('width', ((task.downloadedSize / task
+								.totalSize) * 100) + '%')
+							break;
+						case 4: // 下载完成
+							console.log("wgt下载完成");
+							console.log(JSON.stringify(download));
+							console.log('wgt文件地址：' + download.filename);
+							filename2 = download.filename;
+							break;
+					}
+				})
+				download.start()
+			})
+
+			$('#installAppButton2').on('click', function() {
+				if (filename2.length > 0) {
+					plus.runtime.install(filename2, {}, function() {
+						console.log("安装wgt更新成功");
+
+						//  更新完成后重启应用
+						plus.runtime.restart();
+
+					}, function(e) {
+
+						console.log("安装wgt更新失败 [" + e.code + "]：" + e.message);
+						alert("安装wgt更新失败 [" + e.code + "]：" + e.message)
+					})
+				} else {
+					alert('没有wgt文件地址')
+				}
+			})
+		</script>
+	</body>
+</html>

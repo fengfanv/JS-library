@@ -179,6 +179,11 @@ exports.name = name;
 exports.skills = skills;
 exports.say = say;
 ```
+### node控制资源下载速度
+
+案例文件：[nodeServer1](https://github.com/fengfanv/JS-library/tree/master/node/nodeServer1)
+
+通过 可读流 控制资源传输速度
 
 ### node利用range头实现断点下载
 
@@ -234,15 +239,6 @@ exports.say = say;
 
 案例文件：[wenjiansaomiao](https://github.com/fengfanv/JS-library/tree/master/node/wenjiansaomiao)
 
----
-
-### package.json
-
-功能：
-
-1、用来保存工程元数据
-
-2、用来描述工程依赖项
 
 ### ajax上传文件查看上传进度
 

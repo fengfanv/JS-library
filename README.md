@@ -126,3 +126,5 @@
 5、[h5app更新配置_h5appUpdateConfig](https://github.com/fengfanv/JS-library/tree/master/h5appUpdateConfig)
 
 6、[h5app地图案例和地图api详解_h5appMap](https://github.com/fengfanv/JS-library/tree/master/h5appMap)
+
+7、[h5app案例_h5appdemo1](https://github.com/fengfanv/JS-library/tree/master/h5appdemo1)
