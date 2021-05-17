@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>canvas画原形进度条</title>
+</head>
+
+<body>
+
+    <canvas id="canvas" width="400" height="400" style="background: red;"></canvas>
+    <script>
+        function canvasProgrss(progress) {
+            var canvas = document.getElementById('canvas'); //画布对象          
+            canvas.width = 400;
+            canvas.height = 400;
+            var ctx = canvas.getContext('2d');
+
+            //清空canvas内容
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            //画进度条底色
+            ctx.beginPath();
+            ctx.lineWidth = 10;
+            ctx.strokeStyle = '#fda2a2';
+            ctx.arc(canvas.width / 2, canvas.height / 2, 80, 0, 180);
+            ctx.stroke(); //对路径进行描边 
+            ctx.closePath();
+
+            //画不同进度颜色的进度条
+            //1%时创建一次图片，2%时创建两次图片，3%时创建三次图片
+            let createGradientProgress = function (i, number, width, height) {
+                /**
+                 * i 第几次创建图片
+                 * number 百分之多少
+                 */
+                let canvas = document.createElement('canvas');
+                let ctx = canvas.getContext('2d');
+                //canvas的大小
+                canvas.width = width;
+                canvas.height = height;
+
+                let color = Math.floor((number - i)*(255/100));
+                ctx.beginPath();
+                ctx.strokeStyle = "rgb(" + color + "," + color + "," + + color + ")";
+                ctx.lineWidth = 10;
+                ctx.lineCap = "round";
+                let startAngle = -90 * Math.PI / 180;
+                let endAngle = (-90 + 360 * i / 100) * Math.PI / 180;
+                ctx.arc(canvas.width / 2, canvas.height / 2, 80, startAngle, endAngle);
+                ctx.stroke();
+                ctx.closePath();
+
+                return canvas;
+            }
+
+            //画渐变色进度条，这里倒着渲染，是为了每次渲染时，渐变效果不被覆盖
+            //比如80%，渐变色（黑-白），要渲染80次，倒着渲染，先渲染最大的，然后在渲染小的，这样之前渲染的就不会被覆盖
+            for (let i = progress; i > 0; i--) {
+                ctx.drawImage(createGradientProgress(i, progress, canvas.width, canvas.height), 0, 0)
+            }
+
+        }
+
+        let count = 0;
+        setInterval(() => {
+            if (count <= 100) {
+                count++;
+                canvasProgrss(count);
+            }
+
+        }, 100)
+    </script>
+</body>
+
+</html>
