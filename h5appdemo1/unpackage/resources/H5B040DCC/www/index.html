@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title></title>
+    <script type="text/javascript">
+    	let verson = '空';
+   		document.addEventListener('plusready', function(){
+   			//console.log("所有plus api都应该在此事件发生后调用，否则会出现plus is undefined。")
+			verson = plus.runtime.version;
+			$('#verson').text(verson);
+   		});
+		
+		console.logJson = function(json){
+			this.log(JSON.stringify(json))
+		}
+   		
+    </script>
+	<style type="text/css">
+		#downloadProgressBar{
+			width: 100%;
+			height: 10px;
+			background-color: aliceblue;
+			position: relative;
+		}
+		#downloadProgressBar > div{
+			width: 0%;
+			height: 10px;
+			background-color: red;
+			position: absolute;
+			left: 0;
+			top: 0;
+		}
+	</style>
+</head>
+<body>
+	<h1>
+		我是应用
+	</h1>
+	<h1>
+		当前版本号：<span id="verson"></span>
+	</h1>
+	<div id="buttonList">
+		<button type="button" id="page1">页面1</button>
+		<button type="button" id="page2">页面2</button>
+		<button type="button" id="page3">页面3</button>
+	</div>
+	
+	<!--检查app更新-->
+	<button type="button" id="checkAppUpdateButton">检查app更新</button>
+	
+	<button type="button" id="downloadAppUpdateButton">下载更新</button>
+	
+	<!--查看下载进度条-->
+	<div id="downloadProgressBar">
+		<div></div>
+	</div>
+	
+	
+	<script src="./js/jquery.js"></script>
+	<script type="text/javascript">
+		$('#buttonList > button').on('click',function(e){
+			let targetId = $(this).attr("id");
+			console.log(targetId)
+			if(targetId == 'page1'){
+				let thisPage = plus.webview.create('./pages/page1.html','page1',{},{'woshishui':"woshini1"})
+				plus.webview.show( thisPage.id, 'pop-in', 1000)
+			}else{
+				console.logJson(plus.webview.all());
+			}
+		})
+		
+		$('#checkAppUpdateButton').on('click',function(){
+			//先检查当前版本
+			console.log('当前版本：',plus.runtime.version);
+			console.log('程序版本号：',plus.runtime.versionCode);
+		})
+		
+		$('downloadAppUpdateButton').on('click',function(){
+			//下载更新
+			plus.downloader.createDownload('http://192.168.8.62:8080/update.apk', {
+				method:"get",
+				
+			}).addEventListener('statechanged',function(task, status){
+				switch (task.state) {
+					case 1: // 开始
+						console.log("开始下载...");
+						break;
+					case 2: // 已连接到服务器
+						console.log("链接到服务器...");
+						break;
+					case 3: // 已接收到数据
+						console.log("下载数据更新:");
+						console.log(task.downloadedSize + "/" + task.totalSize);
+						$('#downloadProgressBar > div').css('width',(task.downloadedSize/task.totalSize)+'%')
+						break;
+					case 4: // 下载完成
+						console.log("下载完成！");
+						console.log(task.totalSize);
+						break;
+				}
+			})
+			
+		})
+	</script>
+</body>
+</html>

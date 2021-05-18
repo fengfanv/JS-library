@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>page1</title>
+	</head>
+	<body>
+		<h1>page1</h1>
+		
+		<button type="button" id="getCurrentPageInfoButton">获取当前页面信息</button>
+		<button type="button" id="getWebviewPagesButton">获取webview页面栈信息</button>
+	</body>
+	<script src="../js/jquery.js" type="text/javascript" charset="utf-8"></script>
+	<script src="../public.js"></script>
+	<script type="text/javascript">
+		$('#getCurrentPageInfoButton').on('click',function(){
+			console.log(JSON.stringify(plus.webview.currentWebview()));
+		})
+		$('#getWebviewPagesButton').on('click',function(){
+			console.log(JSON.stringify(plus.webview.all()));
+		})
+	</script>
+</html>

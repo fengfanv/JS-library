@@ -1,15 +1,29 @@
 <!DOCTYPE html>
 <html>
 	<head>
+		<title>主页</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-		<title></title>
+
 		<style type="text/css">
-			*{
+			* {
 				margin: 0;
 				padding: 0;
 			}
-			
+
+			/*1、兼容苹果，沉浸式状态栏，需要如下设置*/
+			body {
+				height: 100vh;
+				overflow: hidden;
+			}
+
+			/*2、兼容苹果，沉浸式状态栏，业务上的html，不能直接在body里，需要准备一个容器，在容器里放，业务上的html*/
+			.container {
+				width: 100%;
+				height: 100vh;
+				overflow: auto;
+			}
+
 			#downloadProgressBar,
 			#downloadProgressBar2 {
 				width: 100%;
@@ -27,144 +41,170 @@
 				left: 0;
 				top: 0;
 			}
-			
-			.h11{
-				width: 100%;
-				background: #FF0000;
-				margin-top: 0;
-			}
-			
-			body{
-				width: 100%;
-				height: auto;
-				background-color: green;
-				/* overflow: hidden; */
-				
-			}
 		</style>
 
-		<script type="text/javascript">
-			let versonName = '空'; //版本号名称
-			let versonNumber = '空'; //版本号
+
+
+	</head>
+	<body>
+		<div class="container">
+			<div style="width: 10px;height:20px;background: red;">
+				1
+			</div>
+			<p>1</p>
+			<p>1</p>
+			<p>1</p>
+			<p>1</p>
+			<p>1</p>
+			<p>1</p>
+			<p>1</p>
+			<p>1</p>
+			<p>1</p>
+			<p>1</p>
+			<p>1</p>
+			<p>1</p>
+			<p>1</p>
+			<p>1</p>
+			<p>1</p>
+			<p>1</p>
+			<p>1</p>
+			<p>1</p>
+			<p>1</p>
+			<p>1</p>
+			<p>1</p>
+			<p>1</p>
+			<p>1</p>
+			<p>1</p>
+			<p>1</p>
+			<p>1</p>
+			<p>1</p>
+			<p>1</p>
+			<p>1</p>
+			<p>1</p>
+			<p>1</p>
+			<p>1</p>
+			<p>1</p>
+			<p>1</p>
+			<p>1</p>
+			<p>1</p>
+			<p>1</p>
+			<p>1</p>
+			<p>1</p>
+			<p>1</p>
+			<p>1</p>
+			<p>1</p>
+			<p>1</p>
+			<p>1</p>
+			<p>1</p>
+			<p>1</p>
+			<p>1</p>
+			<p>1</p>
+			<p>1</p>
+			<p>1</p>
+			<p>1</p>
+			<p>1</p>
+			<p>1</p>
+			<p>1</p>
+			<p>1</p>
+			<p>1</p>
+			<p>1</p>
+			<p>1</p>
+			<p>1</p>
+			<p>1</p>
+			<p>1</p>
+			<p>1</p>
+			<p>1</p>
+			<p>1</p>
+			<p>1</p>
+			<p>1</p>
+			<p>1</p>
+			<p>1</p>
+			<p>2</p>
+
+			<hr>
+
+			<h1>
+				当前应用版本名称：<span id="versonName"></span>
+				<br>
+				当前应用版本号：<span id="versonNumber"></span>
+			</h1>
+
+			<hr>
+
+			<!--跳转页面-->
+			<div id="buttonList">
+				<button type="button" id="page1">页面1</button>
+				<button type="button" id="page2">页面2</button>
+				<button type="button" id="page3">页面3</button>
+			</div>
+
+			<hr>
+
+			<!--检查app更新，方式下载apk文件-->
+			<h2>更新方式1，apk更新</h2>
+			<button type="button" id="downloadAppUpdateButton">下载apk文件</button>
+			<button type="button" id="installAppButton">安装apk文件</button>
+
+			<!--apk下载进度条-->
+			<div id="downloadProgressBar">
+				<div></div>
+			</div>
+
+			<hr>
+
+			<!--检查app更新，方式下载wgt文件-->
+			<!--注意事项，添加新模块，更新会失败，新增模块这种，使用apk更新-->
+			<h2>更新方式2，wgt文件更新</h2>
+			<button type="button" id="downloadAppUpdateButton2">下载wgt文件</button>
+			<button type="button" id="installAppButton2">安装wgt文件</button>
+
+			<!--wgt下载进度条-->
+			<div id="downloadProgressBar2">
+				<div></div>
+			</div>
+
+
+		</div>
+
+		<script src="./js/jquery.js"></script>
+		<script src="./public.js"></script>
+		<script>
 			document.addEventListener('plusready', function() {
-				// versonName = plus.runtime.version;
-				// versonNumber = plus.runtime.versionCode;
 
 				$.ajax({
 					url: './manifest.json',
 					type: 'GET',
 					dataType: 'json',
 					success: function(res) {
-						// console.log(JSON.stringify(res));
-						versonName = res.version.name;
-						versonNumber = res.version.code;
-
-						$('#versonName').text(versonName);
-						$('#versonNumber').text(versonNumber);
+						$('#versonName').text(res.version.name); //版本号名称
+						$('#versonNumber').text(res.version.code); //版本号
 					},
 					error: function(e) {
-						console.log('获取错误~');
-					},
+						console.log('获取 manifest.json 错误~');
+					}
 				})
 
 
 				plus.nativeUI.confirm("Are you sure ready?", function(e) {
 					console.log("Close confirm: " + e.index);
 
-				});
+				})
 
-				// plus.nativeUI.actionSheet({
-				// 		title: "Plus is ready!",
-				// 		cancel: "取消",
-				// 		buttons: [{
-				// 			title: "1"
-				// 		}, {
-				// 			title: "2"
-				// 		}]
-				// 	},
-				// 	function(e) {
-				// 		console.log("User pressed: " + e.index);
-				// 	}
-				// );
+			})
 
-				// plus.nativeUI.prompt("Input your name: ", function(e) {
-				// 	console.log(((e.index == 0) ? "OK: " : "Cancel") + e.value);
-				// }, "nativeUI", "your name", ["OK", "Cancel"]);
-
-				
-				
-
-
-			});
-
-			console.logJson = function(json) {
-				this.log(JSON.stringify(json))
-			}
-		</script>
-
-	</head>
-	<body>
-		<h1 class="h11">assss</h1>
-
-
-		<h1>
-			当前应用版本名称：<span id="versonName"></span>
-			<br>
-			当前应用版本号：<span id="versonNumber"></span>
-		</h1>
-
-		<!--跳转页面-->
-		<div id="buttonList">
-			<button type="button" id="page1">页面1</button>
-			<button type="button" id="page2">页面2</button>
-			<button type="button" id="page3">页面3</button>
-		</div>
-
-		<hr>
-
-		<!--检查app更新，方式下载apk文件-->
-
-		<h2>更新方式1，apk更新</h2>
-		<button type="button" id="downloadAppUpdateButton">下载apk文件</button>
-
-		<button type="button" id="installAppButton">安装apk文件</button>
-
-		<!--下载进度条-->
-		<div id="downloadProgressBar">
-			<div></div>
-		</div>
-
-		<hr>
-
-		<!--检查app更新，方式下载wgt文件-->
-		<!--注意事项，添加新模块，更新会失败，新增模块这种，建议使用apk更新-->
-		<h2>更新方式2，wgt文件更新</h2>
-		<button type="button" id="downloadAppUpdateButton2">下载wgt文件</button>
-
-		<button type="button" id="installAppButton2">安装wgt文件</button>
-
-		<!--下载进度条-->
-		<div id="downloadProgressBar2">
-			<div></div>
-		</div>
-
-		<hr>
-
-
-
-		<script src="./js/jquery.js"></script>
-		<script src="./public.js" type="text/javascript" charset="utf-8"></script>
-		<script type="text/javascript">
-			//跳页面测试
+			//跳页面按钮
 			$('#buttonList > button').on('click', function(e) {
 				let targetId = $(this).attr("id");
 				console.log(targetId)
 				if (targetId == 'page1') {
-					createWebview('./pages/page1.html', 'page1', undefined, {'woshishui': "woshini1"})
+					createWebview('./pages/page1.html', 'page1', undefined, {
+						'woshishui': "woshini1"
+					})
 				} else {
-					console.logJson(plus.webview.all());
+					console.log('跳转其它页面');
 				}
 			})
+
 
 			//更新app方式1，下载apk更新
 			let filename = ''; //下载的更新文件地址
@@ -245,13 +285,10 @@
 			$('#installAppButton2').on('click', function() {
 				if (filename2.length > 0) {
 					plus.runtime.install(filename2, {}, function() {
-						console.log("安装wgt更新成功");
-
-						//  更新完成后重启应用
+						console.log("安装wgt完成");
+						//wgt更新完成后重启应用
 						plus.runtime.restart();
-
 					}, function(e) {
-
 						console.log("安装wgt更新失败 [" + e.code + "]：" + e.message);
 						alert("安装wgt更新失败 [" + e.code + "]：" + e.message)
 					})

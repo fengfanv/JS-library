@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>入口文件</title>
+		<script type="text/javascript">
+			//此入口文件，是为了兼容，苹果手机，沉浸式状态栏
+			document.addEventListener('plusready', function() {
+				//状态栏高
+				let statusbarHeight = plus.navigator.getStatusbarHeight();
+				if (plus.os.name == 'Android') {
+					//兼容安卓
+					//打开主页
+					let index = plus.webview.create('./index.html', '', {
+						top: '0px',
+						bottom: '0px'
+					}).show();
+				} else {
+					//兼容苹果，沉浸式状态栏
+					//打开主页
+					let index = plus.webview.create('./index.html', '', {
+						top: '-' + statusbarHeight + 'px',
+						bottom: '0px'
+					}).show();
+				}
+			})
+		</script>
+	</head>
+	<body>
+	</body>
+</html>
