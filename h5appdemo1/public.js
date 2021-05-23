@@ -36,36 +36,23 @@ function createWebview(url, id, style, data) {
 	if (plus.navigator.isImmersedStatusbar()) {
 		//根据系统判断，获取手机状态栏高度
 		if (plus.os.name == 'Android') {
-			statusbarHeight = plus.navigator.getStatusbarHeight();
+			//statusbarHeight = plus.navigator.getStatusbarHeight();
+			statusbarHeight = 0;
 		} else {
+			//兼容，苹果沉浸式状态栏
 			if (document.documentElement.clientHeight >= 812 && document.documentElement.clientWidth == 375) {
 				//是iphoneX
-				statusbarHeight = 44;
+				statusbarHeight = 0 - 44;
 			} else {
 				//其它苹果手机
-				statusbarHeight = 20;
+				statusbarHeight = 0 - 20;
 			}
-		}
-
-		if (typeof style == 'undefined') {
-			style = {
-				top: statusbarHeight,
-			}
-		} else {
-			style.top = statusbarHeight
-		}
-		
-		//这里，是为了，兼容，苹果沉浸式状态栏
-		if(plus.os.name == 'Android'){
-			style.top = style.top;
-		}else{
-			style.top = 0-style.top;
 		}
 		
 	}
 	//设置状态字体颜色
 	plus.navigator.setStatusBarStyle('dark'); //设置状态栏字体颜色，light 白色 dark 黑色
 
-	let thisPage = plus.webview.create(url, id, style, data)
+	let thisPage = plus.webview.create(url, id, {top:statusbarHeight}, data)
 	plus.webview.show(thisPage.id, 'pop-in', 1000)
 }
