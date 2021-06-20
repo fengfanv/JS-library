@@ -6,6 +6,8 @@ const path = require('path');
 
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+
 module.exports = {
     //webpack配置
     //入口文件
@@ -13,7 +15,7 @@ module.exports = {
     //输出
     output: {
         //输出文件名
-        filename: 'built2.js',
+        filename: 'js/built2.js',//输出到build文件下，js文件夹内
         //输出路径
         path: path.join(__dirname, 'build'),
     },
@@ -29,9 +31,10 @@ module.exports = {
                 test: /\.css$/,//处理已.css结尾的文件
                 //使用那些loader进行处理
                 use: [//use数组中loader执行顺序，从右到左，从下到上执行
-                    //创建style标签，将js里的css字符串，添加到head里
-                    "style-loader",
-                    //将css转成js字符串
+                    //在html内，创建style标签，将js里的css字符串，添加到head里
+                    //"style-loader",//与下面，二选一
+                    MiniCssExtractPlugin.loader,//这个loader，可用来取代style-loader，style-loader是将js里css添加到HTML中，这个loader是将js里css输出到一个css文件里
+                    //将css转成js字符串，放到js里
                     "css-loader",
                 ]
             },
@@ -59,7 +62,8 @@ module.exports = {
                     //优点：减少请求数量（减轻服务器压力）
                     //缺点：图片体积会更大（文件请求速度更慢）
                     //打包结果，一开始有两个图片，一个是500kb的，另一个是4kb的，打包后，4kb的会被转为base64
-                    limit: 8 * 1024
+                    limit: 8 * 1024,
+                    //outputPath:"images"//输出图片到images文件夹下
                 }
             },
             {
@@ -73,13 +77,78 @@ module.exports = {
             {
                 //打包其它资源（除了html/js/css/less等以外的资源）
                 exclude: /\.(css|less|html|js|json|jpg|png|gif)$/,
-                loader: 'url-loader'
-            }
+                loader: 'url-loader',
+                //outputPath:"media",//输出其它资源到media文夹下
+            },
+            /*
+                语法检查：eslint-loader eslint，语法检查常用eslint，使用时这两个库都需要下载
+                注意事项：只检查自己写的代码，不检查第三方库里的代码
+                设置检查规则：
+                    在package.json中eslintConfig中设置规则
+                    常用的语法规则：airbnb 使用这个规则需要下载 eslint-config-airbnb-base eslint-plugin-import eslint
+                    在package中添加如下代码
+                    "eslintConfig":{
+                        "extends": "airbnb-base"
+                    }
+            */
+            /*
+             {
+                 test: /\.js$/,//检查js文件
+                 exclude: /node_modules/,//排除node_modules文件夹内的文件
+                 loader: 'eslint-loader',
+                 options: {
+                     //写的代码不规范，添加如下，可以修复成规范的代码
+                     fix: true
+                 }
+             },
+             */
+            /*
+                注意这里！！！！
+                js兼容这块，实验没有成功，从npm网站上搜索相关包，根据官方使用方法，也没有成功
+                
+                js代码，做兼容处理
+                1、使用@babel/preset-env做js语法兼容，如写的代码是es6的语法，在ie上运行，需要准换成ie能识别的代码
+                缺点：只能做语法兼容，但兼容promise这种方法不可以
+                下载的包：babel-loader @babel/preset-env @babel/core
+                //实验结果，没有用转换
+                2、解决不支持promise
+                使用@babel/polyfill，解决兼容，promise不支持问题
+                //这种方法缺点：兼容做的比较暴力。把所有不兼容的，都打在了代码里，导致打包后的文件很大
+                //使用方法：在代码里 引用 import '@babel/polyfill'; 这句话
+                3、解决上面兼容做的太暴力的问题，
+                按需兼容，我用到了那个不兼容，才兼容那个
+                //使用包：corejs
+                //最新版本不同怎么使用，在npm网站上搜索，相关包的名字
+            */
+            {
+                test: /\.js$/,
+                exclude: /node_modules/,
+                use: {
+                    loader: 'babel-loader',
+                    options: {
+                        //预设：指示babel做怎样的兼容处理
+                        presets: [
+                            [
+                                '@babel/preset-env', 
+                                {
+                                    targets: {
+                                        chrome: 60,
+                                        firefox: 60,
+                                        ie: 9,
+                                        safari: 10,
+                                        edge: 17
+                                    }
+                                }
+                            ]
+                        ]
+                    }
+                }
+            },
         ]
     },
     //打包模式
     mode: 'development',//开发模式
-    //mode:"production"//生产模式
+    //mode:"production"//生产模式，生产模式下，会自动压缩js代码
     //plugins（插件）的配置
     //Plugin可以扩展webpack的功能，让webpack具有更多的灵活性。 在 Webpack 运行的生命周期中会广播出许多事件，Plugin 可以监听这些事件，在合适的时机通过 Webpack 提供的 API 改变输出结果。
     plugins: [
@@ -89,20 +158,31 @@ module.exports = {
         //需求：需要一个结构的html文件
         new HtmlWebpackPlugin({
             //引用或复制，./src/index.html 这个html，然后自动引用打包输出的所有资源（js、css）
-            template: "./src/index.html"
+            template: "./src/index.html",
+            //压缩html代码
+            minify:{
+                //移除空格
+                collapseWhitespace:true,
+                //移除注释
+                removeComments:true
+            }
+        }),
+        new MiniCssExtractPlugin({
+            filename: "css/built.css"//输出的css文件到哪里，或重置css文件名
         })
+
     ],
     //开发服务器devServer：可以用来，开发时自动化（自动编译，自动打开浏览器，自动刷新浏览器等）
     //特点：只会在内存中编译打包，不会有任何输出
     //启动devServer指令：npx webpack serve
-    devServer:{
+    devServer: {
         //项目打包后的目录地址
-        contentBase:path.join(__dirname,'build'),
+        contentBase: path.join(__dirname, 'build'),
         //启动gzip压缩
-        compress:true,
+        compress: true,
         //端口号
-        port:3000,
+        port: 3000,
         //自动打开浏览器
-        open:true
+        open: true
     }
 }
