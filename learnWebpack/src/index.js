@@ -37,3 +37,5 @@ function add(a,b){
 }
 
 console.log(add(1,2));
+
+console.log('我新增的一个console');

@@ -11,11 +11,11 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 module.exports = {
     //webpack配置
     //入口文件
-    entry: "./src/index2.js",
+    entry: ["./src/index2.js","./src/index.html"],
     //输出
     output: {
         //输出文件名
-        filename: 'js/built2.js',//输出到build文件下，js文件夹内
+        filename: 'js/built2[hash:10].js',//输出到build文件下，js文件夹内
         //输出路径
         path: path.join(__dirname, 'build'),
     },
@@ -168,7 +168,7 @@ module.exports = {
             }
         }),
         new MiniCssExtractPlugin({
-            filename: "css/built.css"//输出的css文件到哪里，或重置css文件名
+            filename: "css/built[hash:10].css"//输出的css文件到哪里，或重置css文件名
         })
 
     ],
@@ -183,6 +183,46 @@ module.exports = {
         //端口号
         port: 3000,
         //自动打开浏览器
-        open: true
-    }
+        open: true,
+        //开发服务器环境下，开启，热更新，这个热更新意思是，当某个文件发生变化，只会重新打包这个发生变化的文件，不会把项目所有文件都重新打包，这样开发调试时，速度快
+        hot:true
+    },
+    devtool:"source-map"
+    //source-map 是一种源代码映射到构建后代码的技术。开发代码时，如当代码里出现错误，可以通过浏览器调试器，在构建后代码出现问题的地方 映射 到源代码位置。如果没有开启这个代码映射，代码出现错误，调试器只会显示构建后代码出现错误的地方，构建后代码是被压缩和做过处理的，这样直接调试代码就不好调
+    //启用方法：开启devServer就可以
 }
+
+/*
+    HMR：hot module replacement 热模块替换 或叫 模块热替换
+    作用：一个模块发生变化，只会重新打包这个发生变化的模块，不会重新打包项目所有文件，能够极大的提升构建速度。默认情况下，一个文件发生变化，会重新打包所有文件。如果项目文件少还行，打包速度不会收到影响，但如果有100个,1000个的时候，就会感觉到速度的变化
+    样式文件：可以使用热更新功能，因为style-loader内部实现了热更新功能，这也就是为什么在开发环境使用style-loader，生产环境提取文件的原因，这样开发环境下能有更好的性能
+    js文件：默认是没有热更新功能，js文件发生变化，重新打包整个项目
+    js文件开启热更新：（详见index2.js）
+    if(module.hot){
+        module.hot.accept('./print.js',()=>{
+            //被监听的文件发生变化后，做什么是
+        })
+    }
+    HTML文件：默认没有热更新功能，而且html文件发生变化后，不会触发重新打包项目，解决这个问题：
+    在entry里添加html文件的路径，可以解决，修改html但不刷新的问题。但还是没有热更新功能。
+    html文件一般不做热更新功能
+
+
+*/
+
+
+/*
+    webpack打包时，解决文件缓存问题的  “ hash ”  ，面试会问
+    每次wbepack构建项目时，webpack都是生成一个随机的 hash
+    1、hash：利用每次webpack构建时都会生成一个唯一的hash值
+    问题：同时使用一个hash值，当重新构建项目时，有100个文件，只修改了其中一个文件，则这个100个文件的hash都变，这样的话，就会让一些没有被修改的文件，需要缓存的文件，不能缓存，这样会很浪费资源。如果没有修改文件，重新打包，文件的hash值不变
+    
+    2、chunkhash：这里chunk就是，像项目里边的入口文件就是一个chunk，如这个入口文件引用了很多的js文件，css文件，则引用这些css文件和js文件的入口文件就是chunk，有点类似那种树状图，或咱们人五根手指的chunk就是手掌，然后两条胳膊两条腿的chunk就是人的上身
+    //这个就是已chunk分小组，每个chunk都会被分配一个hash值，如果某个chunk下的子集有100个文件，修改了其中一个，则这个chunk下的100文件的hash都会变。但是不会影响其它chunk下的hash。这个比上面的hash好一点，但还不是最好
+    问题：和上面有类似的问题，虽然把项目所有文件按chunk分开了，但是如果一个chunk下有100个文件，修改了其中一个文件，则这个chunk下的所有文件的hash都会变化，则这个chunk下的需要缓存的文件，缓存会失效
+
+    3、contenthash：根据文件的内容生成hash值，不同的文件hash值都不一样。100个文件，修改了其中一个，只有被修改的这个文件的hash值会变，不影响别的文件的hash值
+    这个最厉害
+    
+
+*/
