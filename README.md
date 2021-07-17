@@ -86,6 +86,8 @@
 
 29、[echarts地图案例_echartsMapDemo](https://github.com/fengfanv/JS-library/tree/master/echartsMapDemo)
 
+30、[canvas解决模糊问题_canvasRetinaScreen](https://github.com/fengfanv/JS-library/tree/master/canvasRetinaScreen)
+
 
 ### html与css
 

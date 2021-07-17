@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>canvas解决不清楚问题</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            width: 100%;
+            height: 100%;
+            background-color: antiquewhite;
+        }
+
+        canvas {
+            display: block;
+            margin: 0 auto;
+            background-color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="canvas"></canvas>
+    <script>
+        //1、初始化页面环境
+        let screenWidth = document.documentElement.clientWidth;//屏幕的宽
+        let screenHeight = document.documentElement.clientHeight;//屏幕的高
+
+        let containerWidth = 0;//容器宽
+        let containerHeight = 0;//容器高
+
+        //兼容显示器，让游戏已9比16的矩形显示
+        if (screenWidth > 768) {
+            containerWidth = 9 / 16 * screenHeight;// newWidth/newHeight=9/16
+            containerHeight = screenHeight;
+        } else {
+            containerWidth = screenWidth;
+            containerHeight = screenHeight;
+        }
+
+        //2、初始化canvas环境
+        let canvas = document.getElementById("canvas");
+        canvas.width = containerWidth;
+        canvas.height = containerHeight;
+        let ctx = canvas.getContext('2d');//生成一个canvas的实例
+
+
+
+        /*
+            非视网膜手机屏幕的分辨率宽度是320“物理像素”
+            视网膜屏幕的手机，如iPhone4s，它的分辨率宽度是640“物理像素”
+            但是为了有更好的阅读体验，更合适的文字大小，iPhone4s的“逻辑像素”是320
+            这种情况，2个“物理像素”当做1个“逻辑像素”，来使用。这样渲染的页面，会有不清楚的问题
+            可以通过这个window.devicePixelRatio来解决这个问题
+            这个参数是 设备真实像素数 / 逻辑像素数 的比值
+            如：真实像素数(640) / 逻辑像素数(320) = 2
+
+        */
+
+
+        //解决canvas模糊问题
+        var scale = window.devicePixelRatio;
+        ctx.scale(scale, scale);//放大到设备真实像素的比例
+
+        var box = {
+            "width":300,//逻辑像素宽度，css宽度
+            "height":300,
+            "x":(containerWidth/2)-(300/2),
+            "y":(containerHeight/2)-(300/2),
+        }
+
+        /*
+            为了canvas能在视网膜屏上也显示清楚，对canvas画布进行了放大，
+            但是直接这样渲染的图像，还是按照逻辑像素大小渲染的，这样渲染的图像，大小位置等会出现问题
+        */
+       //解决 位置异常，大小异常问题
+        box.width = box.width/scale;
+        box.height = box.height/scale;
+        box.x = box.x/scale;
+        box.y = box.y/scale;
+
+        ctx.fillStyle = "#bada55";
+        ctx.fillRect(box.x, box.y, box.width, box.height);
+        
+
+        let font = {
+            "x":containerWidth/2,
+            "y":containerHeight/2
+        }
+
+        font.x = font.x/scale;
+        font.y = font.y/scale;
+
+        ctx.fillStyle = "#ffffff";
+        ctx.font = '16px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText("You do not remember me", font.x, font.y);
+
+    </script>
+</body>
+
+</html>
