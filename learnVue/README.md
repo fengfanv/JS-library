@@ -46,12 +46,13 @@ vue3引用的vue-router创建是通过createRouter创建的，之前是直接new
 vue3引用的vuex创建是通过createStore创建的，之前是vuex.store方法创建
 
 6、新出了一个组合式api
-组合式api方式，主要就是已setup()方法实现，让我们不必向以前那样写代码，
+组合式api方式，主要就是已setup()方法体现，让我们不必向以前那样写代码，
 如：数据必须写在data里，操作data数据里方法得写在methods里的，
 这样写，操作的数据少还行，要是多了，会导致代码很难阅读，
 数据和方法没有写在一起，代码很不内聚，
 为了解决这个问题，出了这个组合式api，这个就是比较省事，在setup方法，
-里定义数据，定义方法，然后暴露出去，就可以可用
+里定义数据，定义方法，然后暴露出去，就可以使用
+补充：之前数据定义在data，操作数据的方法定义在methods里，这种方式叫选项式api
 ```
 ## MVVM设计模式
 ```
@@ -1097,6 +1098,117 @@ this.$store.commit("addCount",1);
 //调用actions下方法
 this.$store.dispatch("addFun");
 ```
+## vue3组合式api
+```html
+<template>
+  <div class="main">
+    <div>{{name}}</div>
+	
+    <hr>
+    <h1>title：</h1>
+    <div>{{title}}</div>
+	
+    <hr>
+    <h1>正常数组：</h1>
+    <ul>
+      <li v-for="(item, index) of arr" :key="index">{{ item }}</li>
+    </ul>
+	
+    <hr>
+    <h1>删除1后的数组：</h1>
+    <ul>
+      <li v-for="(item,index) of arrWhichDeleteNumber1" :key="index">{{item}}</li>
+    </ul>
+    <button @click="getArrData">获取数组数据</button>
+  </div>
+</template>
+
+<script>
+import { ref,toRefs, onMounted, watch, computed} from "vue";
+export default {
+  name: "组合式api测试",
+  components: {},
+  props: {
+    title:{
+      type:String,
+      default:""
+    }
+  },
+  data() {
+    return {
+		
+    };
+  },
+  //执行setup时，组件实例尚未被创建，这时组件内data，computed，methods还不能使用
+  //在setup方法里，因为setup方法是运行在解析数据方法之前，所以setup方法里的this和普通vue里this是不一样的，因此在setup方法里调用this，是无法操控组件里数据和方法
+  setup(props, context) {
+    
+    console.log(context.attrs) //Attribute(非响应式对象)
+    console.log(context.slots)//插槽 (非响应式对象)
+    console.log(context.emit)//触发事件 (方法)
+
+    //let title = props.title;//虽然这里的props是响应式的，但是已这种方式导出，再渲染到页面上，如title值发生变化时，这里是无法监听到变化的
+
+    let {title} = toRefs(props);//上面的问题可以用toRefs方法解决，这个方法是把对象里所有的参数，都通过ref进行响应式变量声明，声明后，当props里参数发生变化后，在这里导出，页面上就能动态变化
+
+    let name = 'kang';
+
+    // let arr = []; //1
+    let arr = ref([]);//ref方法，将参数声明成响应式变量，导出后的数据，是动态的，当数据发生变化时，导出的数据也会跟着变化。反之直接声明的变量，是静态的数据，导出后，数据发生变化，页面上不会跟着变化
+    
+    
+    let getArrData = function () {
+      arr.value = arr.value.concat([1, 2, 3]);
+    };
+
+    //setup里使用声明周期函数
+    //onBeforeMount(); //选项式api里的beforeMount声明周期函数
+    //使用方式1
+    //onMounted(getArrData); //选项式api里的mounted声明周期函数，在setup方法里使用mounted生命周期函数，在mounted时调用getArrData方法
+    //使用方式2
+    onMounted(() => {
+      getArrData()
+    })
+    //onBeforeUpdate(); //选项式api里的beforeUpdate声明周期函数
+    //onUpdated; //选项式api里的updated声明周期函数
+    //onBeforeUnmount; //选项式api里的beforeUnmount声明周期函数
+    //onUnmounted; //选项式api里的unmounted声明周期函数
+    //还有好几个，详见vue3api文档
+
+    //在setup方法里使用watch
+    watch(
+      arr,
+      function (newValue, oldValue) {
+        console.log("arr数据发生变化：", arr.value);
+      },
+      { deep: true }
+    );
+
+    //在setup方法里使用computed
+    let arrWhichDeleteNumber1 = computed(() => {
+      let arrStr = arr.value.join(',');
+      let workStr = arrStr.replace(/(1|,)/g,'');
+      return workStr.split('');
+    });
+
+    return {
+      title,
+      name,
+      arr,
+      getArrData,
+      arrWhichDeleteNumber1,
+    };
+  },
+  mounted() {},
+  methods: {},
+};
+</script>
+
+<style scoped>
+</style>
+
+```
+
 ## vue中自定义插件（利用Vue.extend实现一个插件）
 文件目录
 
