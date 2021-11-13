@@ -226,3 +226,95 @@ module.exports = {
     
 
 */
+
+
+/*
+    tree shaking（摇树，树摇）：去除无用代码，让代码更简洁
+    如：有a，b两个方法，a被使用了，b没被使用，b就会被删除
+    前提：1、必须使用es6模块化，2、开启production（生产环境）
+    es6模块化实例：export function a(a,b){return a+b} 
+
+
+    在package.json配制
+    "sideEffects":false 所有代码都没有副作用（都可以进行tree shaking）
+    问题：css文件 或 做js兼容的@babel/polyill（副作用）文件删除
+    "sideEffects":["*.css","*.less"]这样配置css，less文件不会被tree shaking
+
+*/
+
+
+/*
+    code split（代码分割）：将打包后的一个文件，分割成多个文件，这样的话，加载的时候就可以并行加载，加载更快。
+    分割成多个文件后，就可以按需加载，需要用这个文件时，才加载
+    代码分割主要是对js代码做处理
+
+    方式1：对入口entry与出口output做处理
+    entry: ["./src/index2.js","./src/index.html"],//之前多文件文件入口
+    entry: "./src/index2.js",//之前单文件入口
+    output: {
+        filename: 'js/built2[hash:10].js',//输出到build文件下，js文件夹内
+        path: path.join(__dirname, 'build'),
+    },
+    //之后
+    entry: {//多入口
+        main:'./src/js/index.js',
+        test:'./src/js/test.js',
+    },
+    output: {
+        filename: 'js/[name].[hash:10].js',//按入口名输出多个文件，这个name就是entry的main和test
+        path: path.join(__dirname, 'build'),
+    },
+
+    //方式2：配置optimization
+    这个可以，将node_modules中代码单独打包一个chunk，最终输出
+    还可以，自动分析多入口chunk中，有没有公共的文件。如果有会打包成一个单独的chunk
+    这个方法可以跟上面方法嵌套使用
+    entry:{
+        main:'./src/js/index.js',
+        test:'./src/js/test.js',
+    },
+    output: {
+        //...
+    },
+    optimization:{
+        splitChunks:{
+            chunks:'all'
+        }
+    }
+
+    //方式3，通过js代码，让某个文件单独打包成一个chunk，
+    import动态导入语法，将某个文件单独打包
+    如，在入口文件index.js里
+    import('./test.js').then((res)=>{
+        //文件加载成功,这种情况下，test会被单独打包成一个文件
+        console.log(res.count(1,2))
+    }).catch((err)=>{
+        //文件加载失败
+    })
+
+*/
+
+/*
+    lazy loading（懒加载和预加载）
+    懒加载：当文件需要使用时才加载
+    预加载：会在使用之前，提前加载js文件
+    正常加载：可以认为是并行加载（同一时间加载多个文件）
+    预加载与正常加载区别：预加载是等其它资源加载完毕后，浏览器空闲了，再偷偷加载资源
+
+    如：再index.js文件里加载一个test.js文件
+    function a(){
+        import('test.js',(res)=>{
+            console.log(res.count(1,2));
+        })
+    }
+    上面当需要运行a()方法时，才加载test.js方法。这就实现了懒加载
+
+    function a(){
+        import(\/* webpackChunkName:'test',webpackPrefetch:true*\/'test.js',(res)=>{
+            console.log(res.count(1,2));
+        })
+    }
+    //在import()方法里加上\/* webpackChunkName:'test',webpackPrefetch:true*\/'test.js'这就话就实现了预加载
+    webpackChunkName代表加载的这个文件名字，webpackPrefetch代表开启预加载
+
+*/
