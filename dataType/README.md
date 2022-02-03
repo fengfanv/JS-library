@@ -13,27 +13,35 @@
 
 保存位置：栈内存（栈内存里保存引用数据类型在堆内存中的引用地址），堆内存（数据本体）
 ```
-## typeof 检测数据类型
+## 检测数据类型方法1，typeof
 ```javascript
 typeof "字符串" //"string"
 
 typeof 123 //"number"
 
-typeof true //"boolean"
+typeof NaN //"number"
 
-typeof null //"object"
+typeof true //"boolean"
 
 typeof undefined //"undefined"
 
-typeof Symbol(1) //"symbol"
+typeof function(){} //"function"
 
 typeof {} //"object"
 
 typeof [] //"object"
 
-typeof function(){} //"function"
+typeof null //"object"
+
+typeof Symbol(1) //"symbol"
+
+typeof typeof undefined //"string" 先运算typeof undefined得出"undefined"，然后运算typeof "undefined"，最后得出"string"
+
+typeof alert //"function"
+
+typeof alert("哈哈") //"undefined" alert方法运行后，alert方法默认return一个undefined回来，function不写return都默认返回undefined，typeof undefined，最后得出"undefined"
 ```
-## Object.prototype.toString.call 检测数据类型
+## 检测数据类型方法2，Object.prototype.toString.call
 ```javascript
 Object.prototype.toString.call("字符串") //"[object String]"
 
@@ -41,69 +49,86 @@ Object.prototype.toString.call(123) //"[object Number]"
 
 Object.prototype.toString.call(true) //"[object Boolean]"
 
-Object.prototype.toString.call(null) //"[object Null]"
-
 Object.prototype.toString.call(undefined) //"[object Undefined]"
 
-Object.prototype.toString.call(Symbol(1)) //"[object Symbol]"
+Object.prototype.toString.call(function(){}) //"[object Function]"
 
 Object.prototype.toString.call({}) //"[object Object]"
 
 Object.prototype.toString.call([]) //"[object Array]"
 
-Object.prototype.toString.call(function(){}) //"[object Function]"
+Object.prototype.toString.call(null) //"[object Null]"
 
+Object.prototype.toString.call(Symbol(1)) //"[object Symbol]"
 ```
-## 强制类型转换（不全）
+
+## 显式数据类型转换
 ```javascript
+/*
+问：什么是 显式类型转换？
+答：直接明了的调用方法转换数据类型，通过js提供的数据类型转换方法，将一个类型转成另一个类型。
+*/
+
+String()
+
+Number()
+
+Boolean()
+
+parseInt()
+
+parseFloat()
+
+toString()
+
+
 //1、强制数据类型转换成 字符串
 String(1) //"1"
 
 String(true) //"true"
 
-String(null) //"null"
-
 String(undefined) //"undefined"
 
-String(Symbol(1)) //"Symbol(1)"
+String(function(){return 10}) //"function(){return 10}"
 
 String({}) //"[object Object]"
 
 String([]) //""
-
 String([1,2,3,{}]) //"1,2,3,[object Object]"
 
-String(function(){return 10}) //"function(){return 10}"
+String(null) //"null"
+
+String(Symbol(1)) //"Symbol(1)"
 
 
 //2、强制数据类型转换成 数值
 Number("") //0
-
 Number("1") //1
-
 Number("a") //NaN
-
+Number("-123") //-123
+Number("123abc") //NaN
+Number("false") //NaN
+Number("[1]") //NaN
+Number("null") //NaN
+--
 Number(true) //1
-
-Number(null) //0
-
+Number(false) //0
+--
 Number(undefined) //NaN
-
-Number(Symbol(1)) //报错：Cannot convert a Symbol value to a number
-
-Number({}) //NaN
-
-Number([]) //0
-
-Number([1]) //1
-
-Number(["1"]) //1
-
-Number(["a"]) //NaN
-
-Number([1,2]) //NaN
-
+--
 Number(function(){}) //NaN
+--
+Number({}) //NaN
+--
+Number([]) //0
+Number([1]) //1
+Number(["1"]) //1
+Number(["a"]) //NaN
+Number([1,2]) //NaN
+--
+Number(null) //0
+--
+Number(Symbol(1)) //报错：Cannot convert a Symbol value to a number
 
 
 //3、强制数据类型转换成 布尔
@@ -118,19 +143,57 @@ Number(function(){}) //NaN
 
 */
 
+
+//4、parseInt(string, radix)解析字符串,返回一个十进制的整数
+parseInt("2") //2
+parseInt("1.6") //1
+parseInt("1.6") //1
+parseInt("123a") //123
+parseInt("a123") //NaN
+--
+parseInt("10",16) //16 这时第一个参数里的10不是十进制的数字10。是1和0两位,16进制的，逢16进1，最后转成十进制得出16
+parseInt(10,16) //16
+parseInt("b",16) //11 这时第一个参数里的b被认为是16进制的，b在16进制里代表十进制的11
+parseInt("2a",16) //42 这时第一个参数里的2a被认为是16进制的，16进制，逢16进1，这个参数的第一位2是进行了两次，逢16进1，才变成2的（或理解为，有2个16），如果再来一次逢16进1，那这里就会变成3。参数的第二位a在16进制里代表十进制10，所以最后得出：16+16+10=42
+
+parseInt("2aa",16) //682
+//参数倒着看第一个a，在16进制里代表十进制10
+//参数倒着看第二个a，因为16进制逢16进1，所以说明这个a代表已经累计进行了10次，逢16进1。所以这里是16*10=160
+/*三位的16进制数 0（倒数第三位） 0（倒数第二位） 0（倒数第一位），
+倒数第二位 代表 倒数第一位累计进行了多少次逢16进1，如果倒数第二位是4，说明倒数第一位进行了4次，逢16进1。也就是有4个16。如果累计了16次，也就是有16个16，则倒数第三位会发生变化
+倒数第三位，如果倒数第三位是2，说明有2组“16个16”
+*/
+//参数倒着看第三位2，2*(16*16)=256
+//最后得出：256+160+10=682
+
+
+//5、parseFloat(string)解析字符串，返回一个浮点数
+parseFloat("10") //10
+parseFloat("10.33") //10.33
+parseFloat("34 45 66") //34
+parseFloat("40y") //40
+parseFloat("a40") //NaN
+
 ```
 ## 隐式类型转换
 ```javascript
-//隐式转换规则
 /*
-1、转成string类型： 字符串连接符（ +） ，两边有一边是字符串，则另一边会被转换成字符串
-
-2、转成number类型：算术运算符（ +、-、*、/、%、++、--），关系运算符（ >、<、>=、<=、==、!=、===、!===），会被转换成数值
-
-3、转成boolean类型：逻辑非运算符（ !）
+问：什么是 隐式类型转换？
+答：js偷偷给你转换数据类型。参数在运算时，被转换成能够运行的能到结果的数据类型，如1*"2"=2，这个字符串2在在运算时，被偷偷转换成了数值型。
+隐式数据类型转换时，也是调用的显式类型转换的方法。
 */
 
-//1、字符串连接符 与 算术运算符 隐式转换规则
+
+
+//1、转成string类型： 字符串连接符（ + ） ，两边有一边是字符串，则另一边会被转换成字符串
+
+//2、转成number类型：算术运算符（ +（加号）、-（减号）、*、/、%、++、--、+（正）、-（负） ），关系运算符（ >、<、>=、<=、==、!=、===、!=== ），会被转换成数值
+
+//3、转成boolean类型：逻辑非运算符（ ! ）
+
+
+
+//1、加号在js里有两种身份（字符串连接符、算术运算符）加号的隐式类型转换规则
 console.log(1 + 'true') //"1true"
 
 console.log(1 + true) //2
@@ -139,26 +202,33 @@ console.log(1 + undefined) //NaN
 
 console.log(1 + null) //1
 
-/*
-	解析：以上问题，容易将 字符串连接符（ +，两边有一边是字符串），与算数运算符（ +，两边都是数字）的隐式转换搞混淆
-	
-	1、字符串连接符（+）：会把其它数据类型通过调用String()方法转成字符串，然后在拼接字符串
+console.log(+ true) //1
 
-	2、算数运算符（+）：会把其它数据类型通过调用Number()方法转成数值，然后在做加法运算
-	
+/*	
+	1、字符串连接符（+）： 加号两边有一边是字符串，则会把其它数据类型通过调用String()方法转成字符串，然后在拼接字符串
+
+	2、算数运算符（+）的加号：加号两边没有字符串数据，则会通过Number()方法，把非数值类型转成数值，然后在做加法运算
+
+	3、算数运算符（+/-）的正负号：加号前边没有东西，加号后边有参数，这时加号是算数运算符，是参数的正负号，转换方法与上边一样，调用Number强制数据类型转换
 */
 
 //这里 + 是字符串连接符：String(1) + 'true' => '1true'
 console.log(1 + 'true') //"1true"
 
-//这里 + 是算数运算符：1 + Number(true) => 1 + 1 => 2
+//这里 + 是算数运算符的加号：1 + Number(true) => 1 + 1 => 2
 console.log(1 + true) //2
 
-//这里 + 是算数运算符：1 + Number(undefined) => 1 + NaN => NaN
+//这里 + 是算数运算符的加号：1 + Number(undefined) => 1 + NaN => NaN
 console.log(1 + undefined) //NaN
 
-//这里 + 是算数运算符：1 + Number(null) => 1 + 0 => 1
+//这里 + 是算数运算符的加号：1 + Number(null) => 1 + 0 => 1
 console.log(1 + null) //1
+
+//这里 + 是算数运算符的正负号：Number(true) => 1
+console.log(+ true) //1
+
+
+
 
 
 //2、关系运算符，会把其它数据类型转成number，然后在进行比较
@@ -173,6 +243,10 @@ console.log("abc" > "b") //false
 console.log("abc" > "aad") //true
 
 console.log(NaN == NaN) //false
+
+console.log(true > false) //true
+
+console.log(1 > 2 < 3) //true
 
 console.log(undefined == null) //true
 
@@ -198,13 +272,31 @@ console.log("abc" < "b") //true
 //先比较a与a，两者相等，则继续比较第二个字符，b与a，然后调用charCodeAt方法，'b'.charCodeAt() > 'a'.charCodeAt() => 98 > 97 => true
 console.log("abc" > "aad") //true
 
+console.log(true > false) //true
+//Number(true) => 1，Number(false) => 0，1>0 => true
+
+console.log(1 > 2 < 3) //true
+//从左往右运算，先运算1>2 => false，变成Number(false)<3 => 0<3 => true
+
 //特殊情况，数据类型是undefined与null，则得出固定结果
+console.log(undefined > 0); //false
+console.log(undefined < 0); //false
+console.log(undefined == 0); //false
+
+console.log(null > 0); //false
+console.log(null < 0); //false
+console.log(null == 0); //false
+
 console.log(undefined == undefined) //true
 console.log(undefined == null) //true
 console.log(null == null) //true
 
 //特殊情况2，NaN与任何数据比较都是NaN
 console.log(NaN == NaN) //false
+
+
+
+
 
 
 //3、复杂数据类型（Object,Array）转number
