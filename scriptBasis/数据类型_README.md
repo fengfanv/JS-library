@@ -40,6 +40,8 @@ typeof typeof undefined //"string" 先运算typeof undefined得出"undefined"，
 typeof alert //"function"
 
 typeof alert("哈哈") //"undefined" alert方法运行后，alert方法默认return一个undefined回来，function不写return都默认返回undefined，typeof undefined，最后得出"undefined"
+
+typeof a123 //"undefined"，这里a123是未经声明的，typeof 未经声明的变量，不不报错，打印undefined。一个未经声明的变量，直接使用会报错，但typeof比较特殊不会报错。Object.prototype.toString.call(a123)，这个变量如果是未经声明的，会报错
 ```
 ## 检测数据类型方法2，Object.prototype.toString.call
 ```javascript
@@ -60,6 +62,8 @@ Object.prototype.toString.call([]) //"[object Array]"
 Object.prototype.toString.call(null) //"[object Null]"
 
 Object.prototype.toString.call(Symbol(1)) //"[object Symbol]"
+
+Object.prototype.toString.call(a123) //报错，提示a123未定义。如果是typeof一个未经定义的变量的，不会报错，会打印undefined
 ```
 
 ## 显式数据类型转换
@@ -147,7 +151,6 @@ Number(Symbol(1)) //报错：Cannot convert a Symbol value to a number
 //4、parseInt(string, radix)解析字符串,返回一个十进制的整数
 parseInt("2") //2
 parseInt("1.6") //1
-parseInt("1.6") //1
 parseInt("123a") //123
 parseInt("a123") //NaN
 --
@@ -158,7 +161,7 @@ parseInt("2a",16) //42 这时第一个参数里的2a被认为是16进制的，16
 
 parseInt("2aa",16) //682
 //参数倒着看第一个a，在16进制里代表十进制10
-//参数倒着看第二个a，因为16进制逢16进1，所以说明这个a代表已经累计进行了10次，逢16进1。所以这里是16*10=160
+//参数倒着看第二个a，因为16进制逢16进1，所以说明这个a代表已经累计进行了10次，逢16进1（或理解为，有10个16）。所以这里是16*10=160
 /*三位的16进制数 0（倒数第三位） 0（倒数第二位） 0（倒数第一位），
 倒数第二位 代表 倒数第一位累计进行了多少次逢16进1，如果倒数第二位是4，说明倒数第一位进行了4次，逢16进1。也就是有4个16。如果累计了16次，也就是有16个16，则倒数第三位会发生变化
 倒数第三位，如果倒数第三位是2，说明有2组“16个16”
@@ -269,6 +272,7 @@ console.log('10'.charCodeAt()) //49，这里charCodeAt方法，默认返回字�
 //先比较a与b，a与b不等，然后调用charCodeAt方法，'a'.charCodeAt() > 'b'.charCodeAt() => 97 > 98 => false
 console.log("abc" > "b") //false
 console.log("abc" < "b") //true
+
 //先比较a与a，两者相等，则继续比较第二个字符，b与a，然后调用charCodeAt方法，'b'.charCodeAt() > 'a'.charCodeAt() => 98 > 97 => true
 console.log("abc" > "aad") //true
 
@@ -288,8 +292,8 @@ console.log(null < 0); //false
 console.log(null == 0); //false
 
 console.log(undefined == undefined) //true
-console.log(undefined == null) //true
 console.log(null == null) //true
+console.log(undefined == null) //true
 
 //特殊情况2，NaN与任何数据比较都是NaN
 console.log(NaN == NaN) //false
@@ -324,6 +328,7 @@ console.log(a == "[object Object]") //true
 console.log(a.valueOf()) //{}
 console.log(a.toString()) //"[object Object]"
 console.log(a.valueOf().toString()) //"[object Object]"
+
 
 
 
@@ -442,4 +447,56 @@ console.log(b) //10
 let c = undefined
 let b = c || 20
 console.log(b) //20
+```
+## 特殊运算符
+```javascript
+// ,逗号运算符
+var a = (2-1,3-1,4-1);
+//打印3
+//逗号运算符，会先计算逗号前面的，然后再计算逗号后面的，最后返回最后面的
+
+```
+## 数据拷贝
+```javascript
+var obj1 = {
+	name:"abc",
+	age:132,
+	card:["visa","master"],
+	wife:{
+		name:"bdb",
+		son:{
+			name:"aaa"
+		}
+	}
+}
+
+//1、判断数据是不是原始值，是原始值，直接拷贝
+
+//2、不是原始值，判断是对象还是数组
+
+//3、建立相应的空对象或空数组，然后将对象或数组按照新的引用值，再次调用方法
+
+function deepClone(origin,target){
+	
+	for(let key in origin){
+		if(typeof origin[key] == 'object'){
+			//引用类型
+			if(origin[key] == null){
+				target[key] = null;
+			}else if(Array.isArray(origin[key])){
+				target[key] = [];
+				deepClone(origin[key],target[key])
+			}else{
+				target[key] = {};
+				deepClone(origin[key],target[key])
+			}
+		}else{
+			//基础值
+			target[key] = origin[key]
+
+		}
+	}
+
+}
+
 ```

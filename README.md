@@ -30,7 +30,7 @@
 
 1、[排序算法_paixu](https://github.com/fengfanv/JS-library/blob/master/paixu)
 
-2、[数据类型_dataType](https://github.com/fengfanv/JS-library/blob/master/dataType)
+2、[js基础_scriptBasis](https://github.com/fengfanv/JS-library/blob/master/scriptBasis)
 
 3、[js继承_jsJC](https://github.com/fengfanv/JS-library/blob/master/jsJC)
 

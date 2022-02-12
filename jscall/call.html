@@ -2,34 +2,49 @@
 <html>
 	<head>
 		<meta charset="UTF-8">
-		<title>作用域</title>
+		<title>bind,call,apply</title>
 	</head>
 	<body>
-		<p>作用域</p>
+		<p>bind(),call(),apply()改变this指向
+		</p>
 		<script>
 
 			
 			//bind(),call(),apply()
-			//这三个都是给方法绑定作用域,
-			//bind()绑定作用域时不立即执行，call()和apply()给方法绑定作用域时立即执行，call()和apply()的区别就是call接收参数时一个一个的参数，apply接收参数是已数组的形式接收的
+			//这三个都是改变this指向的方法
+			//bind()给方法改变this时不立即执行，call()和apply()给方法改变this时立即执行，call()和apply()的区别就是call接收参数时一个一个的参数，apply接收参数是已数组的形式接收的
 			
-			function a(){
-				this.name = 'a'
-				this.say = '我是a'
-			};
 			
-			a();
-			
-			function b(){
-				this.name = 'b'
-				console.log(this.say);
-			}
-			
-			b.bind(a);
-			
-			b();//我是a
 
-			
+			//用法
+			//1、给对象增加属性和参数
+			function Person(){
+				this.name = "WangTao";
+				this.gender = "男";
+				this.age = 24;
+			}
+			var person1 = {};
+			console.log(JSON.stringify(person1));//{}
+			Person.call(person1);//这里将对象person1作为Person方法的this，这样person1对象就增加了三个属性
+			console.log(JSON.stringify(person1));//{"name":"WangTao","gender":"男","age":24}
+
+
+			//2、
+			function Man(name,gender,age){
+				//
+				this.name = name;
+				this.gender = gender;
+				this.age = age;
+			}
+			function Student(name,gender,age,grade,number){
+				//这里就把this当做一个名叫this的特殊对象
+				//所以Student方法内的this，就是Student方法的一个特殊对象
+				this.grade = grade;
+				this.number = number;
+				Man.call(this,name,gender,age);//将Man方法的this替换成Student自己的，给自己增加了三个属性
+			}
+			var student = new Student("wang","男",24,"一年级","id:100500")
+			console.log(JSON.stringify(student));//{"grade":"一年级","number":"id:100500","name":"wang","gender":"男","age":24}
 			
 			
 			
