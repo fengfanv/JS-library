@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <h1>一个普通的pc页面，在4k，2k显示器上显示，页面内元素被放大</h1>
+
+    <script>
+        var scale = window.devicePixelRatio //这个参数是(设备真实像素数/逻辑像素数)的比值；如:(真实像素数640)/(逻辑像素数320)=2；显示器缩放125%这里得到的就是1.25；显示器缩放150%这里得到的就是1.5
+        if (scale != 1) { // 如果进行了缩放，也就是不是1
+            document.body.style.zoom = -0.6 * scale + 1.6; // 修改页面的缩放比例。
+        }
+    </script>
+</body>
+
+</html>
