@@ -88,6 +88,8 @@
 
 30、[canvas解决模糊问题_canvasRetinaScreen](https://github.com/fengfanv/JS-library/tree/master/canvasRetinaScreen)
 
+31、[canvas3D模型绘制到2D平面上_canvas3dTo2d](https://github.com/fengfanv/JS-library/tree/master/canvas3dTo2d)
+
 
 ### html与css
 
@@ -114,6 +116,8 @@
 11、[网页瀑布流案例_htmlWaterfallFlow](https://github.com/fengfanv/JS-library/tree/master/htmlWaterfallFlow)
 
 12、[html中nav滑动指示器_htmlNavSlideDemo](https://github.com/fengfanv/JS-library/tree/master/htmlNavSlideDemo)
+
+13、[解决pc页面在4k显示器上被放大的问题（还有其它方法，这种方法不是最优的）_htmlPageScale](https://github.com/fengfanv/JS-library/tree/master/htmlPageScale)
 
 --
 

@@ -1188,9 +1188,21 @@ this.$store.commit("addCount",1);
 this.$store.dispatch("addFun",1);
 ```
 ## keep-alive组件缓存
+
 ```
 keep-alive是vue内置的一个组件，而这个组件的作用就是能够缓存不活动的组件，我们能够知道，一般情况下，组件进行切换的时候，默认会进行销毁，如果有需求，某个组件切换后不进行销毁，而是保存之前的状态，那么就可以利用keep-alive来实现
 
+使用keep-alive后，组件或页面内能使用的钩子函数：
+
+1、activated
+第一次进入某个页面的时候，页面或组件内，钩子触发的顺序是 beforeCreate -> created -> BeforeMount -> mounted -> activated
+第二次进入（打开过这个页面，跳到别的页面去了，现在又跳回来了），页面或组件内，钩子触发的顺序是 activated（当再次前入进，这个缓存的页面或组件时候，只触发activated）
+
+2、deactivated ：离开页面的时候会触发deactivated，不会触发页面或组件的卸载生命周期钩子（如beforeUnmount，unmounted）
+```
+
+使用
+```
 vue3内使用keep-alive组件缓存
 
 //app.vue文件的配置
