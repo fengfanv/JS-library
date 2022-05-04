@@ -1187,6 +1187,52 @@ this.$store.commit("addCount",1);
 //调用actions下方法
 this.$store.dispatch("addFun",1);
 ```
+### vuex里modules的使用
+
+index.js
+```javascript
+import { createStore } from 'vuex'
+import app from './app_modules'
+
+export default createStore({
+  state: {},
+  mutations: {},
+  actions: {},
+  modules: {
+    app
+  }
+})
+```
+app_modules.js
+```javascript
+export default {
+    namespaced: true, //开启命名空间，默认情况下，模块内部的 action 和 mutation 是注册在全局命名空间内的，这样可以使得多个模块能够对同一个 action 或 mutation 作出响应。Getter同样也是默认注册在全局命名空间，所以必须要注意，不要在不同的、无命名空间的模块中定义两个相同的 getter 从而导致错误。namespaced: true使其成为带命名空间的模块，当模块被注册后，它的所有 getter、action、mutation都会自动根据模块注册的路径调整命名
+    state() {
+        return {
+            //在页面中使用 this.$store.state.app.count
+            count: 0
+        }
+    },
+    mutations: {
+        //在页面中使用 this.$store.commit('app/set_value',18)
+        set_value(state, value) {
+            state.count = value
+        }
+    },
+    actions: {
+        //在页面中使用 this.$store.dispatch('app/set_value_async',18)
+        set_value_async({ state, commit, rootState }, value) {
+            state.count = value;
+        }
+    },
+    getters: {
+        //在页面中使用 this.$store.getters['app/get_value']
+        get_value(state, getters, rootState) {
+            return state.count + 'a'
+        }
+    }
+}
+```
 ## keep-alive组件缓存
 
 ```
