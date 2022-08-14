@@ -25,6 +25,8 @@ A(0，0，zA)，B点的三维坐标可以表示为B(0，yB，zB)。从B点做一
 
 _注释：AD/AO = DB/OC_
 
+_注释2：OC/DB = AO/AD_
+
 变换得
 
 ![图片6.png](./img/图片6.png)
@@ -316,30 +318,30 @@ export default {
 
 ![07.png](./img/07.png)
 
-这个时候假定D点与x轴的夹角是α，圆的半径为R，将D点绕着y轴旋转β旋转至D'点，这个时候D'与x轴夹角为α+β，此时D'的x坐标为cos(α+β)*R，D'的z坐标为sin(α+β)*R
+原文章：这个时候假定D点与x轴的夹角是α，圆的半径为R，将D点绕着y轴旋转β旋转至D'点，这个时候D'与x轴夹角为α+β，此时D'的x坐标为cos(α+β)*R，D'的z坐标为sin(α+β)*R
 回一下中学时候我们学过的三角形倍角公式
 
 ![图片29.png](./img/图片29.png)
 
 ![图片30.png](./img/图片30.png)
 
-D'的x坐标cos(α+β)*R=R*cosα*cosβ-R*sinα*sinβ
+原文章：D'的x坐标cos(α+β)*R=R*cosα*cosβ-R*sinα*sinβ
 
-D'的z坐标sin(α+β)*R=R*sinα*cosβ+R*cosα*sinβ
+原文章：D'的z坐标sin(α+β)*R=R*sinα*cosβ+R*cosα*sinβ
 
-而R*sinα就是旋转之前D点的z坐标，R*cosα就是旋转之前D点的x坐标，
+原文章：而R*sinα就是旋转之前D点的z坐标，R*cosα就是旋转之前D点的x坐标，
 
-D'的x坐标为x*cosβ-z*sinβ
+原文章：D'的x坐标为x*cosβ-z*sinβ
 
-D'的z坐标为z*cosβ+x*sinβ
+原文章：D'的z坐标为z*cosβ+x*sinβ
 
-将结论代入到我们的立方体的8个顶点ABCDEFGH中
+原文章：将结论代入到我们的立方体的8个顶点ABCDEFGH中
 
-对于任一点D(xD，yD，zD)，其绕y轴旋转β角的时候，它的三维坐标变为
+原文章：对于任一点D(xD，yD，zD)，其绕y轴旋转β角的时候，它的三维坐标变为
 
-(xD*cosβ-zD*sinβ，yD，zD*cosβ+xD*sinβ)
+原文章：(xD*cosβ-zD*sinβ，yD，zD*cosβ+xD*sinβ)
 
-转换为代码
+原文章：转换为代码
 ```javascript
     methods: {
         init: function () {
@@ -437,6 +439,8 @@ D'的z坐标为z*cosβ+x*sinβ
         this.animationFrame()
     }
 ```
+
+## 注释：它的这个旋转时的三角函数，可能不太好理解。可以简单一点，1、根据（x,z）坐标，把坐标夹角的sin值求出来，2、然后把这个sin值，放进 反sin函数（反正弦）内求出夹角度数，然后对角度数做处理，3、然后根据 处理后角度数 和 半径值，求出新坐标，4详细可以看“3D方块.html”
 
 代码运行效果
 
