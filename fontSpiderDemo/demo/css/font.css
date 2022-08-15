@@ -1,0 +1,43 @@
+/*字体配置文件，别删*/
+
+@font-face {
+    font-family: PingFang SC-Bold;
+    src: url('../font/PINGFANG BOLD.TTF') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: PingFang SC-ExtraLight;
+    src: url('../font/PINGFANG EXTRALIGHT.TTF') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: PingFang SC-Heavy;
+    src: url('../font/PINGFANG HEAVY.TTF') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: PingFang SC-Light;
+    src: url('../font/PINGFANG LIGHT.TTF') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: PingFang SC-Medium;
+    src: url('../font/PINGFANG MEDIUM.TTF') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: PingFang SC-Regular;
+    src: url('../font/PINGFANG REGULAR.TTF') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}

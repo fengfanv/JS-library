@@ -1,0 +1,16 @@
+.page {
+	min-width: 100vw;
+	min-height: 100vh;
+	background-color: #F9F9F9;
+	padding: 32rpx;
+	box-sizing: border-box;
+	color: #3D3D3D;
+}
+.pages{
+	min-width: 100vw;
+	min-height: 100vh;
+	background-color: #F9F9F9;
+	box-sizing: border-box;
+	color: #3D3D3D;
+}
+

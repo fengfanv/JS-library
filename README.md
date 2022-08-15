@@ -117,7 +117,7 @@
 
 12、[html中nav滑动指示器_htmlNavSlideDemo](https://github.com/fengfanv/JS-library/tree/master/htmlNavSlideDemo)
 
-13、[解决pc页面在4k显示器上被放大的问题（还有其它方法，这种方法不是最优的）_htmlPageScale](https://github.com/fengfanv/JS-library/tree/master/htmlPageScale)
+13、[解决pc页面在4k显示器上被放大的问题（有比这个更好的方法，待修改）_htmlPageScale](https://github.com/fengfanv/JS-library/tree/master/htmlPageScale)
 
 --
 
@@ -136,3 +136,5 @@
 6、[h5app地图案例和地图api详解_h5appMap](https://github.com/fengfanv/JS-library/tree/master/h5appMap)
 
 7、[h5app案例_h5appdemo1](https://github.com/fengfanv/JS-library/tree/master/h5appdemo1)
+
+8、[字蛛工具和苹果字体案例_fontSpiderDemo](https://github.com/fengfanv/JS-library/tree/master/fontSpiderDemo)
