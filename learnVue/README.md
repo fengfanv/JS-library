@@ -480,6 +480,57 @@ watch某些时候，可以干和computed一样的事，但在是需要额外的�
 watch监听的数据发生变化，每次变化都需要执行函数
 watch比较适合做异步的操作，如某个数据发生变化后，想让这个数据变化的2秒后，控制一个弹窗弹出一个提示
 ```
+## computed里的get，set
+
+vue computed默认写法下是没有set方法的，只有get方法
+
+```html
+<template>
+  <div>result：{{result}}</div>
+</template>
+<script>
+export default {
+  data() {
+    return {
+      a: 20,
+      b: 100,
+    };
+  },
+  mounted(){
+    console.log(this.result);
+    /*
+    打印如下内容：
+    1、get方法执行了（这个其实在调用console.log(this.result)之前就被打印出来了，也就是vue加载好后就调用了get方法，然后把结果存入了vue缓存里）
+    2、120
+    */
+   this.result = '10 20';
+   /*
+    打印如下内容：
+    1、set方法执行了
+    2、get方法执行了
+
+    vue检测到result被修改，于是调用set方法，打印 set方法执行了，并且把 10 和 20 分别赋值给 a 和 b，vue检测到计算result所依赖的 a 和 b 被修改了，于是重新触发get方法，打印 get方法执行了，并且把计算出来的新的 result 的值渲染到页面上
+    */
+  },
+  computed:{
+    result:{
+      get(){
+        console.log('get方法执行了');
+        return this.a + this.b;
+      },
+      set(value){
+        console.log('set方法执行了');
+        let arr = value.split(' ')
+        this.a = arr[0]
+        this.b = arr[1]
+      }
+    }
+  }
+};
+</script>
+<style scoped>
+</style>
+```
 ## 父组件和子组件生命周期函数执行顺序
 ```
 加载渲染过程：
@@ -709,6 +760,102 @@ Vue.component('peng-input', {
 ```html
 //自定义组件peng-input
 <peng-input v-model="input_text"></peng-input>
+```
+## 组件.sync修饰符
+子组件
+```html
+<template>
+  <div>我是子组件</div>
+  <button @click="updateData">更新数据</button>
+</template>
+<script>
+export default {
+  props: ["value"],
+  data: function () {
+    return {};
+  },
+  methods: {
+    updateData(){
+      //因为value是通过.sync绑定进来的，所以可以使用下面，这种方式更新value
+      this.$emit('update:value',123)
+    }
+  },
+};
+</script>
+<style scoped>
+</style>
+```
+父组件
+```html
+<template>
+  <div>父组件</div>
+  <!--通过.sync修饰符，子组件可以更方便的修改父组件里数据。不用通过之前接收事件的方式更新数据-->
+  <child-component :value.sync="faterValue" />
+</template>
+<script>
+//引入子组件
+import childComponent from "./components/childComponent.vue";
+export default {
+  components: {
+    childComponent,
+  },
+  data() {
+    return {
+      faterValue:456
+    };
+  }
+};
+</script>
+<style scoped>
+</style>
+```
+## 组件name属性，自己调用自己
+```html
+子组件
+<template>
+  <div>
+    <!--子组件里调用navList自己调用自己-->
+    <nav-list :haveChild="false"/>
+  </div>
+</template>
+<script>
+export default {
+  name:"navList",
+  props:{
+    haveChild:{
+      type:Boolean,
+      default:false
+    }
+  },
+  data: function () {
+    return {};
+  },
+};
+</script>
+<style scoped>
+</style>
+```
+父组件
+```html
+<template>
+  <div>
+    <!--父组件里调用navList子组件-->
+    <nav-list :haveChild="true"/>
+  </div>
+</template>
+<script>
+import navList from '@/components/navList.vue'
+export default {
+  components:{
+    navList
+  },
+  data: function () {
+    return {};
+  },
+};
+</script>
+<style scoped>
+</style>
 ```
 ## vue动画
 css样式
