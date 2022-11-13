@@ -1632,6 +1632,10 @@ Vue.loading_main.showLoading(function (data) {
 });
 ```
 ## 其它问题
+#### vue里render渲染函数
+```html
+内容待补充
+```
 #### import与import()区别是什么
 ```
 1、import
