@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>滚动但背景不滚动</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+        
+        .box {
+            width: 400px;
+            height: 400px;
+            margin-top: 400px;
+            margin-bottom: 800px;
+            overflow: hidden;
+        }
+        
+        .box .bg {
+            width: 400px;
+            height: 100vh;
+            background: url('https://goatai.cn/images/index/%E7%BB%84%205%20%E6%8B%B7%E8%B4%9D@2x.png') no-repeat center;
+            background-size: cover;
+            background-attachment: fixed;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="box">
+        <div class="bg"></div>
+    </div>
+
+</body>
+
+</html>

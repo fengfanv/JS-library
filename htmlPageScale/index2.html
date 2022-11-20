@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+
+    </style>
+</head>
+<body>
+    <h1>解决方法2</h1>
+    <h2>问题描述：开发pc端页面时，根据1920宽设计图制作出网页，在4k显示器上，页面内元素被放大显示的问题</h2>
+    <p>解决方法1：根据window.devicePixelRatio获取屏幕缩放比，然后给body设置zoom属性，这种chrome浏览器好使，但火狐和ie不好用；</p>
+    <p>解决方法2：将px单位换成vw或rem，这样页面上元素就会根据浏览器宽度变化而变化。为什么这种方法可行？因为4k是屏幕的物理像素，电脑会将4k分辨率虚拟成1920像素（1k）。</p>
+    <p>使用vw时，vw是根据屏幕宽度来的，将屏幕宽分成100份，1vw就是1份。因为电脑会将4k屏幕虚拟成1920屏幕，设计图又是1920的，这俩就对应上了。如1920宽设计图，元素宽105px，105/1920*100=5.4，这5.4加上vw单位，5.4vw，把这个写到css里就可以了。pc页面用vw单位，这种适用于响应式页面，vw给pc用，rem给手机端用，两个互不干扰；</p>
+    <p>使用rem时，设置html根字体大小：font-size: calc(100vw / 1920 * 100)；然后设计图上元素105px，105px 除 100 等于 1.05rem，如果把这个 1.05rem 写进css里就可以了。pc页面使用rem单位，这种适用于，页面不需要响应式开发，所以不用考虑pc和手机，只考虑pc就可以，rem计算数据更简单，就除100，很爽，一般是优先使用rem</p>
+    <br>
+    <p>问题：使用vw单位开发pc页面时，浏览器缩小，页面也跟着缩小。但pc页面需要有最小宽，如，浏览器缩小到1000px时，页面内容就不继续缩小了。</p>
+    <p>解决方法1：使用rem</p>
+    <p>解决方法2：页面缩小到1000px时，使用@media，这个是页面开发完后，优化这个问题的最优方法</p>
+    <p>解决方法3：使用webpack，使用postcss</p>
+</body>
+</html>

@@ -117,7 +117,9 @@
 
 12、[html中nav滑动指示器_htmlNavSlideDemo](https://github.com/fengfanv/JS-library/tree/master/htmlNavSlideDemo)
 
-13、[解决pc页面在4k显示器上被放大的问题（有比这个更好的方法，待修改）_htmlPageScale](https://github.com/fengfanv/JS-library/tree/master/htmlPageScale)
+13、[解决pc页面在4k显示器上被放大的问题（2种解决方案）_htmlPageScale](https://github.com/fengfanv/JS-library/tree/master/htmlPageScale)
+
+14、[方块在页面上下动，但里面的背景不动_backgroundStill](https://github.com/fengfanv/JS-library/tree/master/backgroundStill)
 
 --
 
@@ -138,3 +140,5 @@
 7、[h5app案例_h5appdemo1](https://github.com/fengfanv/JS-library/tree/master/h5appdemo1)
 
 8、[字蛛工具和苹果字体案例_fontSpiderDemo](https://github.com/fengfanv/JS-library/tree/master/fontSpiderDemo)
+
+9、[css火特效_cssFire](https://github.com/fengfanv/JS-library/tree/master/cssFire)
