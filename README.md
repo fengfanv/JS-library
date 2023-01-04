@@ -6,139 +6,139 @@
 
 1、[mysql_mysql](/mysql)
 
-2、[node_node](https://github.com/fengfanv/JS-library/tree/master/node)
+2、[node_node](/node)
 
-3、[vue_learnVue](https://github.com/fengfanv/JS-library/tree/master/learnVue)
+3、[vue_learnVue](/learnVue)
 
-4、[微信小程序和云开发_learnWechat](https://github.com/fengfanv/JS-library/tree/master/learnWechat)
+4、[微信小程序和云开发_learnWechat](/learnWechat)
 
-5、[TypeScript_learnTypescript](https://github.com/fengfanv/JS-library/tree/master/learnTypescript)
+5、[TypeScript_learnTypescript](/learnTypescript)
 
-6、[react_learnReact](https://github.com/fengfanv/JS-library/tree/master/learnReact)
+6、[react_learnReact](/learnReact)
 
-7、[jquery使用_jquery](https://github.com/fengfanv/JS-library/tree/master/jquery)
+7、[jquery使用_jquery](/jquery)
 
-8、[koa使用_learnKoa](https://github.com/fengfanv/JS-library/tree/master/learnKoa)
+8、[koa使用_learnKoa](/learnKoa)
 
-9、[uniapp使用_uniapp](https://github.com/fengfanv/JS-library/tree/master/uniapp)
+9、[uniapp使用_uniapp](/uniapp)
 
-10、[webpack_learnWebpack](https://github.com/fengfanv/JS-library/tree/master/learnWebpack)
+10、[webpack_learnWebpack](/learnWebpack)
 
 --
 
 ### js
 
-1、[排序算法_paixu](https://github.com/fengfanv/JS-library/tree/master/paixu)
+1、[排序算法_paixu](/paixu)
 
-2、[js基础_scriptBasis](https://github.com/fengfanv/JS-library/tree/master/scriptBasis)
+2、[js基础_scriptBasis](/scriptBasis)
 
-3、[js继承_jsJC](https://github.com/fengfanv/JS-library/tree/master/jsJC)
+3、[js继承_jsJC](/jsJC)
 
-4、[a星寻路算法与强化学习算法_aStarAndQLearning](https://github.com/fengfanv/JS-library/tree/master/aStarAndQLearning)
+4、[a星寻路算法与强化学习算法_aStarAndQLearning](/aStarAndQLearning)
 
-5、[js分页案例_fenye](https://github.com/fengfanv/JS-library/tree/master/fenye)
+5、[js分页案例_fenye](/fenye)
 
-6、[promise运行案例_promise](https://github.com/fengfanv/JS-library/tree/master/promise)
+6、[promise运行案例_promise](/promise)
 
-7、[html商城sku商品规格选择_storeSpecsChoice](https://github.com/fengfanv/JS-library/tree/master/storeSpecsChoice)
+7、[html商城sku商品规格选择_storeSpecsChoice](/storeSpecsChoice)
 
-8、[canvas裁切图片案例_canvasCutImage](https://github.com/fengfanv/JS-library/tree/master/canvasCutImage)
+8、[canvas裁切图片案例_canvasCutImage](/canvasCutImage)
 
-9、[js中bind、call、apply区别_jsCall](https://github.com/fengfanv/JS-library/tree/master/jsCall)
+9、[js中bind、call、apply区别_jsCall](/jsCall)
 
-10、[js操作时间案例_jsDateDemo](https://github.com/fengfanv/JS-library/tree/master/jsDateDemo)
+10、[js操作时间案例_jsDateDemo](/jsDateDemo)
 
-11、[小程序照片裁切案例_xcxPhotoCut](https://github.com/fengfanv/JS-library/tree/master/xcxPhotoCut)
+11、[小程序照片裁切案例_xcxPhotoCut](/xcxPhotoCut)
 
-12、[小程序上下滑动切换页面_xcxSlideToSwitchPage](https://github.com/fengfanv/JS-library/tree/master/xcxSlideToSwitchPage)
+12、[小程序上下滑动切换页面_xcxSlideToSwitchPage](/xcxSlideToSwitchPage)
 
-13、[网页上下滑动切换页面_htmlSlideToSwitchPage](https://github.com/fengfanv/JS-library/tree/master/htmlSlideToSwitchPage)
+13、[网页上下滑动切换页面_htmlSlideToSwitchPage](/htmlSlideToSwitchPage)
 
-14、[网页横向滑动切换页面_htmlSlideToSwitchPageX](https://github.com/fengfanv/JS-library/tree/master/htmlSlideToSwitchPageX)
+14、[网页横向滑动切换页面_htmlSlideToSwitchPageX](/htmlSlideToSwitchPageX)
 
-15、[网页日历案例_htmlCalendar](https://github.com/fengfanv/JS-library/tree/master/htmlCalendar)
+15、[网页日历案例_htmlCalendar](/htmlCalendar)
 
-16、[网页touch事件案例_htmlTouchEvent](https://github.com/fengfanv/JS-library/tree/master/htmlTouchEvent)
+16、[网页touch事件案例_htmlTouchEvent](/htmlTouchEvent)
 
-17、[canvas图像旋转_canvasImageRotation](https://github.com/fengfanv/JS-library/tree/master/canvasImageRotation)
+17、[canvas图像旋转_canvasImageRotation](/canvasImageRotation)
 
-18、[jsCookie使用案例_jsCookie](https://github.com/fengfanv/JS-library/tree/master/jsCookie)
+18、[jsCookie使用案例_jsCookie](/jsCookie)
 
-19、[js获取屏幕参数_jsGetWindowParams](https://github.com/fengfanv/JS-library/tree/master/jsGetWindowParams)
+19、[js获取屏幕参数_jsGetWindowParams](/jsGetWindowParams)
 
-20、[网页选择时间插件_htmlChoiceDatePlugin](https://github.com/fengfanv/JS-library/tree/master/htmlChoiceDatePlugin)
+20、[网页选择时间插件_htmlChoiceDatePlugin](/htmlChoiceDatePlugin)
 
-21、[js封装案例_jsfz](https://github.com/fengfanv/JS-library/tree/master/jsfz)
+21、[js封装案例_jsfz](/jsfz)
 
-22、[canvas字体背景颜色是图片_canvasFontBackground](https://github.com/fengfanv/JS-library/tree/master/canvasFontBackground)
+22、[canvas字体背景颜色是图片_canvasFontBackground](/canvasFontBackground)
 
-23、[js选择地址方式1_jsChoiceAddressPlugin1](https://github.com/fengfanv/JS-library/tree/master/jsChoiceAddressPlugin1)
+23、[js选择地址方式1_jsChoiceAddressPlugin1](/jsChoiceAddressPlugin1)
 
-24、[js选择地址方式2_jsChoiceAddressPlugin2](https://github.com/fengfanv/JS-library/tree/master/jsChoiceAddressPlugin2)
+24、[js选择地址方式2_jsChoiceAddressPlugin2](/jsChoiceAddressPlugin2)
 
-25、[js中利用标签src属性jsonp跨域案例_jsJsonpDemo](https://github.com/fengfanv/JS-library/tree/master/jsJsonpDemo)
+25、[js中利用标签src属性jsonp跨域案例_jsJsonpDemo](/jsJsonpDemo)
 
-26、[swiper层叠轮播案例_swiper层叠轮播](https://github.com/fengfanv/JS-library/tree/master/swiper层叠轮播)
+26、[swiper层叠轮播案例_swiper层叠轮播](/swiper层叠轮播)
 
-27、[html多张图片方式模拟3D_汽车全景](https://github.com/fengfanv/JS-library/tree/master/汽车全景)
+27、[html多张图片方式模拟3D_汽车全景](/汽车全景)
 
-28、[小程序自写层叠轮播图_xcxSelfWriteSwiperDemo](https://github.com/fengfanv/JS-library/tree/master/xcxSelfWriteSwiperDemo)
+28、[小程序自写层叠轮播图_xcxSelfWriteSwiperDemo](/xcxSelfWriteSwiperDemo)
 
-29、[echarts地图案例_echartsMapDemo](https://github.com/fengfanv/JS-library/tree/master/echartsMapDemo)
+29、[echarts地图案例_echartsMapDemo](/echartsMapDemo)
 
-30、[canvas解决模糊问题_canvasRetinaScreen](https://github.com/fengfanv/JS-library/tree/master/canvasRetinaScreen)
+30、[canvas解决模糊问题_canvasRetinaScreen](/canvasRetinaScreen)
 
-31、[canvas3D模型绘制到2D平面上_canvas3dTo2d](https://github.com/fengfanv/JS-library/tree/master/canvas3dTo2d)
+31、[canvas3D模型绘制到2D平面上_canvas3dTo2d](/canvas3dTo2d)
 
 
 ### html与css
 
-1、[css命名规则_cssNameRule](https://github.com/fengfanv/JS-library/tree/master/cssNameRule)
+1、[css命名规则_cssNameRule](/cssNameRule)
 
-2、[css清楚浮动_cssClearfix](https://github.com/fengfanv/JS-library/tree/master/cssClearfix)
+2、[css清楚浮动_cssClearfix](/cssClearfix)
 
-3、[网页中自定义video标签_htmlDiyVideoLabel](https://github.com/fengfanv/JS-library/tree/master/htmlDiyVideoLabel)
+3、[网页中自定义video标签_htmlDiyVideoLabel](/htmlDiyVideoLabel)
 
-4、[网页 媒体查询 和 rem计算 案例_htmlMediaRemDemo](https://github.com/fengfanv/JS-library/tree/master/htmlMediaRemDemo)
+4、[网页 媒体查询 和 rem计算 案例_htmlMediaRemDemo](/htmlMediaRemDemo)
 
-5、[css加载动画_cssLoading](https://github.com/fengfanv/JS-library/tree/master/cssLoading)
+5、[css加载动画_cssLoading](/cssLoading)
 
-6、[html图片懒加载案例_htmlImageLazyLoading](https://github.com/fengfanv/JS-library/tree/master/htmlImageLazyLoading)
+6、[html图片懒加载案例_htmlImageLazyLoading](/htmlImageLazyLoading)
 
-7、[html自定义input单选与多选标签_htmlDiyInputRadioCheckbox](https://github.com/fengfanv/JS-library/tree/master/htmlDiyInputRadioCheckbox)
+7、[html自定义input单选与多选标签_htmlDiyInputRadioCheckbox](/htmlDiyInputRadioCheckbox)
 
-8、[css圆形进度条_cssCircularProgress](https://github.com/fengfanv/JS-library/tree/master/cssCircularProgress)
+8、[css圆形进度条_cssCircularProgress](/cssCircularProgress)
 
-9、[网页小米商城切换浮窗案例_htmlXiaomiSwitchWindowDemo](https://github.com/fengfanv/JS-library/tree/master/htmlXiaomiSwitchWindowDemo)
+9、[网页小米商城切换浮窗案例_htmlXiaomiSwitchWindowDemo](/htmlXiaomiSwitchWindowDemo)
 
-10、[html旋转开屏特效_htmlRotateOpenWindow](https://github.com/fengfanv/JS-library/tree/master/htmlRotateOpenWindow)
+10、[html旋转开屏特效_htmlRotateOpenWindow](/htmlRotateOpenWindow)
 
-11、[网页瀑布流案例_htmlWaterfallFlow](https://github.com/fengfanv/JS-library/tree/master/htmlWaterfallFlow)
+11、[网页瀑布流案例_htmlWaterfallFlow](/htmlWaterfallFlow)
 
-12、[html中nav滑动指示器_htmlNavSlideDemo](https://github.com/fengfanv/JS-library/tree/master/htmlNavSlideDemo)
+12、[html中nav滑动指示器_htmlNavSlideDemo](/htmlNavSlideDemo)
 
-13、[解决pc页面在4k显示器上被放大的问题（2种解决方案）_htmlPageScale](https://github.com/fengfanv/JS-library/tree/master/htmlPageScale)
+13、[解决pc页面在4k显示器上被放大的问题（2种解决方案）_htmlPageScale](/htmlPageScale)
 
-14、[方块在页面上下动，但里面的背景不动_backgroundStill](https://github.com/fengfanv/JS-library/tree/master/backgroundStill)
+14、[方块在页面上下动，但里面的背景不动_backgroundStill](/backgroundStill)
 
 --
 
 ### 其它
 
-1、[nginx配置案例_nginxConfigDemo](https://github.com/fengfanv/JS-library/tree/master/nginxConfigDemo)
+1、[nginx配置案例_nginxConfigDemo](/nginxConfigDemo)
 
-2、[网页表白案例_htmlShowMeLove](https://github.com/fengfanv/JS-library/tree/master/htmlShowMeLove)
+2、[网页表白案例_htmlShowMeLove](/htmlShowMeLove)
 
-3、[网页百度地图案例_htmlBaiduMap](https://github.com/fengfanv/JS-library/tree/master/htmlBaiduMap)
+3、[网页百度地图案例_htmlBaiduMap](/htmlBaiduMap)
 
-4、[h5app支付案例_h5appPayDemo](https://github.com/fengfanv/JS-library/tree/master/h5appPayDemo)
+4、[h5app支付案例_h5appPayDemo](/h5appPayDemo)
 
-5、[h5app更新配置_h5appUpdateConfig](https://github.com/fengfanv/JS-library/tree/master/h5appUpdateConfig)
+5、[h5app更新配置_h5appUpdateConfig](/h5appUpdateConfig)
 
-6、[h5app地图案例和地图api详解_h5appMap](https://github.com/fengfanv/JS-library/tree/master/h5appMap)
+6、[h5app地图案例和地图api详解_h5appMap](/h5appMap)
 
-7、[h5app案例_h5appdemo1](https://github.com/fengfanv/JS-library/tree/master/h5appdemo1)
+7、[h5app案例_h5appdemo1](/h5appdemo1)
 
-8、[字蛛工具和苹果字体案例_fontSpiderDemo](https://github.com/fengfanv/JS-library/tree/master/fontSpiderDemo)
+8、[字蛛工具和苹果字体案例_fontSpiderDemo](/fontSpiderDemo)
 
-9、[css火特效_cssFire](https://github.com/fengfanv/JS-library/tree/master/cssFire)
+9、[css火特效_cssFire](/cssFire)
