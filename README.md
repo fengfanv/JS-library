@@ -4,41 +4,41 @@
 
 ### 框架与工具
 
-1、[mysql_mysql](https://github.com/fengfanv/JS-library/blob/master/mysql)
+1、[mysql_mysql](/fengfanv/JS-library/tree/master/mysql)
 
-2、[node_node](https://github.com/fengfanv/JS-library/blob/master/node)
+2、[node_node](https://github.com/fengfanv/JS-library/tree/master/node)
 
-3、[vue_learnVue](https://github.com/fengfanv/JS-library/blob/master/learnVue)
+3、[vue_learnVue](https://github.com/fengfanv/JS-library/tree/master/learnVue)
 
-4、[微信小程序和云开发_learnWechat](https://github.com/fengfanv/JS-library/blob/master/learnWechat)
+4、[微信小程序和云开发_learnWechat](https://github.com/fengfanv/JS-library/tree/master/learnWechat)
 
-5、[TypeScript_learnTypescript](https://github.com/fengfanv/JS-library/blob/master/learnTypescript)
+5、[TypeScript_learnTypescript](https://github.com/fengfanv/JS-library/tree/master/learnTypescript)
 
-6、[react_learnReact](https://github.com/fengfanv/JS-library/blob/master/learnReact)
+6、[react_learnReact](https://github.com/fengfanv/JS-library/tree/master/learnReact)
 
-7、[jquery使用_jquery](https://github.com/fengfanv/JS-library/blob/master/jquery)
+7、[jquery使用_jquery](https://github.com/fengfanv/JS-library/tree/master/jquery)
 
-8、[koa使用_learnKoa](https://github.com/fengfanv/JS-library/blob/master/learnKoa)
+8、[koa使用_learnKoa](https://github.com/fengfanv/JS-library/tree/master/learnKoa)
 
-9、[uniapp使用_uniapp](https://github.com/fengfanv/JS-library/blob/master/uniapp)
+9、[uniapp使用_uniapp](https://github.com/fengfanv/JS-library/tree/master/uniapp)
 
-10、[webpack_learnWebpack](https://github.com/fengfanv/JS-library/blob/master/learnWebpack)
+10、[webpack_learnWebpack](https://github.com/fengfanv/JS-library/tree/master/learnWebpack)
 
 --
 
 ### js
 
-1、[排序算法_paixu](https://github.com/fengfanv/JS-library/blob/master/paixu)
+1、[排序算法_paixu](https://github.com/fengfanv/JS-library/tree/master/paixu)
 
-2、[js基础_scriptBasis](https://github.com/fengfanv/JS-library/blob/master/scriptBasis)
+2、[js基础_scriptBasis](https://github.com/fengfanv/JS-library/tree/master/scriptBasis)
 
-3、[js继承_jsJC](https://github.com/fengfanv/JS-library/blob/master/jsJC)
+3、[js继承_jsJC](https://github.com/fengfanv/JS-library/tree/master/jsJC)
 
-4、[a星寻路算法与强化学习算法_aStarAndQLearning](https://github.com/fengfanv/JS-library/blob/master/aStarAndQLearning)
+4、[a星寻路算法与强化学习算法_aStarAndQLearning](https://github.com/fengfanv/JS-library/tree/master/aStarAndQLearning)
 
 5、[js分页案例_fenye](https://github.com/fengfanv/JS-library/tree/master/fenye)
 
-6、[promise运行案例_promise](https://github.com/fengfanv/JS-library/blob/master/promise)
+6、[promise运行案例_promise](https://github.com/fengfanv/JS-library/tree/master/promise)
 
 7、[html商城sku商品规格选择_storeSpecsChoice](https://github.com/fengfanv/JS-library/tree/master/storeSpecsChoice)
 
