@@ -4,7 +4,7 @@
 
 ### 框架与工具
 
-1、[mysql_mysql](/tree/master/mysql)
+1、[mysql_mysql](/mysql)
 
 2、[node_node](https://github.com/fengfanv/JS-library/tree/master/node)
 
