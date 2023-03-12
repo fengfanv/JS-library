@@ -2,13 +2,14 @@
 
 ## CommonJs规范
 [CommonJs规范-详解](https://blog.csdn.net/Charissa2017/article/details/104928459)
-[CommonJS规范](https://javascript.ruanyifeng.com/nodejs/module.html)
+
+[阮一峰 - CommonJS规范](https://javascript.ruanyifeng.com/nodejs/module.html)
 
 ### 关于模块
 
 - Node应用由模块组成，采用CommonJS模块规范。
 - 每个文件就是一个模块，有自己的作用域。在一个文件里面定义的变量、函数、类，都是私有的，对其他文件不可见。
-- 在模块中使用global 定义全局变量，不需要导出，在别的文件中可以访问到。
+- 在模块中使用global定义全局变量，不需要导出，在别的文件中可以访问到。
 - CommonJS规范规定，每个模块内部，module变量代表当前模块。这个变量是一个对象，它的exports属性（即module.exports）是对外的接口。加载某个模块，其实是加载该模块的module.exports属性。
 - 通过require加载模块，读取并执行一个js文件，然后返回该模块的exports对象。
 - 所有代码都运行在模块作用域，不会污染全局作用域。
@@ -88,16 +89,16 @@ console.log(counter) //3
 ```
 - 上面代码说明，counter输出以后，b.js模块内部的变化就影响不到counter了
 
-### require的内部处理流程
-- require命令是CommonJS规范之中，用来加载其他模块的命令。它其实不是一个全局命令，而是指向当前模块的module.require命令，而后者又调用Node的内部命令Module._load。
-- 在使用require调用模块时，会执行Node的内部命令Module._load，下面是Module._load的运行过程：
+### require命令的内部处理流程
+- require命令是CommonJS规范之中，用来加载其他模块的命令。它其实不是一个全局命令，而是指向当前模块的module.require命令，调用module.require命令后，module.require会调用Node的内部命令Module._load。
+- 所以在使用require调用模块时，会执行Node的内部命令Module._load，下面是Module._load的运行过程：
 	1. 检查Module._cache，缓存之中是否有指定模块
 	2. 如果缓存没有的话，就创建一个新的module实例，并把它添加到缓存中，缓存的是它exports导出的值；
 	3. 如果缓存中有的话，使用module.load()这个方法，去加载这个模块，读取文件内容后，使用module.compile()执行文件代码；
 	4. 如果解析的过程中，出现异常，就从缓存中删除这个模块；
 	5. 如果没有出现异常，最后返回这个模块的module.exports；
 
-### require加载规则
+### require命令加载规则
 
 - 根据参数的不同格式，require命令会去不同路径寻找模块文件。
 	1. 如果参数字符串以“/”开头，表示加载的是一个位于绝对路径的模块文件。
@@ -105,7 +106,6 @@ console.log(counter) //3
 	3. 如果参数字符串不以“/”或者“./”开头，则表示加载的是一个默认提供的核心模块（位于Node的系统安装目录中），或者一个位于各级node_modules目录的已安装模块（全局安装或局部安装）。
 	4. 如果参数字符串不以“/”或者“./”开头，而是一个路径，则会先找到该路径目录，然后再以它为参数找到后续路径。
 	5. 如果指定的模块文件没有被发现，Node会尝试为文件添加.js、.json、.node后，再去搜索。.js文件会以文本格式的javascript脚本文件解析，.json文件会以JSON格式的文本文件解析，.node文件会以编译后的二进制文件解析。
-	6. 如果想得到require命令所加载模块的文件路径，使用require.resolve()方法。
 
 ### 模块的缓存
 
@@ -158,6 +158,9 @@ Object.keys(require.cache).forEach(function(key) {
 ```javascript
 require.main === module // true
 ```
+- require.resolve()
+	- 如果想得到require命令所加载模块的文件路径，使用require.resolve()方法。
+	
 ---
 
 ## node处理复杂请求
