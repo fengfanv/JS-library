@@ -160,6 +160,59 @@ require.main === module // true
 ```
 - require.resolve()
 	- 如果想得到require命令所加载模块的文件路径，使用require.resolve()方法。
+
+### commonjs模块的数据使用
+```javascript
+//index.js
+
+const b = require('./b.js');
+console.log(b.name); //I am b
+console.log(b.skills); //[ 'aaa', 'bbb', 'ccc' ]
+
+b.name = '123'
+b.skills.push('ddd')
+console.log(b.name); //123 在这里修改 基础数据类型 数据，修改的其实是b模块在当前模块的缓存，影响不到模块内部的值
+console.log(b.skills); //[ 'aaa', 'bbb', 'ccc', 'ddd' ]
+
+b.say();
+//I am b
+//[ 'aaa', 'bbb', 'ccc', 'ddd' ]
+
+// 将上面的代码注释，运行下面的代码
+
+const b = require('./b.js');
+console.log(b.name); //I am b
+console.log(b.skills); //[ 'aaa', 'bbb', 'ccc' ]
+
+b.set('123','ddd');
+b.say();
+//123
+//[ 'aaa', 'bbb', 'ccc', 'ddd' ]
+
+console.log(b.name); //I am b  虽然b模块内部的值变成了 “123”  但这里仍是 “I am b” 是因为这里读取的是b模块在当前模块的缓存，当前模块缓存的这个值 与 模块内部的值 其实已经属于两个值了。如果你想得到b模块内部最新的值，可以通过b模块里的方法暴露这个值，如say方法
+console.log(b.skills); //[ 'aaa', 'bbb', 'ccc', 'ddd' ]
+
+// 总结：引用类型数据是引用，基础类型数据是拷贝。数据浅拷贝。
+```
+```javascript
+//b.js
+
+var name = 'I am b';
+var skills = ['aaa', 'bbb', 'ccc'];
+var set = function (newName, newSkillItem) {
+    name = newName;
+    skills.push(newSkillItem);
+}
+var say = function () {
+    console.log(name);
+    console.log(skills);
+}
+
+exports.name = name;
+exports.skills = skills;
+exports.set = set;
+exports.say = say;
+```
 	
 ---
 
@@ -531,56 +584,6 @@ function fun3(count){
 var arr = [fun1,fun2,fun3];
 var length = arr.length;
 execute(0)
-```
-
-## 模块数据使用
-
-- 基本数据类型，是拷贝
-- 引用类型数据，是引用
-
-```javascript
-//index.js
-
-const b = require('./b.js');
-console.log(b);
-/*
-{
-  name: 'I am b',
-  skills: [ 'aaa', 'bbb', 'ccc' ],
-  say: [Function: say]
-}
-*/
-
-b.name = '123'
-b.skills.push('ddd')
-console.log(b);
-/*
-{
-  name: '123',
-  skills: [ 'aaa', 'bbb', 'ccc', 'ddd' ],
-  say: [Function: say]
-}
-*/
-
-b.say();
-/*
-I am b
-[ 'aaa', 'bbb', 'ccc', 'ddd' ]
-*/
-```
-```javascript
-//b.js
-
-var name = 'I am b';
-var skills = ['aaa','bbb','ccc'];
-var say = function(){
-    console.log(name);
-    console.log(skills);
-}
-
-exports.name = name;
-exports.skills = skills;
-exports.say = say;
 ```
 
 ## node exports

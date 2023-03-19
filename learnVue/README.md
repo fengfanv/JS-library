@@ -160,13 +160,25 @@ npm config get prefix		//获取地址
 npm config set prefix [地址]	//设置地址
 ```
 ## npm安装模块
-"-g"安装到全局，
 
-"--save"表示在package.json文件中（dependencies）记录下载包的版本信息，**一般项目中安装依赖包时都必须加“--save”**
+"-g"表示安装到全局
 
-"--save-dev"下载开发依赖包，上一条命令是下载生产依赖包
+"--save"表示安装包时，会把包的信息记录到package.json文件中（dependencies）下
+
+"--save-dev"表示安装包时，会把包的信息记录到package.json文件中（devDependencies）下
+
+在安装包时，不加 -g，--save，--save-dev，默认会执行 --save 的操作，将包的信息记录到（dependencies）下
+
+保证项目正常运行或生产环境下需要的包信息，会被记录到（dependencies）下
+
+项目开发时需要的一些工具包，如单元测试包，会被记录到（devDependencies）下。项目生产打包时，不会将（devDependencies）下的包 打包进去
+
 ```
 npm install 模块名
+```
+## 查看版本
+```
+vue -V
 ```
 ## 安装脚手架2版本
 ```
@@ -1370,6 +1382,13 @@ export default {
         //在页面中使用 this.$store.dispatch('app/set_value_async',18)
         set_value_async({ state, commit, rootState }, value) {
             state.count = value;
+        },
+        //在页面中使用 this.$store.dispatch('app/set_value_1',18)
+        set_count_1({ state, commit, dispatch, rootState }, value) {
+          //调用当前模块里的其它dispatch，调用时不用写 app/set_value_async，写 set_value_async 就可以
+          dispatch('set_value_async',18)
+          //调用其它模块里的dispatch，调用时需要写全 xxx/set_value
+          dispatch('xxx/set_value',18,{root:true})
         }
     },
     getters: {
