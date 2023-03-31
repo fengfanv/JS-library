@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vue版日历</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        .calendar {
+            width: 400px;
+            min-height: 400px;
+            background-color: red;
+        }
+
+        .today {
+            width: 100%;
+            text-align: center;
+        }
+
+        .btn-box {
+            width: 100%;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .switch-btn {
+            display: block;
+            margin: 0 auto;
+        }
+
+        .week-list {
+            width: 100%;
+            height: auto;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            list-style: none;
+        }
+
+        .week-list li {
+            flex: 1;
+            text-align: center;
+        }
+
+        .week-panel,
+        .month-panel {
+            width: 100%;
+            height: auto;
+        }
+
+        .content {
+            width: 100%;
+            height: auto;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+        }
+
+        .content .row {
+            width: 100%;
+            height: auto;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .content .row .day {
+            flex: 1;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .content .row .grey {
+            color: #9E9E9E !important;
+        }
+
+        .content .row .active,
+        .content .row .day:hover {
+            box-sizing: border-box;
+            border: 1px solid grey;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="app">
+        <div class="calendar">
+            <!--当前显示的是哪年哪月的日历-->
+            <h5 class="today">{{this.showYear}}-{{this.showMonth}}</h5>
+            <!--切换周的按钮-->
+            <div class="btn-box">
+                <button>上周</button>
+                <button>下周</button>
+            </div>
+            <!--切换月的按钮-->
+            <div class="btn-box">
+                <button>上月的日历月视图</button>
+                <button>下月的日历月视图</button>
+            </div>
+
+            <h6>月视图</h6>
+            <ul class="week-list">
+                <li>日</li>
+                <li>一</li>
+                <li>二</li>
+                <li>三</li>
+                <li>四</li>
+                <li>五</li>
+                <li>六</li>
+            </ul>
+            <div class="month-panel">
+                <div class="content">
+                    <div class="row" v-for="(item,index) of allArr" :key="index">
+                        <p v-for="(dayItem,dayIndex) of item" :key="dayIndex" class="day"
+                            :class="[(index==0 && dayItem>8)||(index==allArr.length-1 && dayItem<8) ? 'grey':'',isSelected(dayItem,dayIndex)?'active':'']"
+                            @click="selectSomeDay(index,dayItem,dayIndex)">
+                            {{dayItem}}</p>
+                    </div>
+                </div>
+            </div>
+
+            <h6>周视图</h6>
+            <ul class="week-list">
+                <li>日</li>
+                <li>一</li>
+                <li>二</li>
+                <li>三</li>
+                <li>四</li>
+                <li>五</li>
+                <li>六</li>
+            </ul>
+            <div class="week-panel">
+                <div class="content">
+                    <div class="row">
+                        <p class="day" v-for="(dayItem,dayIndex) of weekData.arr" :key="dayIndex" :class="[isSelected(dayItem,dayIndex)?'active':'']" @click="selectSomeDay(weekData.index,dayItem,dayIndex)">{{dayItem}}</p>
+                    </div>
+                </div>
+            </div>
+
+             
+
+        </div>
+    </div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+    <script>
+        var app = new Vue({
+            el: '#app',
+            data: {
+
+                allArr: [],//某年某月的日历（月视图）数据
+                showYear: "",//当前日历数据是哪年哪月的某年
+                showMonth: "",//当前日历数据是哪年哪月的某月（1-12）
+
+                focusDay: "",//点击日历上的日期后，点击的是哪天（1-31）
+                focusWeek: "",//点击日历上的日期后，被点击的那天是星期几 （0-6）
+
+            },
+            mounted() {
+
+                this.getCalendarData();
+
+            },
+            methods: {
+                //获取 某年某月 的日历（月视图）数据
+                getCalendarData(y, m) {
+                    var date = null;
+                    if (typeof y == 'undefined' || typeof m == 'undefined') {
+                        //如果没传，则获取当前日期的
+                        date = new Date();
+                        //初始化当前选中的日期及星期
+                        this.focusDay = date.getDate();
+                        this.focusWeek = date.getDay();
+                    } else {
+                        date = new Date(y + '-' + m + '-' + 1);
+                    }
+
+                    // 当月1号是周几
+                    var oneDateWeek = new Date(`${date.getFullYear()}/${date.getMonth() + 1}/${1}`).getDay();
+                    // 当月最后一天是几号
+                    var totalDate = new Date(date.getFullYear(), (date.getMonth() + 1), 0).getDate();
+
+                    // 获取上个月的信息
+                    var prevYue = date.getMonth() + 1 == 1 ? 12 : date.getMonth();
+                    var prevNian = prevYue == 12 ? date.getFullYear() - 1 : date.getFullYear();
+                    // 获取上个月最后一天是几号
+                    var prevTotalDate = new Date(prevNian, prevYue, 0).getDate();
+
+                    // 生成当月的日历面板上，将会显示的上月的那几天的日期
+                    var prevDay = prevTotalDate - oneDateWeek;
+                    var prevArr = [];
+                    for (var i = 1; i <= oneDateWeek; i++) {
+                        prevArr.push(prevDay + i)
+                    }
+                    // console.log(prevArr);
+
+                    // 生成当月的日期
+                    var currentArr = []
+                    for (var j = 1; j <= totalDate; j++) {
+                        currentArr.push(j)
+                    }
+                    // console.log(currentArr);
+
+                    // 获取下个月的信息
+                    // 获取这个月最后一天是星期几
+                    var nextDateWeek = new Date(date.getFullYear(), date.getMonth(), totalDate).getDay();
+                    var nextDay = 6 - nextDateWeek <= 0 ? 0 : 6 - nextDateWeek;
+
+                    // 生成当月的日历面板上，将会显示的下月的那几天的日期
+                    var nextArr = []
+                    for (var n = 1; n <= nextDay; n++) {
+                        nextArr.push(n)
+                    }
+                    // console.log(nextArr);
+
+                    // 将 prevArr 和 currentArr 和 nextArr 这三个数组合并
+                    var calendarTotalDays = [];
+                    calendarTotalDays = prevArr.concat(currentArr, nextArr);
+                    console.log(calendarTotalDays);
+
+                    // 每7天一组
+                    var allArr = [];
+                    for (var a = 0; a < calendarTotalDays.length;) {
+                        allArr.push(calendarTotalDays.slice(a, a += 7))
+                    }
+                    console.log(allArr);
+                    this.allArr = allArr;
+                    this.showYear = date.getFullYear();
+                    this.showMonth = date.getMonth() + 1;
+
+                },
+                //在日历下点击选中某一天
+                selectSomeDay(index, dayItem, dayIndex) {
+                    let day = dayItem;
+                    let week = dayIndex;
+
+                    this.focusDay = day;
+                    this.focusWeek = week;
+
+                    //判断是否需要切换日历面板
+                    if (index == 0 && dayItem > 8) {
+                        //点击的是上个月的日期，切换成上个月的日历
+                        let prevMonth = this.showMonth - 1 <= 0 ? 12 : this.showMonth - 1;
+                        let year = prevMonth == 12 ? this.showYear - 1 : this.showYear;
+                        this.getCalendarData(year, prevMonth)
+                    } else if (index == this.allArr.length - 1 && dayItem < 8) {
+                        //点击的是下月的日期，切换成下月的日历
+                        let nextMonth = this.showMonth + 1 >= 13 ? 1 : this.showMonth + 1;
+                        let year = nextMonth == 1 ? this.showYear + 1 : this.showYear;
+                        this.getCalendarData(year, nextMonth)
+                    }
+                },
+                //当前是否被选中
+                isSelected(dayItem, dayIndex) {
+                    if (this.focusDay == dayItem && this.focusWeek == dayIndex) {
+                        return true;
+                    }
+                    return false;
+                }
+            },
+            computed: {
+                //获取当前周列表及其它信息
+                weekData(){
+                    for(let i=0;i<this.allArr.length;i++){
+                        for(let j=0;j<this.allArr[i].length;j++){
+                            if(this.focusDay == this.allArr[i][j] && this.focusWeek == j){
+                                return {
+                                    arr:this.allArr[i],
+                                    index:i
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+
+
+        })
+    </script>
+</body>
+
+</html>
