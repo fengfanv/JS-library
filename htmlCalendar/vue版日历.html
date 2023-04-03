@@ -124,9 +124,9 @@
                 <div class="content">
                     <div class="row" v-for="(item,index) of allArr" :key="index">
                         <p v-for="(dayItem,dayIndex) of item" :key="dayIndex" class="day"
-                            :class="[(index==0 && dayItem>8)||(index==allArr.length-1 && dayItem<8) ? 'grey':'',isSelected(index,dayItem,dayIndex)?'active':'']"
-                            @click="selectSomeDay(index,dayItem,dayIndex)">
-                            {{dayItem}}</p>
+                            :class="[(index==0 && dayItem.day>8)||(index==allArr.length-1 && dayItem.day<8) ? 'grey':'',isSelected(dayItem,dayIndex)?'active':'']"
+                            @click="selectSomeDay(dayItem,dayIndex)">
+                            {{dayItem.day}}</p>
                     </div>
                 </div>
             </div>
@@ -145,8 +145,8 @@
                 <div class="content">
                     <div class="row">
                         <p class="day" v-for="(dayItem,dayIndex) of weekData.arr" :key="dayIndex"
-                            :class="[isSelected(weekData.index,dayItem,dayIndex)?'active':'']"
-                            @click="selectSomeDay(weekData.index,dayItem,dayIndex)">{{dayItem}}</p>
+                            :class="[isSelected(dayItem,dayIndex)?'active':'']"
+                            @click="selectSomeDay(dayItem,dayIndex)">{{dayItem.day}}</p>
                     </div>
                 </div>
             </div>
@@ -167,6 +167,8 @@
                 showYear: "",//当前日历数据是哪年哪月的某年
                 showMonth: "",//当前日历数据是哪年哪月的某月（1-12）
 
+                focusYear: "",//点击日历上的日期后，点击的是哪年
+                focusMonth: "",//点击日历上的日期后，点击的是那月（1-12）
                 focusDay: "",//点击日历上的日期后，点击的是哪天（1-31）
                 focusWeek: "",//点击日历上的日期后，被点击的那天是星期几 （0-6）
 
@@ -183,6 +185,8 @@
                         //如果没传，则获取当前日期的
                         date = new Date();
                         //初始化当前选中的日期及星期
+                        this.focusYear = date.getFullYear();
+                        this.focusMonth = (date.getMonth() + 1);
                         this.focusDay = date.getDate();
                         this.focusWeek = date.getDay();
                     } else {
@@ -195,7 +199,7 @@
                     var totalDate = new Date(date.getFullYear(), (date.getMonth() + 1), 0).getDate();
 
                     // 获取上个月的信息
-                    var prevYue = date.getMonth() + 1 == 1 ? 12 : date.getMonth();
+                    var prevYue = (date.getMonth() + 1) == 1 ? 12 : (date.getMonth() + 1) - 1;
                     var prevNian = prevYue == 12 ? date.getFullYear() - 1 : date.getFullYear();
                     // 获取上个月最后一天是几号
                     var prevTotalDate = new Date(prevNian, prevYue, 0).getDate();
@@ -204,14 +208,22 @@
                     var prevDay = prevTotalDate - oneDateWeek;
                     var prevArr = [];
                     for (var i = 1; i <= oneDateWeek; i++) {
-                        prevArr.push(prevDay + i)
+                        prevArr.push({
+                            year: prevNian,
+                            month: prevYue,
+                            day: prevDay + i
+                        })
                     }
                     // console.log(prevArr);
 
                     // 生成当月的日期
                     var currentArr = []
                     for (var j = 1; j <= totalDate; j++) {
-                        currentArr.push(j)
+                        currentArr.push({
+                            year: date.getFullYear(),
+                            month: (date.getMonth() + 1),
+                            day: j
+                        })
                     }
                     // console.log(currentArr);
 
@@ -219,11 +231,17 @@
                     // 获取这个月最后一天是星期几
                     var nextDateWeek = new Date(date.getFullYear(), date.getMonth(), totalDate).getDay();
                     var nextDay = 6 - nextDateWeek <= 0 ? 0 : 6 - nextDateWeek;
+                    var nextYue = (date.getMonth() + 1) == 12 ? 1 : (date.getMonth() + 1) + 1;
+                    var nextNian = nextYue == 1 ? date.getFullYear() + 1 : date.getFullYear();
 
                     // 生成当月的日历面板上，将会显示的下月的那几天的日期
                     var nextArr = []
                     for (var n = 1; n <= nextDay; n++) {
-                        nextArr.push(n)
+                        nextArr.push({
+                            year: nextNian,
+                            month: nextYue,
+                            day: n
+                        })
                     }
                     // console.log(nextArr);
 
@@ -244,29 +262,20 @@
 
                 },
                 //在日历下点击选中某一天
-                selectSomeDay(index, dayItem, dayIndex) {
-                    let day = dayItem;
-                    let week = dayIndex;
+                selectSomeDay(dayItem, dayIndex) {
+                    this.focusYear = dayItem.year;
+                    this.focusMonth = dayItem.month;
+                    this.focusDay = dayItem.day;
+                    this.focusWeek = dayIndex;
 
-                    this.focusDay = day;
-                    this.focusWeek = week;
-
-                    //判断是否需要切换日历面板
-                    if (index == 0 && dayItem > 8) {
-                        //点击的是上个月的日期，切换成上个月的日历
-                        let prevMonth = this.showMonth - 1 <= 0 ? 12 : this.showMonth - 1;
-                        let year = prevMonth == 12 ? this.showYear - 1 : this.showYear;
-                        this.getCalendarData(year, prevMonth)
-                    } else if (index == this.allArr.length - 1 && dayItem < 8) {
-                        //点击的是下月的日期，切换成下月的日历
-                        let nextMonth = this.showMonth + 1 >= 13 ? 1 : this.showMonth + 1;
-                        let year = nextMonth == 1 ? this.showYear + 1 : this.showYear;
-                        this.getCalendarData(year, nextMonth)
+                    //判断是否需要切换月视图面板
+                    if (this.showMonth != dayItem.month) {
+                        this.getCalendarData(dayItem.year, dayItem.month);
                     }
                 },
                 //检查当前日期是否被选中
-                isSelected(index, dayItem, dayIndex) {
-                    if (index == this.weekData.index && this.focusDay == dayItem && this.focusWeek == dayIndex) {
+                isSelected(dayItem, dayIndex) {
+                    if (this.focusYear == dayItem.year && this.focusMonth == dayItem.month && this.focusDay == dayItem.day && this.focusWeek == dayIndex) {
                         return true;
                     }
                     return false;
@@ -276,55 +285,69 @@
                     let prevMonth = this.showMonth - 1 <= 0 ? 12 : this.showMonth - 1;
                     let year = prevMonth == 12 ? this.showYear - 1 : this.showYear;
                     this.getCalendarData(year, prevMonth);
+                    let oneDateIndex = null;//保存这月1号的数据，备用
                     //月视图切换（切换到新月份时，切换前是几号，新月份就选几号）
                     for (let i = 0; i < this.allArr.length; i++) {
                         for (let j = 0; j < this.allArr[i].length; j++) {
-                            if (this.allArr[i][j] == this.focusDay) {
-                                this.focusWeek = j;
+                            let dayItem = this.allArr[i][j];
+                            if (dayItem.year == year && dayItem.month == prevMonth && dayItem.day == 1) {
+                                oneDateIndex = j;
+                            }
+                            if (dayItem.year == year && dayItem.month == prevMonth && dayItem.day == this.focusDay) {
+                                this.selectSomeDay(dayItem, j)
                                 return true;
                             }
                         }
                     }
                     //新月份里没有上个月所选的日期，如上个月选的是31号，这个月里没有31号，则切换成1号
-                    this.focusDay = 1;
-                    this.focusWeek = this.allArr[0].indexOf(1);
+                    this.selectSomeDay(this.allArr[0][oneDateIndex], oneDateIndex);
                 },
                 //按钮，让日历显示下个月的日历（月视图切换成下个月的）
                 switchNextMonth() {
                     let nextMonth = this.showMonth + 1 >= 13 ? 1 : this.showMonth + 1;
                     let year = nextMonth == 1 ? this.showYear + 1 : this.showYear;
                     this.getCalendarData(year, nextMonth);
+                    let oneDateIndex = null;//保存这月1号的数据，备用
                     //月视图切换（切换到新月份时，切换前是几号，新月份就选几号）
                     for (let i = 0; i < this.allArr.length; i++) {
                         for (let j = 0; j < this.allArr[i].length; j++) {
-                            if (this.allArr[i][j] == this.focusDay) {
-                                this.focusWeek = j;
+                            let dayItem = this.allArr[i][j];
+                            if (dayItem.year == year && dayItem.month == nextMonth && dayItem.day == 1) {
+                                oneDateIndex = j;
+                            }
+                            if (dayItem.year == year && dayItem.month == nextMonth && dayItem.day == this.focusDay) {
+                                this.selectSomeDay(dayItem, j)
                                 return true;
                             }
                         }
                     }
                     //新月份里没有上个月所选的日期，如上个月选的是31号，这个月里没有31号，则切换成1号
-                    this.focusDay = 1;
-                    this.focusWeek = this.allArr[0].indexOf(1);
+                    this.selectSomeDay(this.allArr[0][oneDateIndex], oneDateIndex);
                 },
                 //按钮，从当前周，切换成上周
                 switchPrevWeek() {
                     //周视图切换（切换到新周时，切换前是星期几，新周就选星期几）
                     if (this.weekData.index == 0) {
                         let haveGreaterThan8 = this.weekData.haveGreaterThan8;//这周里是否有31,30,29,28这样的日期
-                        //先切换成上个月
+                        //先日历切换成上个月
                         let prevMonth = this.showMonth - 1 <= 0 ? 12 : this.showMonth - 1;
                         let year = prevMonth == 12 ? this.showYear - 1 : this.showYear;
                         this.getCalendarData(year, prevMonth);
                         if (haveGreaterThan8 == true) {
                             //切换成功后，这时this.weekData.index就从0变成了this.allArr.length-1，但又因为this.allArr.length-1指向的还是当前这个星期，所以需要-2
-                            this.focusDay = this.allArr[this.allArr.length - 2][this.focusWeek];
+                            let newIndex = this.allArr.length - 2;
+                            let newDay = this.allArr[newIndex][this.focusWeek];
+                            this.selectSomeDay(newDay, this.focusWeek);
                         } else {
                             //切换前的那周的周日，是那个月的一号，那周的第一天，也是那月的第一天，（判断方法就是，判断那周里有没有31,30,29,28这样的日期）（咱们这里的显示标准是美国标准，周日是一周的开始，周六是一周的结束）所以切换到上个月后，this.allArr.length - 1，就是切换到上一周。
-                            this.focusDay = this.allArr[this.allArr.length - 1][this.focusWeek];
+                            let newIndex = this.allArr.length - 1;
+                            let newDay = this.allArr[newIndex][this.focusWeek];
+                            this.selectSomeDay(newDay, this.focusWeek);
                         }
                     } else {
-                        this.focusDay = this.allArr[this.weekData.index - 1][this.focusWeek];
+                        let newIndex = this.weekData.index - 1;
+                        let newDay = this.allArr[newIndex][this.focusWeek];
+                        this.selectSomeDay(newDay, this.focusWeek);
                     }
                 },
                 //按钮，从当前周，切换成下周
@@ -338,13 +361,19 @@
                         this.getCalendarData(year, nextMonth);
                         if (haveOne == true) {
                             //切换成功后，焦点时间和星期，就从this.allArr.length-1变成this.allArr[0]了。为了切换成下周，这里需要使用this.allArr[1]
-                            this.focusDay = this.allArr[1][this.focusWeek];
+                            let newIndex = 1;
+                            let newDay = this.allArr[newIndex][this.focusWeek];
+                            this.selectSomeDay(newDay, this.focusWeek);
                         } else {
                             //切换前的那周，那周的最后一天，也是那月的最后一天，（判断方法，判断那周里，有没有1号）（咱们这里的显示标准是美国标准，周日是一周的开始，周六是一周的结束）。所以切换到下个月后，this.allArr[0]，就是切换到下一周。
-                            this.focusDay = this.allArr[0][this.focusWeek];
+                            let newIndex = 0;
+                            let newDay = this.allArr[newIndex][this.focusWeek];
+                            this.selectSomeDay(newDay, this.focusWeek);
                         }
                     } else {
-                        this.focusDay = this.allArr[this.weekData.index + 1][this.focusWeek];
+                        let newIndex = this.weekData.index + 1;
+                        let newDay = this.allArr[newIndex][this.focusWeek];
+                        this.selectSomeDay(newDay, this.focusWeek);
                     }
                 }
             },
@@ -353,12 +382,23 @@
                 weekData() {
                     for (let i = 0; i < this.allArr.length; i++) {
                         for (let j = 0; j < this.allArr[i].length; j++) {
-                            if (this.focusDay == this.allArr[i][j] && this.focusWeek == j) {
+                            let dayItem = this.allArr[i][j];
+                            if (dayItem.year == this.focusYear && dayItem.month == this.focusMonth && dayItem.day == this.focusDay && j == this.focusWeek) {
+                                let haveOne = false;//这周里是否有1号
+                                let haveGreaterThan8 = false;//这周里是否有大于8的日子（这周里是否有31,30,29,28这样的日子）
+                                for (let k = 0; k < this.allArr[i].length; k++) {
+                                    if (this.allArr[i][k].day == 1) {
+                                        haveOne = true;
+                                    }
+                                    if (this.allArr[i][k].day > 8) {
+                                        haveGreaterThan8 = true;
+                                    }
+                                }
                                 return {
                                     arr: this.allArr[i],//这周的日期
                                     index: i,//这周是这个月的第几个星期
-                                    haveOne: this.allArr[i].indexOf(1) == -1 ? false : true,//这周里是否有1号
-                                    haveGreaterThan8: Math.max.apply(null, this.allArr[i]) > 8 ? true : false,//这周里是否有大于8的日子（这周里是否有31,30,29,28这样的日子）
+                                    haveOne,
+                                    haveGreaterThan8
                                 }
                             }
                         }
