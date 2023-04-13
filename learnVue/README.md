@@ -1271,8 +1271,8 @@ Vue.use(Vuex)
 
 // state：存储的数据（状态） ，我们在项目中使用 this.$store.state.参数名
 // getters：可以将getters理解为store的计算属性，getters的返回值会根据它的依赖被缓存起来，且只有当它的依赖值发生了改变才会被重新计算。我们在项目中使用 $sotre.getters.方法名
-// mutations：官网建议专门用来修改数据（状态），只支持同步的方法。我们在项目中使用 $store.commit('方法名',params)
-// actions：官方不建议我们直接调用mutations下方法改数据，所以提供了另一种方法，主要用于调用mutations下的方法，actions里可以使用异步操作，我们在项目中使用 $store.dispatch('方法名',params)
+// mutations：官网建议专门用来修改数据（状态），mutations的方法里仅支持同步的方法（如：在方法里面不能使用setTimeout这种）。我们在项目中使用 $store.commit('方法名',params)
+// actions：官方不建议我们直接调用mutations下方法来改数据，所以提供了另一种方法，主要用于调用mutations下的方法，actions里可以使用异步操作（如：在actions的方法里面可以使用setTimeout等，区别上面mutations），我们在项目中使用 $store.dispatch('方法名',params)
 // modules：由于使用单一状态树，应用的所有状态会集中到一个比较大的对象。当应用变得非常复杂时，store对象就会变得很臃肿。为了解决这个问题，Vuex允许我们将store分割成模块（module）。每个模块拥有自己的state、mutation、action、getter，一般用于权限管理
 
 const store = new Vuex.Store({
@@ -1293,6 +1293,13 @@ const store = new Vuex.Store({
   actions: {
     addFun: function (context,value) {
       context.commit("addCount", value);
+    },
+    //actions可以使用promise返回值（区别于mutations，mutations里不可以使用promise返回值）
+    //调用时，this.$store.dispatch('promiseTest',123).then((res)=>{console.log(res)})
+    promiseTest: function (context,value) {
+    	return new Promise((resolve,reject)=>{
+		resolve('啦啦啦')
+	})
     }
   }
 })
