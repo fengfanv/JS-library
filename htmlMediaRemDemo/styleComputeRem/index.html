@@ -4,20 +4,40 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <title>通过style计算rem</title>
+    <style>
+      h1,h2{
+        font-size:30px!important
+      }
+      h3,h4{
+        font-size: 16px!important;
+      }
+      h4{
+        padding-left: 20px!important;
+      }
+    </style>
   </head>
   <body>
-    <h1 style="font-size:30px!important">通过style计算rem</h1>
-    <h2 style="font-size:30px!important">750尺寸设计图:</h2>
-    <h2 style="font-size:30px!important"><span><</span>html style="font-size:calc(100vw/750*100);"><span><</span>html></h2>
-    <h2 style="font-size:30px!important">案例：width:(750设计图上量的尺寸/100)rem</h2>
-	<br>
-	<h2 style="font-size:30px!important">怎样通过当前html的font-size的大小计算rem单位在实际屏幕上的大小：</h2>
-	<h2 style="font-size:30px!important">如1：width:0.5rem（这个0.5rem是从750尺寸设计图上量后并计算得出的）;假如当前显示设备宽750px，则在设备上实际(计算)的宽等于：（设备的宽/750*100*0.5）=50px，这50px就是在750设备宽上rem计算后的实际尺寸。</h2>
-	<h2 style="font-size:30px!important">如2：width:0.5rem（这个0.5rem是从750尺寸设计图上量后并计算得出的）;假如当前显示设备宽600px，则在设备上实际(计算)的宽等于：（设备的宽/750*100*0.5）=40px，这40px就是在600设备宽上rem计算后的实际尺寸。</h2>
-	<br>
-    <h2 style="font-size:30px!important">640尺寸设计图:</h2>
-    <h2 style="font-size:30px!important"><span><</span>html style="font-size:calc(100vw/640*40);"><span><</span>html></h2>
-    <h2 style="font-size:30px!important">案例：width:(640设计图上量的尺寸/40)rem</h2>
+    <h1>通过style计算rem</h1>
+    <hr>
+    <h2>rem原理：</h2>
+    <h4>rem是指相对于根元素的字体大小的单位（html标签的font-size属性大小）。简单的说它就是一个相对单位。</h4>
+    <h4>rem和em类似，em是指相对于父元素的字体大小的单位。</h4>
+    <h4>两者区别是，一个计算的规则是依赖根元素，一个是依赖父元素计算。</h4>
+    <h4>rem的本质是等比缩放，一般是基于 设备宽度 比 设计稿宽度</h4>
+    <h4>rem是相对于根元素的字体大小的单位，也就是html的font-size大小。浏览器默认的字体大小是16px，所以默认1rem=16px</h4>
+    <h4>&lt;html style="font-size:calc(设备宽度/设计稿宽度*100)px"&gt;...&lt;/html&gt;（提示：乘以100是为了好计算px，防止 设备宽度/设计稿宽度的值太小 不好计算）</h4>
+    <h4>&lt;p style="width:calc(从指定宽度的设计稿上 所量出来的大小/100)rem"&gt;...&lt;/p&gt;</h4>
+    <hr>
+    <h2>如：设计图宽是750px</h2>
+    <h4>&lt;html style="font-size:calc(100vw/750*100);"&gt;...&lt;/html&gt;</h4>
+    <h4>&lt;p style="width:(从750px设计图上 所量出来的尺寸/100)rem;"&gt;...&lt;/p&gt;</h4>
+    <h2>如：设计图宽是640px</h2>
+    <h4>&lt;html style="font-size:calc(100vw/640*40);"&gt;...&lt;/html&gt;</h4>
+    <h4>&lt;p style="width:(从640px设计图上 所量出来的尺寸/40)rem;"&gt;...&lt;/p&gt;</h4>
+    <hr>
+	  <h2>如何通过html的font-size的大小，来计算rem单位在实际屏幕上的大小？</h2>
+	<h4>如1：width:0.5rem（这个0.5rem是从750尺寸设计图上量后并计算得出的）;假如当前显示设备宽750px，则在设备上实际(计算)的宽等于：（设备的宽/750*100*0.5）=50px，这50px就是在750设备宽 上rem计算后的实际尺寸。</h4>
+	<h4>如2：width:0.5rem（这个0.5rem是从750尺寸设计图上量后并计算得出的）;假如当前显示设备宽600px，则在设备上实际(计算)的宽等于：（设备的宽/750*100*0.5）=40px，这40px就是在600设备宽 上rem计算后的实际尺寸。</h4>
 
   </body>
 </html>
