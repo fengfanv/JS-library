@@ -90,6 +90,7 @@
 
 31、[canvas3D模型绘制到2D平面上_canvas3dTo2d](/canvas3dTo2d)
 
+32、[互斥锁/防抖/节流_jsMutexDebounceThrottle](/jsMutexDebounceThrottle)
 
 ### html与css
 
