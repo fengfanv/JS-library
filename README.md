@@ -92,6 +92,8 @@
 
 32、[互斥锁/防抖/节流_jsMutexDebounceThrottle](/jsMutexDebounceThrottle)
 
+33、[js惯性滚动动画_inertialScrolling](/inertialScrolling)
+
 ### html与css
 
 1、[css命名规则_cssNameRule](/cssNameRule)
