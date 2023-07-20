@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>原生js模仿滚动条动画</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        #box {
+            width: 100px;
+            height: 100px;
+            background-color: red;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="box"></div>
+
+    <script>
+        const dom = document.getElementById('box');
+
+        const startScrollTop = 0; // 开始滚动的位置  
+        const scrollDistance = 200;//滚动的距离
+        const endScrollTop = startScrollTop + scrollDistance; // 计算结束滚动的位置  
+        const duration = 500; // 动画持续时间，单位为毫秒  
+        function animateScroll() {
+            const currentScrollTop = Math.min(1, (Date.now() - startTime) / duration) * (endScrollTop - startScrollTop) + startScrollTop; // 计算当前滚动位置，使用线性缓动函数  
+            console.log('currentScrollTop',currentScrollTop);
+            dom.style.marginLeft = `${currentScrollTop}px`; // 更新滚动条的位置  
+
+            if (currentScrollTop < endScrollTop) { // 如果还未到达结束位置，继续执行动画函数  
+                requestAnimationFrame(animateScroll);
+            } else { // 如果已到达结束位置，执行动画结束后的回调函数（可选）  
+                // animationEnded();
+            }
+        }
+        const startTime = Date.now(); // 记录开始时间  
+        animateScroll(); // 开始执行动画函数
+
+    </script>
+</body>
+
+</html>

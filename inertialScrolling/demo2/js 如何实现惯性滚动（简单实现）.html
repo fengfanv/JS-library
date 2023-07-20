@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<!-- saved from url=(0043)https://codeleading.com/article/1613453299/ -->
+<html>
+
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>js 如何实现惯性滚动（简单实现）</title>
+  <link rel="stylesheet" href="./js 如何实现惯性滚动（简单实现）_files/atom-one-dark.css">
+  <link rel="stylesheet" href="./js 如何实现惯性滚动（简单实现）_files/ck.css">
+</head>
+
+<body aria-hidden="false">
+  <h2 style="line-height: 32px;word-break: break-all;">
+    <span>js 如何实现惯性滚动（简单实现）</span>
+  </h2>
+  <div class="htmledit_views">
+    <div class="show-content-free">
+      <h2>为什么需要惯性滚动</h2>
+      <p>这个其实很好理解，因为如果没有惯性滚动的话，你在使用手机的时候，向上滑动后，手拿起来 页面也停了下来，这样用户体验很差，让用户感到很没有控制感。</p>
+      <h2>惯性滚动是什么？</h2>
+      <p>惯性滚动，是苹果早期发明的一个专利，主要是让用户在滑动手机终端的页面之后，不会马上挺下来，而是会像你推一辆小车那样有惯性的进行滑动，最后因为摩擦力而停止下来<br>
+        惯性滚动，主要强调惯性这两个字</p>
+      <p><strong>惯性是什么？</strong><br>
+        惯性是物体保持原来运动状态的一种属性（保持原来速度）<br>
+        但是如果只有惯性，是停不下来的，所以还得有一个东西：摩擦力（提供了加速度）</p>
+      <h2>如何实现？</h2>
+      <h3>回顾惯性的物理公式</h3>
+      <ul>
+        <li>f = ma  // f物体所受的力(牛顿N)，m物体的质量(千克kg)，a物体的加速度(米每秒平方m/s²)。这个公式用来描述物体所受的力和加速度之间的关系，公式意义是，当一个物体所受的力一定时，物体的质量越大，加速度越小；反之，当物体的质量一定时，所受的力越大，加速度越大。</li>
+        <li>speed = initSpeed - a * ( t -T )  // speed现在的速度，initSpeed初始速度，a加速度，t是当下时间，T为开始时候的时间</li>
+      </ul>
+      <h3>改编公式</h3>
+      <p>speed = speed - a // speed 为上一时刻的速度，减去 a ，得到这一时刻的速度，这可以使得我们不用关心时间 t</p>
+      <p>而在现实生活中，摩擦力与速度成某种比例关系，我们设为函数 f</p>
+      <p>所以，f = f( speed ) 推理出加速度 a 和 speed 的关系 a = f( speed ) / m</p>
+      <h3>我们把 a 和 speed 的函数关系，用 g() 表示，则有：a = f( speed ) / m = g( speed )</h3>
+      <h3>设 g() 满足以下关系，则有：</h3>
+      <ul>
+        <li>a = A ; (speed / m) &gt; A</li>
+        <li>a = (speed / m) ; (speed / m) &gt; A</li>
+      </ul>
+      <p>Ps： 为什么药使用分段函数？因为现实中摩擦力虽然和速度有关系，但是是有上限的，不然你一下就停下来了，还是让人不爽</p>
+      <p>到现在为止，我们已经找到了加速度和速度的关系了，下一步我要做的就是把这些公式套用到我们的代码当中</p>
+      <h2>代码实现逻辑</h2>
+      <p>首先我们分析公式后发现，我们需要的根据用户的滑动获取到滑动的速度，那怎么计算这个速度呢？<br>
+        我们知道在移动 web
+        开发中，用户操作屏幕时候拥有很多事件，并且每一个事件，我们都可以获取到用户点击屏幕的位置信息，而如果我们可以获取到用户触摸下屏幕时候的位置是时间和用户手离开屏幕时候的位置和时间，就可以计算出滑动的速度（
+        路程 / ( 离开时的时间 - 触摸时的时间 ) ）<br>
+        速度有了，我们现在应该去滑动什么呢？我们先来给页面进行布局</p>
+      <pre><code class="hljs xml"><ol class="hljs-ln"><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="1"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-tag">&lt;<span class="hljs-name">style</span>&gt;</span><span class="css"></span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="2"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-selector-class">.s-body</span> {</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="3"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">    <span class="hljs-attribute">width</span>: <span class="hljs-number">100%</span>;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="4"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">    <span class="hljs-attribute">height</span>: <span class="hljs-number">100%</span>;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="5"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">    <span class="hljs-attribute">position</span>: relative;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="6"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">    <span class="hljs-attribute">overflow</span>: hidden;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="7"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">    <span class="hljs-attribute">margin</span>: <span class="hljs-number">0</span> auto;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="8"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">}</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="9"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-selector-class">.s-content</span> {</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="10"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">    <span class="hljs-attribute">width</span>: <span class="hljs-number">100%</span>;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="11"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">    <span class="hljs-attribute">height</span>: <span class="hljs-number">1000px</span>;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="12"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">    <span class="hljs-attribute">-webkit-user-select</span>: none;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="13"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">    <span class="hljs-attribute">position</span>: absolute;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="14"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">    <span class="hljs-attribute">top</span>: <span class="hljs-number">0</span>;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="15"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">    <span class="hljs-attribute">left</span>: <span class="hljs-number">0</span>;</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="16"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">}</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="17"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-tag">&lt;/<span class="hljs-name">style</span>&gt;</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="18"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"s-body"</span>&gt;</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="19"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">    <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"s-content"</span>&gt;</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="20"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">     这边是真正的内容区</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="21"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">    <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="22"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></div></div></li></ol></code><div class="hljs-button" data-title="复制"></div></pre>
+      <p>根据上面的布局，我们就可以很清晰的知道，滑动的时候我们滑动的是 .s-content
+        ，但是还有一个问题就是，当用户在滑动过程中，页面是需要跟着手指一起动的，不然就会很怪，所以还需要使用到，页面手机在屏幕移动上面的事件，并根据移动的位置，移动页面</p>
+      <pre><code class="hljs javascript"><ol class="hljs-ln" style="width:1231px"><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="1"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"><span class="hljs-keyword">var</span> content = <span class="hljs-built_in">document</span>.querySelector(<span class="hljs-string">'.s-content'</span>)</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="2"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">   ,body = <span class="hljs-built_in">document</span>.querySelector(<span class="hljs-string">'.s-body'</span>)</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="3"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">body.ontouchstart = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">event</span>) </span>{  <span class="hljs-comment">// 手触摸下去那一刻</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="4"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">   <span class="hljs-comment">// 需要存几个东西</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="5"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">   <span class="hljs-comment">// 起点的位置、这时的时间、.s-content 的起点位置</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="6"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line"> </div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="7"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">   body.ontouchmove = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">event</span>) </span>{  <span class="hljs-comment">// 手在屏幕上移动</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="8"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">      <span class="hljs-comment">// 需要计算 .s-content 的当前位置，并赋值，计算公式是：</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="9"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">      <span class="hljs-comment">// 获取到手当前的位置 - 起点的位置 + .s-content 的起点位置</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="10"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">   }</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="11"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">   body.ontouchend = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">event</span>) </span>{  <span class="hljs-comment">// 手离开屏幕</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="12"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">      <span class="hljs-comment">// 计算初始 speed </span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="13"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">      <span class="hljs-comment">//  speed = ( 结束时候手的位置 - 起点的位置 )  / ( 结束时候的时间 - 开始时的时间 )</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="14"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">      <span class="hljs-comment">// 打开定时器，根据 speed 让 .s-content 进行运动，然后 speed 进行减速运动 speed = speed - a ; a = g( speed ) ; 根据这两个公式进行运算即可</span></div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="15"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">   }</div></div></li><li><div class="hljs-ln-numbers"><div class="hljs-ln-line hljs-ln-n" data-line-number="16"></div></div><div class="hljs-ln-code"><div class="hljs-ln-line">}</div></div></li></ol></code><div class="hljs-button" data-title="复制"></div></pre>
+      <p>到这里，就基本把写一个滚动条的基本流程介绍完了，这个教程只是基本的简介教程，代码编写方式不优雅，主要用于提供思路。其实市面上也有很多惯性滚动的插件，但是有些滑动的时候让人不能特别愉快，有两个原因
+      </p>
+      <ul>
+        <li>摩擦力值没有设置好（也就是加速度没有弄好）导致过快或者过慢停下来了</li>
+        <li>还有就是，真正好的用户体验应使用手指离开屏幕时候的瞬时速度，而不是使用平均速度，本教程为了容易理解采用了平均速度（才用平均速度的时候，需要给 300ms 的限制，如果手在屏幕上停留了 大于
+          300ms 就不进行惯性滚动，如果不加这个会导致，你很快滑动屏幕，然后手停下来一会儿后，用户的心里预期是不会动，但是它竟然滑动了，可以去把我的源码拷贝下来 把里面的 第 83
+          行注释掉，放你手机上体验一下）</li>
+      </ul>
+      <p>到这里就结束了哦，谢谢<br><a href="https://github.com/gwiron/demo/blob/gh-pages/js-base/scroll/index.html"
+          rel="nofollow,noindex" target="_blank"><strong>源码链接</strong></a></p>
+    </div>
+  </div>
+</body>
+
+</html>
