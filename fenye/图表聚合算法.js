@@ -40,3 +40,40 @@ for(let i=0;i<thinLen;i++){
 }
 
 
+//下面方法实现
+//图表数据聚合瘦身精简
+function dataThin(arr, thinLen) {
+	let allLen = arr.length; //总数量
+	var thinLen = thinLen; //总量瘦身后的数量
+	let itemMinLen = parseInt(allLen / thinLen);
+	let itemMaxLen = allLen / thinLen > parseInt(allLen / thinLen) ? parseInt(allLen / thinLen) + 1 : parseInt(allLen /
+		thinLen);
+	let countItemMax = allLen % thinLen;
+	if (allLen <= thinLen) {
+		let newArr = [];
+		for (let i = 0; i < allLen; i++) {
+			newArr.push([arr[i]])
+		}
+		return newArr
+	}
+	//下面开始切割数据
+	let newArr = []; //用于放置处理好的数据
+	let startSlice = 0;
+	let endSlice = 0;
+	for (let i = 0; i < thinLen; i++) {
+		if (itemMinLen != itemMaxLen) {
+			if (i < countItemMax) {
+				startSlice = i * itemMaxLen;
+				endSlice = startSlice + itemMaxLen;
+			} else {
+				startSlice = endSlice;
+				endSlice = startSlice + itemMinLen;
+			}
+		} else {
+			startSlice = i * itemMaxLen;
+			endSlice = startSlice + itemMaxLen;
+		}
+		newArr.push(arr.slice(startSlice, endSlice))
+	}
+	return newArr;
+}
