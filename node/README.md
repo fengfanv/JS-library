@@ -1,10 +1,10 @@
 # Node.js
 
-1、[CommonJS_commonJS](/commonJS)
+1、[CommonJS_commonJS](/node/commonJS)
 
-2、[多进程和多线程_processThread](/processThread)
+2、[多进程和多线程_processThread](/node/processThread)
 
-3、[创建HTTP服务（不使用第三方库）_createWebServer](/createWebServer)
+3、[创建HTTP服务（不使用第三方库）_createWebServer](/node/createWebServer)
 
 
 
