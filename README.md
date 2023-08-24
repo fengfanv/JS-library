@@ -147,3 +147,5 @@
 9、[css火特效_cssFire](/cssFire)
 
 10、[uniapp日历和ScrollView组件_calendar_latest](/calendar_latest)
+
+11、[uniapp的renderjs_renderjs-echarts-demo](/renderjs-echarts-demo)
