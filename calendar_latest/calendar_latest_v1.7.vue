@@ -1,0 +1,857 @@
+<!--calendar 1.7版本 支持android和ios的vue模式，但不支持nvue模式。解决了app-vue下性能拉胯的问题。解决方法是通过使用renderjs直接在uniapp的视图层操作dom（利用renderjs解决了uniapp逻辑层和视图层通信延迟的问题（逻辑层和视图层通信延迟是touchmove卡顿的原因）） -->
+<template>
+	<view class="calendar" id="calendar" :options="options" :change:options="calendar.updateOptions" :allArr="allArr"
+		:change:allArr="calendar.updateAllArr" :weekData="weekData" :change:weekData="calendar.updateWeekData">
+		<view class="calendar_content" id="calendar_content">
+			<!-- 日历 -->
+			<view class="top_date">
+				<view class="date_time">{{dateTit}}</view>
+				<view class="date_btn">
+					<image src="" class="icon_left" @click="getPrev()">
+					</image>
+					<image src="" class="icon_right" @click="getNext()">
+					</image>
+				</view>
+			</view>
+			<view class="week_date">
+				<view class="week_item">日</view>
+				<view class="week_item">一</view>
+				<view class="week_item">二</view>
+				<view class="week_item">三</view>
+				<view class="week_item">四</view>
+				<view class="week_item">五</view>
+				<view class="week_item">六</view>
+			</view>
+			<view class="calendar_panel" id="calendar_panel">
+				<!-- 当前周面板 -->
+				<view class="box_panel week_panel" id="week_panel">
+					<view class="row">
+						<view class="day_item" v-for="(dayItem,dayIndex) of weekData.arr" :key="dayIndex"
+							:class="[isSelected(dayItem,dayIndex)?'active':'',isToday(dayItem,dayIndex)?'today':'']"
+							@click="selectSomeDay(dayItem,dayIndex)">
+							<text class="text">{{dayItem.day}}</text>
+							<view class="icon" v-show="getDailyData(dayItem)"></view>
+						</view>
+					</view>
+				</view>
+				<!-- 当前月面板 -->
+				<view class="box_panel" id="month_panel">
+					<view class="row" v-for="(item,index) of allArr" :key="index">
+						<view class="day_item" v-for="(dayItem,dayIndex) of item" :key="dayIndex"
+							:class="[(index==0 && dayItem.day>8)||(index==allArr.length-1 && dayItem.day<8) ? 'grey':'',isSelected(dayItem,dayIndex)?'active':'',isToday(dayItem,dayIndex)?'today':'']"
+							@click="selectSomeDay(dayItem,dayIndex)">
+							<text class="text">{{dayItem.day}}</text>
+							<view class="icon" v-show="getDailyData(dayItem)"></view>
+						</view>
+					</view>
+				</view>
+				<view class="scroll-view" id="scroll-view">
+					<slot ref="slot"></slot>
+				</view>
+			</view>
+
+		</view>
+	</view>
+</template>
+
+<script>
+	//节流
+	function throttle(fn, delay) {
+		if (typeof delay == 'undefined') {
+			delay = 1800;
+		}
+		let canRun = true; // 通过闭包保存一个标记
+		return function() {
+			if (!canRun) return; //在delay时间内，直接返回，不执行fn
+			canRun = false;
+			fn.apply(this, arguments);
+			setTimeout(() => {
+				canRun = true; //直到执行完fn,也就是delay时间后，打开开关，可以执行下一个fn
+			}, delay);
+		};
+	}
+	export default {
+		props: {
+			//红点列表
+			checkDailyList: {
+				type: [Object, Array],
+				default: () => {
+					return []
+				}
+			},
+		},
+		data() {
+			return {
+				/*日历相关数据 start*/
+				allArr: [], //某年某月的日历（月视图）数据
+				showYear: "", //当前日历数据是哪年哪月的某年
+				showMonth: "", //当前日历数据是哪年哪月的某月（1-12）
+
+				focusYear: "", //点击日历上的日期后，点击的是哪年
+				focusMonth: "", //点击日历上的日期后，点击的是那月（1-12）
+				focusDay: "", //点击日历上的日期后，点击的是哪天（1-31）
+				focusWeek: "", //点击日历上的日期后，被点击的那天是星期几 （0-6）
+				/*日历相关数据 end*/
+
+				options: {
+					isShowAll: false, //日历是否显示全部（true，月视图，false周视图）
+				}
+			};
+		},
+		created() {
+			//初始化日历
+			this.getCalendarData();
+		},
+		methods: {
+			//获取 某年某月 的日历（月视图）数据
+			getCalendarData(y, m) {
+				var date = null;
+				if (typeof y == 'undefined' || typeof m == 'undefined') {
+					//如果没传，则获取当前日期的
+					date = new Date();
+					//初始化当前选中的日期及星期
+					this.focusYear = date.getFullYear();
+					this.focusMonth = (date.getMonth() + 1);
+					this.focusDay = date.getDate();
+					this.focusWeek = date.getDay();
+				} else {
+					date = new Date(y + '/' + m + '/' + 1);
+				}
+
+				// 当月1号是周几
+				var oneDateWeek = new Date(`${date.getFullYear()}/${date.getMonth() + 1}/${1}`).getDay();
+				// 当月最后一天是几号
+				var totalDate = new Date(date.getFullYear(), (date.getMonth() + 1), 0).getDate();
+
+				// 获取上个月的信息
+				var prevYue = (date.getMonth() + 1) == 1 ? 12 : (date.getMonth() + 1) - 1;
+				var prevNian = prevYue == 12 ? date.getFullYear() - 1 : date.getFullYear();
+				// 获取上个月最后一天是几号
+				var prevTotalDate = new Date(prevNian, prevYue, 0).getDate();
+
+				// 生成当月的日历面板上，将会显示的上月的那几天的日期
+				var prevDay = prevTotalDate - oneDateWeek;
+				var prevArr = [];
+				for (var i = 1; i <= oneDateWeek; i++) {
+					prevArr.push({
+						year: prevNian,
+						month: prevYue,
+						day: prevDay + i
+					})
+				}
+				// console.log(prevArr);
+
+				// 生成当月的日期
+				var currentArr = []
+				for (var j = 1; j <= totalDate; j++) {
+					currentArr.push({
+						year: date.getFullYear(),
+						month: (date.getMonth() + 1),
+						day: j
+					})
+				}
+				// console.log(currentArr);
+
+				// 获取下个月的信息
+				// 获取这个月最后一天是星期几
+				var nextDateWeek = new Date(date.getFullYear(), date.getMonth(), totalDate).getDay();
+				var nextDay = 6 - nextDateWeek <= 0 ? 0 : 6 - nextDateWeek;
+				var nextYue = (date.getMonth() + 1) == 12 ? 1 : (date.getMonth() + 1) + 1;
+				var nextNian = nextYue == 1 ? date.getFullYear() + 1 : date.getFullYear();
+
+				// 生成当月的日历面板上，将会显示的下月的那几天的日期
+				var nextArr = []
+				for (var n = 1; n <= nextDay; n++) {
+					nextArr.push({
+						year: nextNian,
+						month: nextYue,
+						day: n
+					})
+				}
+				// console.log(nextArr);
+
+				// 将 prevArr 和 currentArr 和 nextArr 这三个数组合并
+				var calendarTotalDays = [];
+				calendarTotalDays = prevArr.concat(currentArr, nextArr);
+				console.log(calendarTotalDays);
+
+				// 每7天一组
+				var allArr = [];
+				for (var a = 0; a < calendarTotalDays.length;) {
+					allArr.push(calendarTotalDays.slice(a, a += 7))
+				}
+				console.log(allArr);
+				this.allArr = allArr;
+				this.showYear = date.getFullYear();
+				this.showMonth = date.getMonth() + 1;
+
+			},
+			//在日历下点击选中某一天
+			selectSomeDay(dayItem, dayIndex) {
+				this.focusYear = dayItem.year;
+				this.focusMonth = dayItem.month;
+				this.focusDay = dayItem.day;
+				this.focusWeek = dayIndex;
+
+				//判断是否需要切换月视图面板
+				if (this.showMonth != dayItem.month) {
+					this.getCalendarData(dayItem.year, dayItem.month);
+				}
+			},
+			//检查当前日期是否被选中
+			isSelected(dayItem, dayIndex) {
+				if (this.focusYear == dayItem.year && this.focusMonth == dayItem.month && this.focusDay == dayItem.day &&
+					this.focusWeek == dayIndex) {
+					return true;
+				}
+				return false;
+			},
+			//按钮，让日历显示上个月的日历（月视图切换成上个月的）
+			switchPrevMonth() {
+				let prevMonth = this.showMonth - 1 <= 0 ? 12 : this.showMonth - 1;
+				let year = prevMonth == 12 ? this.showYear - 1 : this.showYear;
+				this.getCalendarData(year, prevMonth);
+				let oneDateIndex = null; //保存这月1号的数据，备用
+				//月视图切换（切换到新月份时，切换前是几号，新月份就选几号）
+				for (let i = 0; i < this.allArr.length; i++) {
+					for (let j = 0; j < this.allArr[i].length; j++) {
+						let dayItem = this.allArr[i][j];
+						if (dayItem.year == year && dayItem.month == prevMonth && dayItem.day == 1) {
+							oneDateIndex = j;
+						}
+						if (dayItem.year == year && dayItem.month == prevMonth && dayItem.day == this.focusDay) {
+							this.selectSomeDay(dayItem, j)
+							return true;
+						}
+					}
+				}
+				//新月份里没有上个月所选的日期，如上个月选的是31号，这个月里没有31号，则切换成1号
+				this.selectSomeDay(this.allArr[0][oneDateIndex], oneDateIndex);
+			},
+			//按钮，让日历显示下个月的日历（月视图切换成下个月的）
+			switchNextMonth() {
+				let nextMonth = this.showMonth + 1 >= 13 ? 1 : this.showMonth + 1;
+				let year = nextMonth == 1 ? this.showYear + 1 : this.showYear;
+				this.getCalendarData(year, nextMonth);
+				let oneDateIndex = null; //保存这月1号的数据，备用
+				//月视图切换（切换到新月份时，切换前是几号，新月份就选几号）
+				for (let i = 0; i < this.allArr.length; i++) {
+					for (let j = 0; j < this.allArr[i].length; j++) {
+						let dayItem = this.allArr[i][j];
+						if (dayItem.year == year && dayItem.month == nextMonth && dayItem.day == 1) {
+							oneDateIndex = j;
+						}
+						if (dayItem.year == year && dayItem.month == nextMonth && dayItem.day == this.focusDay) {
+							this.selectSomeDay(dayItem, j)
+							return true;
+						}
+					}
+				}
+				//新月份里没有上个月所选的日期，如上个月选的是31号，这个月里没有31号，则切换成1号
+				this.selectSomeDay(this.allArr[0][oneDateIndex], oneDateIndex);
+			},
+			//按钮，从当前周，切换成上周
+			switchPrevWeek() {
+				//周视图切换（切换到新周时，切换前是星期几，新周就选星期几）
+				if (this.weekData.index == 0) {
+					let haveGreaterThan8 = this.weekData.haveGreaterThan8; //这周里是否有31,30,29,28这样的日期
+					//先日历切换成上个月
+					let prevMonth = this.showMonth - 1 <= 0 ? 12 : this.showMonth - 1;
+					let year = prevMonth == 12 ? this.showYear - 1 : this.showYear;
+					this.getCalendarData(year, prevMonth);
+					if (haveGreaterThan8 == true) {
+						//切换成功后，这时this.weekData.index就从0变成了this.allArr.length-1，但又因为this.allArr.length-1指向的还是当前这个星期，所以需要-2
+						let newIndex = this.allArr.length - 2;
+						let newDay = this.allArr[newIndex][this.focusWeek];
+						this.selectSomeDay(newDay, this.focusWeek);
+					} else {
+						//切换前的那周的周日，是那个月的一号，那周的第一天，也是那月的第一天，（判断方法就是，判断那周里有没有31,30,29,28这样的日期）（咱们这里的显示标准是美国标准，周日是一周的开始，周六是一周的结束）所以切换到上个月后，this.allArr.length - 1，就是切换到上一周。
+						let newIndex = this.allArr.length - 1;
+						let newDay = this.allArr[newIndex][this.focusWeek];
+						this.selectSomeDay(newDay, this.focusWeek);
+					}
+				} else {
+					let newIndex = this.weekData.index - 1;
+					let newDay = this.allArr[newIndex][this.focusWeek];
+					this.selectSomeDay(newDay, this.focusWeek);
+				}
+			},
+			//按钮，从当前周，切换成下周
+			switchNextWeek() {
+				//周视图切换（切换到新周时，切换前是星期几，新周就选星期几）
+				if (this.weekData.index == this.allArr.length - 1) {
+					let haveOne = this.weekData.haveOne; //当前一周里，是否有1号
+					//先切换成上下月
+					let nextMonth = this.showMonth + 1 >= 13 ? 1 : this.showMonth + 1;
+					let year = nextMonth == 1 ? this.showYear + 1 : this.showYear;
+					this.getCalendarData(year, nextMonth);
+					if (haveOne == true) {
+						//切换成功后，焦点时间和星期，就从this.allArr.length-1变成this.allArr[0]了。为了切换成下周，这里需要使用this.allArr[1]
+						let newIndex = 1;
+						let newDay = this.allArr[newIndex][this.focusWeek];
+						this.selectSomeDay(newDay, this.focusWeek);
+					} else {
+						//切换前的那周，那周的最后一天，也是那月的最后一天，（判断方法，判断那周里，有没有1号）（咱们这里的显示标准是美国标准，周日是一周的开始，周六是一周的结束）。所以切换到下个月后，this.allArr[0]，就是切换到下一周。
+						let newIndex = 0;
+						let newDay = this.allArr[newIndex][this.focusWeek];
+						this.selectSomeDay(newDay, this.focusWeek);
+					}
+				} else {
+					let newIndex = this.weekData.index + 1;
+					let newDay = this.allArr[newIndex][this.focusWeek];
+					this.selectSomeDay(newDay, this.focusWeek);
+				}
+			},
+			//检查是否今日
+			isToday(dayItem, dayIndex) {
+				var d = new Date();
+				var currentYear = d.getFullYear(); //年
+				var currentMonth = d.getMonth() + 1; //月
+				var currentDay = d.getDate(); //日
+				var currentWeek = d.getDay(); //星期几
+				if (dayItem.year == currentYear && dayItem.month == currentMonth && dayItem.day == currentDay &&
+					currentWeek == dayIndex) {
+					return true
+				}
+				return false;
+			},
+			getPrev() {
+				if (this.options.isShowAll) {
+					this.switchPrevMonth()
+				} else {
+					this.switchPrevWeek()
+				}
+			},
+			getNext() {
+				if (this.options.isShowAll) {
+					this.switchNextMonth()
+				} else {
+					this.switchNextWeek()
+				}
+			},
+			//检测某日，是否有数据
+			getDailyData(dayItem) {
+				let dayStr = dayItem.year + '-' + (dayItem.month < 10 ? '0' + dayItem.month : dayItem.month) + '-' + (
+					dayItem.day < 10 ? '0' + dayItem.day : dayItem.day);
+				if (this.checkDailyList.indexOf(dayStr) != -1) {
+					return true;
+				} else {
+					return false;
+				}
+			},
+			//滚动条触底事件
+			scrolltolower: throttle(function() {
+				// this.$emit('scrolltolower'); //暴露触底事件
+			}, 2000),
+			//renderjs同步数据到逻辑层
+			updateOptionsToLogicLayer(data){
+				let keys = Object.keys(data);
+				console.log('keys',keys);
+				let isUpdate = false;//true需要更新，false不需要更新
+				for(let i=0;i<keys.length;i++){
+					let key = keys[i];
+					if(data[key]!=this.options[key]){
+						isUpdate = true;
+						break;
+					}
+				}
+				if(isUpdate){
+					this.options = data;
+				}
+			}
+		},
+		computed: {
+			//获取当前周列表及其它信息
+			weekData() {
+				for (let i = 0; i < this.allArr.length; i++) {
+					for (let j = 0; j < this.allArr[i].length; j++) {
+						let dayItem = this.allArr[i][j];
+						if (dayItem.year == this.focusYear && dayItem.month == this.focusMonth && dayItem.day == this
+							.focusDay && j == this.focusWeek) {
+							let haveOne = false; //这周里是否有1号
+							let haveGreaterThan8 = false; //这周里是否有大于8的日子（这周里是否有31,30,29,28这样的日子）
+							for (let k = 0; k < this.allArr[i].length; k++) {
+								if (this.allArr[i][k].day == 1) {
+									haveOne = true;
+								}
+								if (this.allArr[i][k].day > 8) {
+									haveGreaterThan8 = true;
+								}
+							}
+							return {
+								arr: this.allArr[i], //这周的日期
+								index: i, //这周是这个月的第几个星期
+								haveOne,
+								haveGreaterThan8
+							}
+						}
+					}
+				}
+				return {
+					arr: [],
+					index: 0,
+					haveOne: false,
+					haveGreaterThan8: false,
+				}
+			},
+			//当前焦点时间（年-月-日）
+			dateTit() {
+				return (this.showYear) + '.' + (this.showMonth < 10 ? '0' + this.showMonth : this.showMonth) + '.' + (this
+					.focusDay < 10 ? '0' + this.focusDay : this.focusDay);
+			}
+		},
+	}
+</script>
+
+<script module="calendar" lang="renderjs">
+	export default {
+		data() {
+			return {
+				/*逻辑层同步过来的数据 start*/
+				options: {
+					isShowAll: false, //日历是否显示全部（true，月视图，false周视图）
+				},
+				allArr: [],
+				weekData: {},
+				/*逻辑层同步过来的数据 end*/
+
+				startY: 0, //触摸开始的位置
+				touchStartY: 0, //touchstart时的位置
+				startTime: 0, //触摸开始时间
+				isAnimation: true, //是否可以执行惯性动画
+
+				viewWidth: 0, //日历组件的宽度
+				viewHeight: 0, //日历组件的高度
+				scrollTop: 0, //scroll-view的scrollTop值
+				isTop: true, //scrollTop是否等于0
+				isScrollView: true, //scroll-view是否可以滚动
+				scrollHeight:0,//scroll的高度（容器内容高度）
+				scrollTopMax:0,//scrollTop的最大值
+			}
+		},
+		mounted() {
+			this.getDomInfo();
+			let scrollViewDom = document.getElementById('scroll-view');
+			scrollViewDom.addEventListener('touchstart', this.touchStart);
+			scrollViewDom.addEventListener('touchmove', this.touchMove);
+			scrollViewDom.addEventListener('touchend', this.touchEnd);
+			this.showPanel(false);
+		},
+		methods: {
+			//监听逻辑层options数据变化
+			updateOptions(newValue, oldValue, ownerInstance, instance) {
+				this.options = newValue;
+			},
+			//监听逻辑层allArr数据变化
+			updateAllArr(newValue, oldValue, ownerInstance, instance) {
+				this.allArr = newValue;
+			},
+			//监听逻辑层weekData数据变化
+			updateWeekData(newValue, oldValue, ownerInstance, instance) {
+				this.weekData = newValue;
+			},
+			showPanel(value) {
+				let weekPanelDom = document.getElementById('week_panel');
+				let monthPanelDom = document.getElementById('month_panel');
+				if (value) {
+					//展开（显示月面板）
+					monthPanelDom.style.marginTop = this.calendarOpenMarginTop + 'px';
+					this.marginTop = this.calendarOpenMarginTop;
+
+					monthPanelDom.style.opacity = 1; //月面板透明度
+
+					weekPanelDom.style.display = 'none'; //隐藏周面板
+					this.weekShow = false; //隐藏周面板
+				} else {
+					//收起（不显示月面板）
+					monthPanelDom.style.marginTop = this.calendarCloseMarginTop + 'px';
+					this.marginTop = this.calendarCloseMarginTop;
+
+					monthPanelDom.style.opacity = 0; //月面板透明度
+
+					weekPanelDom.style.display = 'block'; //显示周面板
+					this.weekShow = true; //显示周面板
+				}
+				this.options.isShowAll = value;
+				this.$ownerInstance.callMethod('updateOptionsToLogicLayer',this.options)
+			},
+			touchStart(e) {
+				this.getDomInfo();
+				this.startY = e.touches[0].pageY;
+				this.touchStartY = e.touches[0].pageY;
+				this.startTime = Date.now();
+				this.isAnimation = false;
+			},
+			touchMove(e) {
+				let py = e.touches[0].pageY;
+				let move = py - this.startY;
+				this.startY = py;
+
+				//move负值（手指从 手机底部 划向 手机顶部）
+				//move正值（手指从手机顶部 划向 手机底部）
+
+				this.touchCalendar(move);
+				this.touchSroll(move);
+			},
+			touchEnd(e) {
+				//松手后惯性动画
+				if (this.isTop == false && this.weekShow == true) {
+					let pageY = e.changedTouches[0].pageY;
+					let now = Date.now();
+					let speed = ((pageY - this.touchStartY) / (now - this.startTime)) * 16 //重点
+					if (now - this.startTime > 300) {
+						return false;
+					}
+					this.isAnimation = true;
+					let f = 0;
+					let animation = () => {
+						this.isAnimation && setTimeout(animation, 10)
+						f = Math.min(Math.abs(speed) / 32, 0.5) //重点
+						if (speed > 0.2) {
+							speed = speed - f
+						} else if (speed < -0.2) {
+							speed = speed + f
+						} else {
+							this.isAnimation = false;
+							speed = 0
+							return false;
+						}
+
+						let target = this.scrollTop - speed;
+						if (target <= 0) {
+							target = 0;
+							this.isAnimation = false;
+						} else if (target >= this.scrollTopMax) {
+							target = this.scrollTopMax;
+							this.isAnimation = false;
+						}
+						//下面setScrollTop的animation参数是为了优化松手后动画与日历展开动作的一个小兼容（有时惯性动画自动滑到顶部，然后想展开日历，这时需要多执行一次展开动作，为了取消多余的那个动作，增加了如下参数）
+						this.setSrollTop(target, 'animation')
+					}
+					animation();
+				}
+
+				//手指松开后判断月面板是否可以展开
+				if (this.marginTop >= -this.oneMonthHeight / 2) {
+					//展开（显示月面板）
+					this.showPanel(true)
+				} else {
+					//收起（不显示月面板）
+					this.showPanel(false)
+				}
+				//手指松开后判断是否触顶
+				if (this.scrollTop == 0) {
+					this.isTop = true;
+				}
+				//手指松开后恢复值
+				this.isScrollView = true;
+				this.isCalendar = true;
+			},
+			//触摸移动页面scrollTop变化
+			touchSroll(move) {
+				//move负值（手指从 手机底部 划向 手机顶部）
+				//move正值（手指从手机顶部 划向 手机底部）
+				let scrollTop = this.scrollTop - move;
+				if (scrollTop <= 0) {
+					//触顶了
+					scrollTop = 0;
+				} else if (scrollTop >= this.scrollTopMax) {
+					//触底了
+					if (this.scrollHeight <= this.viewHeight) {
+						scrollTop = 0;
+					} else {
+						scrollTop = this.scrollTopMax;
+					}
+				} else {
+					//既没触底也没触顶
+				}
+				this.setSrollTop(scrollTop);
+			},
+			//设置scrollTop
+			setSrollTop(scrollTop, type) {
+				if (!this.isScrollView) {
+					return false;
+				}
+
+				if (scrollTop == 0) {
+					//触顶
+					this.isTop = true;
+					//animation参数判断是为了优化松手后动画与日历展开动作的一个小兼容（有时惯性动画自动滑到顶部，然后想展开日历，这时需要多执行一次展开动作，为了取消多余的那个动作，增加了如下参数）
+					if (type && type == 'animation') {
+						this.isCalendar = true;
+					} else {
+						this.isCalendar = false;
+					}
+				} else if (scrollTop >= (this.scrollTopMax - 150)) {
+					//抛出触底事件
+					// this.scrolltolower();
+					this.$ownerInstance.callMethod('scrolltolower')
+					this.isTop = false;
+				} else {
+					this.isTop = false;
+				}
+
+				document.getElementById('calendar_content').style.top = -scrollTop + 'px';
+				this.scrollTop = scrollTop;
+			},
+			//触摸移动展开或关闭日历
+			touchCalendar(move) {
+				//move负值（手指从 手机底部 划向 手机顶部）
+				//move正值（手指从手机顶部 划向 手机底部）
+				let calendarContentDom = document.getElementById('calendar_content');
+				let monthPanelDom = document.getElementById('month_panel');
+				let weekPanelDom = document.getElementById('week_panel');
+				if (this.isTop && move > 0) {
+					this.isScrollView = false;
+					this.scrollTop = 0;
+				}
+
+				if (this.isTop && move < 0 && this.options.isShowAll) {
+					this.scrollTop = 0;
+					this.isScrollView = false;
+				}
+
+				if (this.isTop == false && move > 0) {
+					this.marginTop = this.calendarCloseMarginTop;
+					move = 0;
+				}
+
+				if (this.isCalendar == false) {
+					move = 0;
+				}
+				calendarContentDom.style.top = -this.scrollTop + 'px';
+				monthPanelDom.style.marginTop = this.marginTop + 'px';
+
+				//日历展开与收起
+				let marginTop = this.marginTop + move;
+				let weekShow = this.weekShow;
+				let monthOpacity = this.monthOpacity;
+				if (marginTop >= 0) {
+					marginTop = 0;
+				}
+				if (marginTop <= this.calendarCloseMarginTop) {
+					marginTop = this.calendarCloseMarginTop;
+				}
+				if (marginTop <= -this.weekData.index * this.oneWeekHeight) {
+					//显示周
+					weekShow = true;
+					//月面板透明度
+					monthOpacity = 0.5;
+				} else {
+					//不显示周
+					weekShow = false;
+					//月面板透明度
+					monthOpacity = 1;
+				}
+				if (marginTop <= this.calendarCloseMarginTop) {
+					//月面板完全收起来了，隐藏月面板
+					monthOpacity = 0;
+				}
+				this.marginTop = marginTop;
+				this.weekShow = weekShow;
+				this.monthOpacity = monthOpacity;
+				monthPanelDom.style.marginTop = this.marginTop + 'px';
+				monthPanelDom.style.opacity = this.monthOpacity;
+				weekPanelDom.style.display = this.weekShow ? 'block' : 'none';
+			},
+			getDomInfo() {
+				let calendarDom = document.getElementById('calendar');
+				this.viewWidth = calendarDom.offsetWidth;
+				this.viewHeight = calendarDom.offsetHeight;
+				
+				let calendarContentDom = document.getElementById('calendar_content');
+				this.scrollHeight = calendarContentDom.offsetHeight;
+				
+				this.scrollTopMax = this.scrollHeight - this.viewHeight;
+			}
+		},
+		computed: {
+			//一周的高度
+			oneWeekHeight() {
+				return uni.upx2px(56); //设计图里的高度，56
+			},
+			//当前月的高度
+			oneMonthHeight() {
+				return this.allArr.length * this.oneWeekHeight;
+			},
+			//日历展开的marginTop
+			calendarOpenMarginTop() {
+				return 0;
+			},
+			//日历收起的marginTop
+			calendarCloseMarginTop() {
+				return this.oneWeekHeight - this.oneMonthHeight;
+			},
+		}
+	}
+</script>
+
+<style scoped>
+	.calendar {
+		width: 100%;
+		height: 100%;
+		display: flex;
+		flex-direction: column;
+		justify-content: flex-start;
+		align-items: flex-start;
+		position: relative;
+		overflow: hidden;
+		background-color: antiquewhite;
+	}
+
+	.calendar_content {
+		width: 100%;
+		height: auto;
+		position: absolute;
+		left: 0;
+		/* background-color: brown; */
+	}
+
+	/* 日历 */
+	.top_date {
+		width: 100%;
+		box-sizing: border-box;
+		padding: 24rpx 32rpx;
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		justify-content: space-between;
+	}
+
+	.date_time {
+		font-size: 32rpx;
+		font-family: Arial-BoldMT, Arial;
+		font-weight: normal;
+		color: #333333;
+		line-height: 36rpx;
+	}
+
+	.date_btn {
+		display: flex;
+	}
+
+	.icon_left,
+	.icon_right {
+		display: block;
+		width: 40rpx;
+		height: 40rpx;
+		background-color: orange;
+	}
+
+	.icon_right {
+		margin-left: 46rpx;
+	}
+
+	.week_date {
+		width: 100%;
+		margin-bottom: 10rpx;
+		display: flex;
+		flex-direction: row;
+		justify-content: space-around;
+	}
+
+	.week_item {
+		flex: 1;
+		text-align: center;
+		font-size: 32rpx;
+		font-family: PingFangSC-Regular, PingFang SC;
+		font-weight: 400;
+		color: #999999;
+		/* background-color: blue; */
+		line-height: 44rpx;
+	}
+
+	.calendar_panel {
+		width: 100%;
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+		justify-content: flex-start;
+		align-items: center;
+		/* background-color: red; */
+		position: relative;
+		overflow: hidden;
+	}
+
+	.week_panel {
+		position: absolute;
+		left: 0;
+		top: 0;
+		z-index: 9;
+	}
+
+	.box_panel {
+		display: flex;
+		flex-direction: column;
+		width: 100%;
+	}
+
+	.box_panel .row {
+		display: flex;
+		flex-direction: row;
+		justify-content: space-around;
+		align-items: center;
+	}
+
+	.box_panel .row .day_item {
+		width: 56rpx;
+		height: 56rpx;
+		display: flex;
+		flex-direction: column;
+		justify-content: flex-start;
+		align-items: center;
+		box-sizing: border-box;
+	}
+
+	.box_panel .row .day_item .text {
+		font-size: 32rpx;
+		font-family: Arial-BoldMT, Arial;
+		font-weight: normal;
+		color: #333333;
+		line-height: 36rpx;
+		margin-top: 8rpx;
+	}
+
+	.box_panel .row .day_item .icon {
+		width: 8rpx;
+		height: 8rpx;
+		background: #FFBA91;
+		border-radius: 50%;
+	}
+
+	.box_panel .row .active {
+		box-sizing: border-box;
+		border-radius: 50%;
+		border: 2rpx solid #FFBA91;
+	}
+
+	.box_panel .row .today {
+		background: #FFBA91;
+		border-radius: 50%;
+	}
+
+	.box_panel .row .today .text {
+		color: #FFFFFF !important;
+	}
+
+	.box_panel .row .today .icon {
+		background: #FFFFFF !important;
+	}
+
+	.box_panel .row .grey .text {
+		color: #DDDDDD !important;
+	}
+
+	.scroll-view {
+		width: 100%;
+		height: auto;
+		min-height: 40rpx;
+		flex: 1;
+		/* background-color: aquamarine; */
+		display: flex;
+		flex-direction: column;
+		justify-content: flex-start;
+		align-items: flex-start;
+		flex-shrink: 0;
+	}
+</style>
