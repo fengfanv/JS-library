@@ -6,6 +6,9 @@
 
 3、[创建HTTP服务（不使用第三方库）_createWebServer](/node/createWebServer)
 
+4、[node源码利用range头实现Mp4文件流播放（不使用第三方库）_video-stream](/node/video-stream)
+
+5、[node大文件分片上传（不使用第三方库）_file-upload](/node/file-upload)
 
 
 搭建一个简单的http服务（和https服务）(不使用第三方库)
@@ -13,8 +16,6 @@
 node控制资源下载速度(不使用第三方库)
 
 node源码利用range头实现断点下载(不使用第三方库)
-
-node源码利用range头实现Mp4文件流播放(不使用第三方库)
 
 node源码M3u8流格式文件视频播放(不使用第三方库)
 
@@ -29,8 +30,6 @@ node文件上传(express,multer)
 node文件上传(不使用第三方库)
 
 node文件或文件夹上传(不使用第三方库)
-
-node大文件分片上传(不使用第三方库)
 
 --
 
@@ -52,7 +51,6 @@ node多进程性能提升(不使用第三方库)
 
 整理mysql文档
 
-	
 ---
 
 
