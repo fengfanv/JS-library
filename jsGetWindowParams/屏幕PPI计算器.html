@@ -9,7 +9,7 @@
 
 <body>
     <form>
-        <div id="tianxie">
+        <div>
             <div class="r2">
                 <label class="e">屏幕高度</label>
                 <input type="number" class="k" value="1920" id="Height" placeholder="请填写">
@@ -26,41 +26,99 @@
                 <span class="u">英寸</span>
             </div>
         </div>
-        <div id="jisuan">
-            <input type="button" value="计算" onclick="PPICalculator()" class="b">
+        <div>
+            <input type="button" value="计算" onclick="calculate()" class="b">
         </div>
-        <div id="jieguo">
-            <label class="e">PPI：</label>
+        <div>
+            <label class="e">标准RGB排列 PPI：</label>
             <span class="z" id="PPI"></span>
+            ppi
+        </div>
+        <div>
+            <label class="e">Pentile排列 PPI：</label>
+            <span class="z" id="PPI2"></span>
+            ppi
+        </div>
+        <div>
+            <label class="e">屏幕尺寸：</label>
+            <span class="z" id="screenSize"></span>
+            英寸
+        </div>
+        <div>
+            <label class="e">屏幕比例：</label>
+            <span class="z" id="ratio"></span>
         </div>
     </form>
     <hr>
     <div id="memo">
-        <p>PPI即每英寸所拥有的像素数目。pixels per inch 所表示的是每英寸所拥有的像素（pixel）数目。</p>
-        <p>其实计算方法很简单，用长跟高的像素数计算出对角方向的像素数（直角三角形），然后再用对角的像素数除以屏幕尺寸就是ppi了,公式表达为 PPI=√（X^2+Y^2）/ Z
-            （X：长度像素数；Y：宽度像素数；Z：屏幕大小）。
+        <p>PPI即每英寸所拥有的像素数目。pixels per inch 所表示的是每英寸所拥有的像素（pixel）数目。当屏幕的PPI当达到一定数值时，人眼无法分辨不出颗粒感。</p>
+        <p>RGB排列的屏幕PPI为标准值，Pentile排列或者其它规则排列的OLED屏幕均会有一定的像素折损。Pentile排列主要是通过相邻像素公用子像素的方法来减少子像素的个数，从而达到低分辨率模拟高分辨率的效果。</p>
+        <p>标准RGB排列PPI，计算方法很简单，用屏幕长跟屏幕高的像素数计算出屏幕对角线(此处说的对角线，是勾股定理里的弦，直角三角形的斜边)的像素数（直角三角形，勾股定理 a^2+b^2=c^2），然后再用对角线的像素数除以屏幕尺寸就是PPI了，公式表达为 PPI=√(X^2+Y^2)/Z
+            （X：横向(长度)像素数；Y：纵向(宽度)像素数；Z：屏幕尺寸）。
         </p>
+        <p>计算公式：</p>
+        <img src="./ppicalc.png" alt="PPI计算公式">
+        <p>从上边公式可以看出，屏幕长跟屏幕高的像素数计算出屏幕对角线的像素数 除以PPI可以得到屏幕尺寸。</p>
     </div>
     <hr>
     <ol>
         <li>设备：小米 12；分辨率：2400x1080；屏幕尺寸：6.28；PPI：419；感官：非常清晰细腻</li>
-        <li>设备：Nokia N1；分辨率：2048×1536；屏幕尺寸：7.9；PPI：324.05；感官：非常清晰细腻（屏幕体验很棒，感觉和ipad的视网膜屏似的）</li>
+        <li>设备：Nokia N1；分辨率：2048×1536；屏幕尺寸：7.9；PPI：324.05；感官：非常清晰细腻，屏幕体验很棒，感觉与ipad视网膜屏不相上下，屏幕质感没有廉价感</li>
         <li>设备：MacBook Pro 14；分辨率：3024x1964；屏幕尺寸：14.2；PPI：254；感官：非常清晰细腻</li>
-        <li>设备：Yoga Pro 14s；分辨率：3072×1920；屏幕尺寸：14.5；PPI：249.84；感官：清晰细腻（还行不错）</li>
+        <li>设备：Yoga Pro 14s；分辨率：3072×1920；屏幕尺寸：14.5；PPI：249.84；感官：清晰细腻，还行不错</li>
         <hr>
         <li>设备：Surface go 2；分辨率：1920x1280；屏幕尺寸：10.5；PPI：220；感官：一般，仔细看能看见像素点，屏幕体验不好，感觉不清楚</li>
         <li>设备：惠普 暗夜精灵 2；分辨率：1920x1080；屏幕尺寸：15.6；PPI：141.21；感官：一般，仔细看能看见像素点，屏幕体验不好，感觉不清楚</li>
     </ol>
-    <p>总结：屏幕PPI值达到250以上可以获得不错的清晰度体验，所以购买的新设备屏幕PPI必须达到250以上</p>
+    <p>总结：屏幕PPI值达到250以上可以获得不错的清晰度体验，所以购买的新设备屏幕PPI必须达到250以上，约高约好</p>
     <script>
-        function PPICalculator() {
-            t = parseFloat(document.getElementById("Width").value);
-            i = parseFloat(document.getElementById("Height").value);
-            r = parseFloat(document.getElementById("Size").value);
-            u = Math.sqrt(t * t + i * i) / r;
-            u = Math.round(u * 100) / 100;
-            document.getElementById("PPI").innerHTML = u;
-        };
+        function calculate() {
+            PPI()
+            screenRatio()
+        }
+
+        //屏幕ppi
+        function PPI() {
+            //标准RGB排列ppi
+            w = parseFloat(document.getElementById("Width").value);
+            h = parseFloat(document.getElementById("Height").value);
+            s = parseFloat(document.getElementById("Size").value);
+            r = Math.sqrt(w * w + h * h) / s;
+            r = Math.round(r * 100) / 100;
+            document.getElementById("PPI").innerHTML = r;
+            document.getElementById("screenSize").innerHTML = Math.sqrt(w * w + h * h) / r;
+
+            //Pentile排列ppi
+            r2 = Math.sqrt((2/3)*(w * w + h * h)) / s;
+            r2 = Math.round(r2 * 100) / 100;
+            document.getElementById("PPI2").innerHTML = r2;
+        }
+
+        //屏幕比例
+        function screenRatio() {
+            /*
+            1920*1080分辨率的屏幕，如何计算出屏幕比例16:9？
+            计算式：1920÷120:1080÷120 => 16:9
+
+            计算步骤：
+            1、先求出1920和1080的最大公约数
+            2、然后用1920/最大公约数，然后在用1080/最大公约数
+            3、除完后，就得出屏幕比例了
+            如：1920和1080的最大公约数是120，所以有1920/120=16，所以有1080/120=9
+            */
+
+            //整除数计算，获取两值最大公约数，欧几里德算法
+            function aliquot(x, y) {
+                if (x % y == 0) return y;
+                return aliquot(y, x % y);
+            }
+            let width = parseFloat(document.getElementById("Width").value); //宽度
+            let height = parseFloat(document.getElementById("Height").value); //高度
+            let divisor = aliquot(width, height); //获取最大公约数
+            let ratio = (width / divisor) + ':' + (height / divisor); //比例
+            document.getElementById("ratio").innerHTML = ratio;
+        }
+
     </script>
 </body>
 
