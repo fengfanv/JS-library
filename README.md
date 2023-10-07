@@ -64,7 +64,7 @@
 
 18、[jsCookie使用案例_jsCookie](/jsCookie)
 
-19、[js获取屏幕参数_jsGetWindowParams](/jsGetWindowParams)
+19、[js获取屏幕参数和屏幕PPI计算器_jsGetWindowParams](/jsGetWindowParams)
 
 20、[网页选择时间插件_htmlChoiceDatePlugin](/htmlChoiceDatePlugin)
 

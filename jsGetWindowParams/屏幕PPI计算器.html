@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>屏幕PPI计算器</title>
+</head>
+
+<body>
+    <form>
+        <div id="tianxie">
+            <div class="r2">
+                <label class="e">屏幕高度</label>
+                <input type="number" class="k" value="1920" id="Height" placeholder="请填写">
+                <span class="u">像素</span>
+            </div>
+            <div class="r2">
+                <label class="e">屏幕宽度</label>
+                <input type="number" class="k" value="1080" id="Width" placeholder="请填写">
+                <span class="u">像素</span>
+            </div>
+            <div class="r2">
+                <label class="e">屏幕大小</label>
+                <input type="number" class="k" value="5" id="Size" placeholder="请填写">
+                <span class="u">英寸</span>
+            </div>
+        </div>
+        <div id="jisuan">
+            <input type="button" value="计算" onclick="PPICalculator()" class="b">
+        </div>
+        <div id="jieguo">
+            <label class="e">PPI：</label>
+            <span class="z" id="PPI"></span>
+        </div>
+    </form>
+    <hr>
+    <div id="memo">
+        <p>PPI即每英寸所拥有的像素数目。pixels per inch 所表示的是每英寸所拥有的像素（pixel）数目。</p>
+        <p>其实计算方法很简单，用长跟高的像素数计算出对角方向的像素数（直角三角形），然后再用对角的像素数除以屏幕尺寸就是ppi了,公式表达为 PPI=√（X^2+Y^2）/ Z
+            （X：长度像素数；Y：宽度像素数；Z：屏幕大小）。
+        </p>
+    </div>
+    <hr>
+    <ol>
+        <li>设备：小米 12；分辨率：2400x1080；屏幕尺寸：6.28；PPI：419；感官：非常清晰细腻</li>
+        <li>设备：Nokia N1；分辨率：2048×1536；屏幕尺寸：7.9；PPI：324.05；感官：非常清晰细腻（屏幕体验很棒，感觉和ipad的视网膜屏似的）</li>
+        <li>设备：MacBook Pro 14；分辨率：3024x1964；屏幕尺寸：14.2；PPI：254；感官：非常清晰细腻</li>
+        <li>设备：Yoga Pro 14s；分辨率：3072×1920；屏幕尺寸：14.5；PPI：249.84；感官：清晰细腻（还行不错）</li>
+        <hr>
+        <li>设备：Surface go 2；分辨率：1920x1280；屏幕尺寸：10.5；PPI：220；感官：一般，仔细看能看见像素点，屏幕体验不好，感觉不清楚</li>
+        <li>设备：惠普 暗夜精灵 2；分辨率：1920x1080；屏幕尺寸：15.6；PPI：141.21；感官：一般，仔细看能看见像素点，屏幕体验不好，感觉不清楚</li>
+    </ol>
+    <p>总结：屏幕PPI值达到250以上可以获得不错的清晰度体验，所以购买的新设备屏幕PPI必须达到250以上</p>
+    <script>
+        function PPICalculator() {
+            t = parseFloat(document.getElementById("Width").value);
+            i = parseFloat(document.getElementById("Height").value);
+            r = parseFloat(document.getElementById("Size").value);
+            u = Math.sqrt(t * t + i * i) / r;
+            u = Math.round(u * 100) / 100;
+            document.getElementById("PPI").innerHTML = u;
+        };
+    </script>
+</body>
+
+</html>
