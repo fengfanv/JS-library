@@ -105,7 +105,7 @@ const httpsOption = {
     key: fs.readFileSync("./ssl证书/xxx.key"),
     cert: fs.readFileSync("./ssl证书/xxx.crt")
 };
-http.createServer(httpsOption,function (request, response) {
+https.createServer(httpsOption,function (request, response) {
 	// 发送 HTTP 头部 
 	// HTTP 状态值: 200 : OK
 	// 内容类型: text/plain
