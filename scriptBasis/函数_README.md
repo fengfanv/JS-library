@@ -6,7 +6,7 @@
 function test(){}
 console.log(test.name); //test
 
-//定义函数第二种，函数表达式，函数表达式有两种，一种叫命名，一种叫匿名，通常认为的函数表达式 是2匿名函数表达式
+//定义函数第二种，函数表达式，函数表达式有两种（一种叫命名，一种叫匿名），通常认为的函数表达式 是第二种匿名函数表达式
 //1、命名函数表达式声明
 var test1 = function abc(){}
 console.log(test1.name); //abc
@@ -25,11 +25,11 @@ function add(a,b){
 
 add(1,2);//这里1和2，是实实在在的参数的数据值，所以在这里叫“实际参数”
 
-//在js里，假如形参定义了5个参数，调用方法时传的实参不用非得也是5个，传1也行，不穿也行。C语言里这种就是不行的
+//在js里，假如形参定义了5个参数，调用方法时传的实参不用非得也是5个，传1个也行，不传也行。但C语言里这种就是不行的
 
 function add(a,b){
 	//每个函数里都有一个用来接收调用方法时传进来的实参的列表，叫“agruments”实参列表
-	//agruments 实参列表，类数组，代表实参，有length属性，这个length属性代表实参的数量，这里调用console.log(agruments.length)会打印，4
+	//agruments实参列表，类数组，代表实参，有length属性，这个length属性代表实参的数量。如 执行add(1,2,3,4)后 这里 console.log(agruments.length)会打印，4
 
 	//每个方法都有一个length属性，这个length属性，代表函数形参的数量，这里调用console.log(add.length)会打印，2
 }
@@ -37,11 +37,11 @@ add(1,2,3,4)
 
 function add(a,b,c){
 	/*
-		函数内arguments（实参列表）与函数的形参是有映射连接的，只是有映射，不是一个东西。
-	也就是说，在这里，运行arguments[0] = 4，后，a的值也会发生变化成4。运行a=8，arguments[0]也会跟着变化成8
+	函数内arguments(实参列表)与(函数的形参)是有映射连接的，只是有映射，不是一个东西。
+	也就是说，在这里，运行arguments[0] = 4后，形参a的值也会发生变化成4。运行a=8，arguments[0]也会跟着变化成8
 	但上面这种映射有特殊情况：
 	就是当函数运行时形参里没有对应的实参时，这时是没有映射的。
-	如add方法有abc三个形参，但传进来的实参就两个，a和b这时是有映射，c没有映射。
+	如add方法定义有a b c三个形参，但在调用add方法时，就传了两个实参，这时形参a b和arguments(实参列表)有映射，c没有映射。
 	如运行arguments[2] = 4手动给arguments增加数据，这时打印c的值，c是undefined。
 	如运行c = 10，打印arguments[2]的值，如果arguments[2]没有手动设置值，则会打印undefined
 
@@ -60,6 +60,7 @@ function add(a,b,c){
 		console.log(b);
 		console.log(arguments[1]);
 	}
+	add(1)
 	*/
 }
 add(1,2)
