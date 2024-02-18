@@ -80,7 +80,7 @@ console.log(this.foo) // global
 console.log(this.bar) // undefined
 ```
 
-那这里就有一个疑问， let 在全局环境中声明的变量 不在全局对象的属性中，那它是保存在哪呢？
+那这里就有一个疑问， let 在全局环境中声明的变量不在全局对象的属性中，那它是保存在哪呢？
 
 在浏览器的控制台中，执行如下代码，查看 test 函数的作用域链
 ```javascript
@@ -97,7 +97,7 @@ let 在全局环境中声明的变量 bar 保存在图中 [[Scopes]][0]: Script 
 
 ### var 与 let 区别(变量提升与暂存死区)：
 
-全局或者函数环境下，在代码执行前，会有预编译阶段，在预编译过程中，会先在代码内找函数形参和var变量声明，然后将函数形参和var变量声明的变量名添加到AO对象并初始化值为undefined。而这一操作，就是通常我们所说的“变量提升”
+全局或者函数环境下，在代码执行前，会有预编译阶段，在预编译过程中，会先在代码内找函数形参和var变量声明，然后将函数形参和var变量声明的变量名添加到AO对象并初始化值为undefined。而这一操作，就是我们通常所说的“变量提升”
 
 变量提升示例：
 ```javascript
@@ -108,29 +108,36 @@ console.log(a) // 1
 
 let 声明变量存在暂存死区，如何理解暂存死区呢？
 
-其实 let 也存在与 var 类似的“变量提升”过程，但与 var 不同的是，在代码(块)执行前，代码(块)预编译阶段 let 只会创建变量而不会初始化值undefined。（注意这里var与let的区别“let预编译阶段只创建变量而不初始化值”，“var在预编译阶段不仅会创建变量而且还初始化值为undefined”）
+其实 let 也存在与 var 类似的“变量提升”过程，但与 var 不同的是，在代码(块)执行前，代码(块)预编译阶段 let 只会创建变量而不会初始化值undefined。（注意这里var与let的区别 “let在预编译阶段只创建变量而不初始化值”，“var在预编译阶段不仅会创建变量而且还会初始化值为undefined”）
 
 那 let 什么时候初始化值呢？
 
 ES6 规定，其初始化值是在代码执行阶段（即直到它们的"定义语句"被执行时才初始化值）
 
-而 暂存死区(Temporal Dead Zone) 是指 let变量被创建的那一刻开始，到它被初始化值的(那一刻/那一期间)。
+而 暂存死区(Temporal Dead Zone) 就是指 let变量被创建的那一刻开始，到它被初始化值的(那一刻/那一期间)。
 
-直到为let变量初始化值之前，该变量都是不可访问的。如果你尝试在“暂存死区”期间 访问该变量，则JavaScript会抛出一个引用错误（ReferenceError）
+直到为 let 变量初始化值之前，该变量都是不可访问的。如果你尝试在“暂存死区”期间 访问该变量，则JavaScript会抛出一个引用错误（ReferenceError）
 
 ```javascript
-console.log(bar); // undefined
-console.log(foo); // Uncaught ReferenceError: Cannot access 'foo' before initialization  这里let变量已创建，但还未初始化值。所以这里let还处于“暂存死区”期间，所以才会报错 初始化前无法访问foo
-var bar = 1;
-let foo = 2;
+{
+  //注意，如果直接在浏览器控制台运行如下代码，那请在代码外 套上 { } ，否则报错将打印 Uncaught ReferenceError: foo is not defined 打印foo未定义，是因为，浏览器控制台环境已经预编译结束(已经初始化完毕)，已经进入到代码执行阶段。在代码执行阶段，在控制台输入(let foo = 2;)代码将直接运行，没有预编译。而如果你在代码外 套上 { } 后，{ } 这个块级 会因为let的缘故，会先进行预编译，然后再执行。
+  console.log(bar); // undefined
+  console.log(foo); // Uncaught ReferenceError: Cannot access 'foo' before initialization  这里let变量已创建，但还未初始化值。所以这里let还处于“暂存死区”期间，所以才会报错 初始化前无法访问foo
+  var bar = 1;
+  let foo = 2;
+}
 ```
 ```javascript
-console.log(xx) // Uncaught ReferenceError: Cannot access 'xx' before initialization
-let x;
+{
+  console.log(xx) // Uncaught ReferenceError: Cannot access 'xx' before initialization
+  let xx;
+}
 ```
 ```javascript
-let x;
-console.log(x); //undefined
+{
+  let x;
+  console.log(x); //undefined  //这里打印undefined，是因为上边(let x)没有写(let x=10)这种语法，所以默认初始化值为undefined
+}
 ```
 ### let 与 const 区别：
 
@@ -146,7 +153,7 @@ b = 'change' // TypeError: Assignment to constant variable
 
 如何理解声明之后不允许改变其值？
 
-const 不允许改变 栈内存 中保存的地址或值。
+const 不允许改变保存在 栈内存 中的地址和值。
 
 地址 是指，栈内存里保存着引用数据类型在堆内存中的引用地址。
 
@@ -157,16 +164,16 @@ const 示例2：
 const obj = {
   value: 1
 }
-obj.value = 2 // 引用数据类型的数据的本体，保存在 堆内存里。所以没报错
+obj.value = 2 // 引用数据类型的数据的本体，保存在 堆内存里。这里改变的是 堆内存 中的数据，所以没有报错。
 console.log(obj) // { value: 2 }
-obj = {} // TypeError: Assignment to constant variable //栈内存保存的引用数据类型的数据的地址发生改变，所以报错。
+obj = {} // TypeError: Assignment to constant variable //栈内存里保存着引用数据类型在堆内存中的引用地址。这里保存在栈内存中的引用地址发生改变，所以报错。
 ```
 
 ### 块级作用域：
 
 JavaScript中的作用域主要有全局作用域、函数作用域和块级作用域三种。
 
-在ES6之前，JavaScript只有全局作用域、函数作用域，没有块级作用域。从ES6开始，JavaScript引入了let和const关键字，自此js中出现块级作用域。
+在ES6之前，JavaScript只有全局作用域、函数作用域，没有块级作用域。而从ES6开始，JavaScript引入了let和const关键字，自此js中出现块级作用域。
 
 块级作用域，块级是指 代码块 ，这个代码块可以是 if、while、switch、for 等等 使用 {} 限定的代码块，也可以是函数代码块等等。
 
@@ -186,3 +193,7 @@ if(true){
   // ...
 }
 ```
+
+### 参考文献：
+
+[深入理解JS：var、let、const的异同 - OneForCheng - 博客园](https://www.cnblogs.com/forcheng/p/13033976.html)
