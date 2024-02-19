@@ -41,32 +41,25 @@ person.name//这样使用对象属性，系统内部会把这句话转成person[
 
 //只有undefined和null没有包装类
 
-
 ``` 
 
 ## 原型
 ```javascript
-//原型是function对象的一个属性，它定义了 构造函数制造出的对象 的公共祖先。通过该 构造函数产生的对象 ，可以继承该原型的属性和方法，原型也是对象
+//原型(prototype)是function对象的一个属性，它定义了 构造函数制造出来的对象 的公共祖先。通过 该构造函数产生的对象，可以继承该构造函数原型的属性和方法。原型也是对象。利用原型特点和概念，可以提取共有属性。
 
-// 对象.prototype 原型
+//原型是 构造函数构造出来的对象 的共有祖先
 
-//原型用法
-//利用原型特点和概念，可以提取共有属性
+//构造函数.prototype 查看构造函数的原型
 
-Person.prototype
+function Person(){ }
 
-Person.prototype.constructor //指向构造函数
+Person.prototype //查看构造函数(Person)的原型
 
-function Person(){
+Person.prototype.constructor //原型里的constructor指向构造函数本身
 
-}
+var person1 = new Person() //使用Person构造函数，new一个person1对象
 
-var person1 = new Person();
-
-//获取对象的原型
-person1.__proto__ //Person.prototype
-
-
+person1.__proto__ //对象可通过(隐式属性 __proto__) 来查看原型。如这里对象(person1)通过隐式属性(__proto__)来查看原型，得到构造函数(Person)的原型(Person.prototype)
 
 
 
@@ -80,14 +73,11 @@ Object.prototype.__proto__ == null
 //通过Object.create(原型)方法，create括号里放的是对象的原型
 var obj = Object.create(null);//对象原型里设置成null，创建出来的obj对象是没有原型的
 
-
- 
-
 ```
 ## 继承
 ```javascript
 //继承第一种，原型链继承
-//缺点：继承了一些没有用的属性，如对象son不想继承Father方法内的name属性
+//缺点：继承了一些没有用的属性，如对象(son)不想继承Father方法内的name属性
 Grand.prototype.lastName = "Deng";
 function Grand(){}
 var grand = new Grand();
@@ -107,7 +97,8 @@ var son = new Son();
 
 
 //继承第二种，借用构造函数
-//缺点：不能继承 借用的构造函数 的原型
+//缺点：仅是借用(复制粘贴)其它构造函数里的属性，不能继承 其它构造函数 的原型。老师说，这种其实都不算继承。
+//缺点2：每次使用构造函数new对象时，会额外的在运行一下借用的构造函数。
 function Person(name,age,sex){
 	this.name = name;
 	this.age = age;
@@ -124,12 +115,12 @@ var student = new Student("wang",18,"男","一年级");
 
 
 
-//继承第三种，共享原型或共有原型（多个构造函数用一个原型）
-//缺点：不能随便改变原型，改完原型，继承该原型的构造函数或对象，很被动，有的构造函数需要改，有的构造函数不需要改
+//继承第三种，共享原型或共有原型（多个构造函数共用一个原型）
+//缺点：不能随便改变原型，改原型后，所有继承该原型的构造函数或对象，很被动。因为有的构造函数需要改，有的构造函数不需要改，所以很被动很尴。
 Father.prototype.lastName = "Deng";
 function Father(){};
 
-Son.prototype = Father.prototype;
+Son.prototype = Father.prototype; //Son 和 Father 共用一个原型
 function Son(){};
 var son = new Son();
 var father = new Father();
@@ -146,7 +137,7 @@ console.log(father.sex);//男
 
 
 
-//继承第四种，圣杯模式，主要是从第三种演变来的，优化了第三种不能随便改原型的问题
+//继承第四种，圣杯模式，由第三种演变来的，优化了第三种不能随便改原型的问题
 function inherit(Target,Origin){
 	function F(){};
 	F.prototype = Origin.prototype;
@@ -173,7 +164,6 @@ Son.prototype.sex = "男";
 console.log(father.sex);//undefined
 console.log(son.sex);//男
 //改变Son原型后，Father的原型不会收到影响，解决了第三种的问题
-
 
 
 ```
@@ -217,7 +207,7 @@ for(var key in obj){
 ```
 ## this
 ```javascript
-//1、函数预编译过程中（或理解函数默认环境里，this指向window） this --> window
+//1、函数预编译过程中 将 this --> window（或理解函数默认环境里，this指向window） 
 function test(){
 	var a = 123;
 	function b(){
@@ -236,16 +226,31 @@ console.log(this);
 //打印： Window {window: Window, self: Window, document: document, name: '', location: Location, …}
 
 
-//3、call/apply/bind 改变函数运行时this指向
+//3、call/apply/bind 可以改变 函数运行时 this指向
 
 
-//4、obj1.fun(); 这时fun()内的this指向obj1，或理解为：函数fun被对象obj1 “点调用”，则函数内的this指向调用这个函数的那个人。
+//4、obj1.fun(); 这时fun()内的this指向obj1。
+//或理解为，函数fun被对象obj1 “点调用”，则函数fun内的this就指向点调用这个函数的那个人。
+//或理解为，谁调用函数fun，则函数fun里的this就是谁。
 //除了call/apply/bind强制改this指向 和 对象点调用函数，其余任何情况，函数内this默认指向window。
+<script>
 
+var obj = {
+	a:function(){
+		console.log(this.name)
+	},
+	name:"abc"
+};
+var name = "global";
+var aFun = obj.a;
+obj.a(); //abc     //打印abc 是因为a方法在运行前的预编译阶段将a方法的this指向了对象obj，所以这里打印了obj里的name值
+aFun();  //global
+
+</script>
 
 
 ```
-## new构造函数，发生了啥
+## new构造函数时，发生了啥
 ```javascript
 function Person(){
 	this.name = "123";
