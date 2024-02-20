@@ -33,15 +33,15 @@ destroyed -> unmounted
 可以用这个来验证子传父时，验证数据是否正确
 
 5、脚手架创建项目命令变化 
-2版本：vue init webpack 项目名
-最新版：vue create 项目名
+脚手架2版本：vue init webpack 项目名
+脚手架最新版：vue create 项目名
 
 6、启动项目的命令发生变化
 npm run dev -> npm run serve
 
-7、脚手架项目 目录变化
+7、脚手架 项目目录变化
 static -> public
-删除了config，build配置脚手架文件，可用vue.config.js代替了
+删除了config，build配置脚手架文件，最新版用vue.config.js代替了
 
 8、vue3版本引用vue-router和vuex的创建方式发生变化
 vue3引用的vue-router创建是通过createRouter创建的，之前是直接new Router()
@@ -58,61 +58,43 @@ vue3引用的vuex创建是通过createStore创建的，之前是vuex.store方法
 ```
 ## MVVM设计模式
 ```
-MVVM是一种框架设计模式（软件架构模式），vue，react都是基于这种设计模式
+MVVM是一种软件设计模式，vue，react都是基于这种设计模式
 
-MVVM把 UI用户界面 与 业务逻辑 分开，这样开发者只需关注
-业务逻辑，不需要操作dom
+MVVM把 UI用户界面 与 业务逻辑 分开，这样开发者只需关注，业务逻辑，不需要操作dom
 
 MVVM 是 Model-View-ViewModel 的缩写
 
 Model 业务逻辑相关的数据对象
 View 视图层，负责将数据转化成UI展现出来
-ViewModel 是一个同步 View 和 Model 的对象
+ViewModel 是 Model 和 View 的连接器
 
 在MVVM架构下，View 和 Model 之间并没有直接的联系，
 而是通过 ViewModel 进行交互，
-Model 和 ViewModel 之间的交互是双向的， 
-因此 View 数据的变化会同步到 Model 中，
-而 Model 数据的变化也会立即反应到 View 上。
+ViewModel 负责将 Model 中的数据同步到 View，并将 View 中的用户交互操作同步到 Model。
 ```
 ## Vue响应式原理
 ```
-用 Object.defineProperty 方法赋予data里各个属性getter/setter来监听数据。当属性发生变动时 通知 订阅者 变化。
+通过Object.defineProperty()劫持数据属性的访问和修改，与 发布订阅者模式，实现数据的响应式更新。实现数据和视图之间的自动同步关系。这种机制大大简化了数据绑定和事件处理的代码量，提高了开发效率和代码可读性。
 
-Observer：数据监听器，能够对数据对象的所有属性进行监听，如有变动可拿到最新值并通知订阅者，内部采用Object.defineProperty的getter和Setter来实现的。
+在初始化阶段，Vue会遍历data中的所有属性，并使用Object.defineProperty()把这些属性全部转为getter/setter。
+在getter中，Vue会追踪依赖，即在组件渲染过程中，使用过的数据会被getter收集为依赖；
+在setter中，当数据变化时，会触发依赖的更新，即通知watcher重新渲染关联的组件。
 
-Compile：模板编译，它的作用对每个元素节点的指令和文本节点进行扫描和解析，根据指令模板替换数据，以及绑定相应的更新函数。
-
-Watcher：订阅者，作为连接Observer和Compile的桥梁，能够订阅并收到每个属性变动的通知，执行指令绑定的相应回调函数。
-
-Dep：消息订阅器，内部定义了一个数组，用来收集订阅者（Watcher），数据变动触发notify函数，再调用订阅者的update方法。
-
-当执行 new Vue() 时，Vue 就进入了初始化阶段，
-一方面 Vue 会遍历 data 选项中的属性，
-并用 Object.defineProperty 赋予它们 getter/setter，实现数据变化监听功能；
-另一方面，Vue 的指令编译器 Compile 对元素节点的指令进行扫描和解析，
-初始化视图，并订阅 Watcher 来更新视图， 
-此时 Wather 会将自己添加到消息订阅器中(Dep)，初始化完毕。
-当数据发生变化时，Observer 中的 setter 方法被触发，
-setter 会立即调用 Dep.notify()，
-Dep 开始遍历所有的订阅者，
-并调用订阅者的 update 方法，
-订阅者收到通知后对视图进行相应的更新。
+采用 数据劫持 结合 发布者-订阅者模式 的方式
+通过Object.defineProperty()来劫持监听data里各个属性的setter，getter，
+当数据发生变动时 通知 订阅者 变化。
 ```
 ## Vue双向数据绑定原理
 ```
-采用 数据劫持 结合 发布者-订阅者模式 的方式
-通过Object.defineProperty()来劫持data里各个属性的setter，getter，
-在数据变动时 发布消息 给 订阅者。
+Vue双向数据绑定原理基于 Vue响应式原理。
 
-如：当把一个普通js对象传给 Vue 实例来作为vue data 时，Vue 将遍历它的属性，
-用 Object.defineProperty 方法赋予data里各个属性getter/setter来监听数据。
-当属性发生变动时 通知 订阅者 变化。
+实现 数据变化自动同步到视图，视图变化自动更新到数据 的双向绑定。
 ```
-
-1、Object.defineProperty 方法会直接在一个对象上定义一个新属性，或者修改一个对象的现有属性，并返回此对象。
+## Object.defineProperty 和 Proxy
+1、Object.defineProperty
 ```javascript
 var obj = {}
+//当对象中不存在指定的属性时，可根据属性名，为对象创建一个新的属性
 Object.defineProperty(obj, "a", {
   set: function (newValue) {
     console.log("监听到给a赋值:" + newValue);
@@ -129,7 +111,7 @@ console.log(obj.a);//将触发get方法
 2、Proxy
 ```javascript
 var obj = {}
-//new一个Proxy然后返回一个代理对象
+//new一个Proxy，然后返回一个代理对象
 var proxyObj = new Proxy(obj,{
 	set:function(target,attr,value){
 		console.log('111');
@@ -140,9 +122,10 @@ var proxyObj = new Proxy(obj,{
 		return target[attr];
 	}
 })
-
 proxyObj.name = 123;//触发set方法
 console.log(proxyObj.name);//get方法
+obj.name = 456;//值可以修改，但不会触发set方法
+console.log(obj.name);//值可以获取，但不会触发get方法
 ```
 ## 设置npm镜像源地址
 ```
@@ -208,31 +191,27 @@ vue create 项目名称
 ## 脚手架2版本开发环境解决跨域问题
 1、修改项目“config/index.js”文件
 ```javascript
-'use strict'
-
-const path = require('path')
-
 module.exports = {
-  dev: {
-    // Paths
-    assetsSubDirectory: 'static',
-    assetsPublicPath: '/',
-    proxyTable: {
-      '/api': {							//匹配的路径								
-        target: "http://xxx.com",		//跨域的地址
-        changeOrigin: true,				//允许跨域
-        pathRewrite: {
-          '^/api': '/xpg'				//路径重写：请求地址'/api/abc'转化成'/xpg/abc'
-        }
-      }
-    },
-    //...
-  }
-  //...
+	dev: {
+		// Paths
+		assetsSubDirectory: 'static',
+		assetsPublicPath: '/',
+		proxyTable: {
+			'/api': {							       //匹配的路径								
+				target: "http://xxx.com",	 //跨域的地址
+				changeOrigin: true,				 //允许跨域
+				pathRewrite: {
+					'^/api': '/xpg'				   //路径重写：请求地址 /api/abc 转化成 /xpg/abc
+				}
+			}
+		},
+		//...
+	}
+	//...
 }
 ```
 ## 脚手架3或更高版本开发环境解决跨域问题
-1、最新版本脚手架不提供build、config等配置项目的文件夹，此版本用vue.config.js代替
+1、最新版本脚手架不提供build、config等项目配置文件，此版本用vue.config.js代替
 ```javascript
 module.exports = {
     publicPath: process.env.NODE_ENV === 'production'
@@ -575,15 +554,17 @@ const app = Vue.createApp({
     baseBoard //这里局部组件需要在这里绑定一下，才能使用。这里虽然是驼峰写法，但在html中使用时，需要转换成<base-board />这里因为在js变量中不能使用 “ - ”，html组件可以使用。这样做可以有个区分
   }
 })
-//全局组件，只要定义了，处处可以使用，性能不高，但是使用起来简单。为什么性能不高，全局组件就是你一旦定义了，就会占用系统资源，不管你用不用
 
+//全局组件，只要定义了，处处可以使用，性能不高，但是使用起来简单。为什么性能不高，全局组件就是你一旦定义了，就会占用系统资源，不管你用不用
 app.component('a1', {
   template: `<h1>我是全局组件</h1>`
 });
+
 //局部组件，定义了，不占资源。只有使用了才占资源
 const baseBoard = {
   template: `<div>局部组件</div>`
 };
+
 app.$mount('#app');//挂载vue3实例
 ```
 ## 组件单向数据流
@@ -1118,12 +1099,11 @@ const router = new Router({
       path: '/home',
       name: 'home',
       component: home,
-	  beforeEnter (to, from, next) {
-		//路由配置中增加钩子
-		//beforeEnter调用顺序是在beforeEach和beforeResolve之间
-		console.log(' app route before enter')
-	    next()
-	  }
+      //可以在路由配置中增加钩子函数，beforeEnter(路由独享守卫)
+      beforeEnter (to, from, next) {
+        // ...
+        next()
+      }
     },
     //跳转到index组件
     {
@@ -1134,13 +1114,15 @@ const router = new Router({
   ]
 })
 
-//1、全局路由前置守卫
-router.beforeEach((to, from, next) => {// 跳转前执行
-  console.log('to:');//要到哪里去
-  console.log(to);
+//路由钩子函数
+//1、全局前置守卫（跳转前执行）
+router.beforeEach((to, from, next) => {
+  console.log('to:',to);//要到哪里去
+  console.log('from:',from);//从什么地方来
 
-  console.log('from:');//从什么地方来
-  console.log(from);
+  //next() 与next(true)意思一样允许跳转
+  //next(true/false) false不允许跳转
+  //next('/another') 重定向到指定路由  
 
   if (to.path === '/index') {//当地址为/index时做处理
     if (to.query.id !== undefined) {
@@ -1155,20 +1137,42 @@ router.beforeEach((to, from, next) => {// 跳转前执行
   }
 })
 
-//2、全局路由解析守卫
+//2、全局解析守卫（执行在 beforeEach 与 afterEach 之间）
 router.beforeResolve((to, from, next) => {
   console.log('before resolve invoked')
   next()
 })
 
-
-//3、全局路由后置钩子
-router.afterEach((to, from) => { // 跳转后执行，不需要 next
+//3、全局后置守卫（跳转后执行）
+router.afterEach((to, from) => {
   console.log('after each invoked')
 })
 
 export default router
 
+//路由钩子函数分三大类：全局守卫、独享守卫，组件内守卫
+//路由钩子函数执行顺序：
+/*
+1、全局前置守卫(beforeEach(to,from,next))
+在跳转前调用
+
+2、路由独享的守卫(beforeEnter(to,from,next))
+在路由配置中单独定义，针对特定路由的导航守卫
+
+3、组件内的守卫1(beforeRouteEnter(to,from,next))
+在路由进入组件之前调用（此时组件实例尚未被创建，因此不能访问this）
+
+4、组件内的守卫2(beforeRouteUpdate(to,from,next))
+在当前路由改变，但是该组件被复用时调用。
+
+5、组件内的守卫3(beforeRouteLeave(to,from,next))
+导航离开该组件的对应路由时调用
+
+6、全局解析守卫(beforeResolve(to,from,next))
+
+7、全局后置守卫(afterEach(to,from))
+跳转后执行
+*/
 
 //vue3版本
 import { createRouter, createWebHashHistory } from 'vue-router'
@@ -1215,46 +1219,17 @@ createApp(App).use(router).mount('#app')
 ```javascript
 this.$router.push({"path":'/home'});//地址    /home
 
+this.$router.go(-1);//和JavaScript里的history.go(-1)功能基本一样
+
+this.$router.replace("/home");//跟 router.push 很像，不同的是，它不会向 history 添加新记录，而是跟它的方法名一样，会替换掉当前的 history 记录
+
 this.$router.push({"path":'/home',query:{"a","dad"}});//地址    /home?a=dad
+
+this.$router.push({"name":'index',params:{"id","dad"}});//地址    /home/dad   使用这种需要预先配置好，才能使用
 
 this.$route.query  //获取query里面传过来的值
 
-this.$router.go(-1);//和JavaScript里的history.go(-1)功能基本一样
-
-//跟 router.push 很像，唯一的不同就是，它不会向 history 添加新记录，而是跟它的方法名一样 —— 替换掉当前的 history 记录
-this.$router.replace("/home");
-
-this.$router.push({"name":'index',params:{"id","dad"}});//地址    /home/dad   ,使用这种需要预先配置好，才能使用
-
 this.$route.params  //获取params里面传过来的值
-```
-## 路由守卫触发流程
-```
-路由守卫触发的流程一般分为两类：
-
-1、是不同组件（组件A跳转到组件B）的路由跳转流程
-
-11 导航被触发（A–>B）
-22 调用A组件内路由守卫beforeRouteLeave(to,from,next)
-33 调用全局路由前置守卫router.beforeEach(to,from,next)
-44 调用B路由独享守卫 beforeEnter(to,from.next)
-55 解析异步路由组件B
-66 调用B的组件内路由守卫beforeRouteEnter(to,from,next)
-77 调用全局路由解析守卫 router.beforeResolve(to,from,next)
-88 导航被确认
-99 调用全局路由钩子router.afterEach(to,from)
-100 渲染B组件DOM
-
-
-2、是复用组件的路由跳转流程（组件A包含动态路由参数，只改变组件A的动态路由参数触发的路由跳转流程，示例： name/:id, 只改变id的值来触发路由跳转）
-
-11 导航被触发（改变动态路由参数）
-22 调用全局路由前置守卫 router.beforeEach(to,from,next)
-33 调用复用组件的组件内路由守卫 beforeRouteUpdate(to,from,next)
-44 调用全局路由解析守卫router.beforeResolve(to,from,next)
-55 导航被确认
-66 调用全局路由钩子 router,afterEach(to,from)
-77 更新DOM
 ```
 ## vuex使用
 1、在项目内创建一个文件夹store
@@ -1421,7 +1396,7 @@ keep-alive是vue内置的一个组件，而这个组件的作用就是能够缓�
 ```
 
 使用
-```
+```javascript
 vue3内使用keep-alive组件缓存
 
 //app.vue文件的配置
