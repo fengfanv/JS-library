@@ -10,6 +10,7 @@
 
 5、[node大文件分片上传（不使用第三方库）_file-upload](/node/file-upload)
 
+6、[node制作formdata数据并保存成文件_zipFile](/node/zipFile)
 
 搭建一个简单的http服务（和https服务）(不使用第三方库)
 

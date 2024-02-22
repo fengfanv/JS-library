@@ -129,7 +129,11 @@ console.log(obj.name);//值可以获取，但不会触发get方法
 ```
 ## 设置npm镜像源地址
 ```
-npm config set registry https://registry.npm.taobao.org   //设置npm镜像源地址
+https://registry.npmjs.org      npm官方镜像地址
+https://registry.npm.taobao.org 淘宝镜像地址(地址已失效)
+https://registry.npmmirror.com  国内最新镜像地址
+
+npm config set registry https://registry.npmmirror.com   //设置npm镜像源地址
 npm config get registry //获取npm镜像源地址
 ```
 ## 获取和设置npm全局 npm_cache地址
@@ -1636,6 +1640,9 @@ Vue.loading_main.showLoading(function (data) {
 #### vue里render渲染函数
 ```html
 内容待补充
+
+
+
 ```
 #### import与import()区别是什么
 ```

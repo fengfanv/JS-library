@@ -88,14 +88,7 @@ var d6:Date = new Date(year,month,day,hour,minute,second,ms);
 var d6:Date = new Date(2008,12,20,15,26,0,0);
 console.log(d6);//2009-01-20T07:26:00.000Z
 ```
-```javascript
-//元祖，可以理解为一种数组
-var x:[string,number]
-//赋值的时候需要参数的类型，对应声明时的类型
-//如:
-x=['字符串',2];//这样就ok
-x=[1,'字符串'];//没有对着声明时的类型的位置，所以报错
-```
+
 ### 类的使用
 ```javascript
 class renlei{
