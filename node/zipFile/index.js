@@ -37,7 +37,11 @@ var hashValue = randomStr16();
 var boundaryString = `------WebKitFormBoundary${hashValue}`;
 // console.log(boundaryString);
 
-var formDataStr = Buffer.from(`${boundaryString}\r\n`).toString('binary'); //formData数据开始
+//formData数据开始
+//受js字符串长度限制，这里最多只能压缩500MB的数据，如果需要保存的数据大于500MB，请分包处理。
+//这里使用node测试，保存的数据在510MB时能保存，保存的数据在514MB时不能保存。
+//MDN官网介绍字符串最大长度：https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/String/length
+var formDataStr = Buffer.from(`${boundaryString}\r\n`).toString('binary'); 
 
 //处理普通(key:value)数据
 for (let i = 0; i < keyValueArr.length; i++) {
@@ -56,7 +60,8 @@ for (let i = 0; i < filesArr.length; i++) {
     formDataStr += (startStr + itemFileData + endStr);
 }
 
-formDataStr = formDataStr.replace(/(\r\n)$/, `--`);//formData数据结束
+//formData数据结束
+formDataStr = formDataStr.replace(/(\r\n)$/, `--`);
 
 // console.log(formDataStr)
 /*制作formData数据 end*/
