@@ -134,7 +134,7 @@ create table `表名`(
 	`字段名` varchar(30) not null,
 	primary key (`id`)
 )charset=utf8;
-## auto_increment ==> 自增主键
+# auto_increment ==> 自增主键
 ```
 > 数据表插入数据
 ```
@@ -171,7 +171,7 @@ where id in (1,2,3);
 > 批量更新数据2
 ```
 replace into 表名 (id,dr) values (1,'2'),(2,'3'),…(x,'y');
-//此语句不是 想修改那个字段就放那个字段，使用这个语句时，需要把不要修改的字段和需要修改的字段都放上，就是要修改的这个表的所有字段都放在语句上，不放的话就该清除这个字段的值，或sql语句报错
+# 此语句不是 想修改那个字段就放那个字段，使用这个语句时，需要把不要修改的字段和需要修改的字段都放上，就是要修改的这个表的所有字段都放在语句上，不放的话就该清除这个字段的值，或sql语句报错
 ```
 > 删除数据表里数据
 ```
@@ -239,7 +239,7 @@ ALTER TABLE 表名 AUTO_INCREMENT=1；
 ```
 select [DISTINCT] [*,字段名或表达式 [AS 显示的名字]] from 表名;
 
-## DISTINCT 可选，指查询结果中，相同查询结果只显示一条
+# DISTINCT 可选，指查询结果中，相同查询结果只显示一条
 
 如:select 姓名,班级,语文成绩+数学成绩+英语成绩 AS 总分 from 成绩单
 如:select DISTINCT 专业 from 学籍;  结果为：某某专业，某某专业
@@ -308,5 +308,9 @@ select "20"+LEFT(学号,2) AS 入学年, AVG(入学成绩) from 学籍表 where 
 ```
 ### 修改mysql密码
 ```
-修改mysql密码（适用版本：5.7.11）：1、use mysql; //打开mysql库2、update user set authentication_string=password('123456') where user='root' and host='localhost'; //修改密码3、flush privileges; //刷新权限注意：如果按照上面的操作执行完之后密码没有变化，请尝试把host='localhost'中 'localhost' 改成 '%'
+修改mysql密码（适用版本：5.7.11）：
+1、use mysql; //打开mysql库
+2、update user set authentication_string=password('123456') where user='root' and host='localhost'; //修改密码
+3、flush privileges; //刷新权限
+注意：如果按照上面的操作执行完之后密码没有变化，请尝试把host='localhost'中 'localhost' 改成 '%'
 ```

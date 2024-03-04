@@ -4,7 +4,7 @@
 
 2、[多进程和多线程_processThread](/node/processThread)
 
-3、[创建HTTP服务（不使用第三方库）_createWebServer](/node/createWebServer)
+3、[创建HTTP服务（不使用第三方库）（使用CORS解决跨域问题）_createWebServer](/node/createWebServer)
 
 4、[node源码利用range头实现Mp4文件流播放（不使用第三方库）_video-stream](/node/video-stream)
 

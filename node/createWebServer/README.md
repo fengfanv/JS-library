@@ -1,6 +1,6 @@
-## 创建HTTP服务（不使用第三方库）
+## 创建HTTP服务（不使用第三方库）（使用CORS解决跨域问题）
 
-### 简单请求与复杂请求：
+### CORS的简单请求与复杂请求：
 - [跨域资源共享 CORS 详解 - 阮一峰](http://www.ruanyifeng.com/blog/2016/04/cors.html)
 - [JavaScript CORS通信 - W3Cschool](https://www.w3cschool.cn/javascript_guide/javascript_guide-z4jy26a3.html)
 
