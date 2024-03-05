@@ -14,6 +14,8 @@
 
 7、[node下载m3u8视频 node合并m3u8视频_nodeM3u8](/node/nodeM3u8)
 
+8、[m3u8视频播放器_m3u8VideoServer](/node/m3u8VideoServer)
+
 搭建一个简单的http服务（和https服务）(不使用第三方库)
 
 node控制资源下载速度(不使用第三方库)

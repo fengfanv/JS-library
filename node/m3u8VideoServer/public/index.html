@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        ul,
+        li {
+            list-style: none;
+        }
+
+        li {
+            box-sizing: border-box;
+            border-bottom: 1px solid #ccc;
+            padding: 12px 12px;
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+        .typeicon {
+            padding: 0 5px;
+            color: white;
+            border-radius: 1px;
+        }
+
+        .m3u8 {
+            background: #1E90FF;
+        }
+
+        .mp4 {
+            background: #9400D3;
+        }
+
+        .other {
+            background: #FFD700;
+        }
+
+        #videoTitle {
+            width: 100%;
+            height: 30px;
+            line-height: 30px;
+            white-space: nowrap;
+            /*字体不换行*/
+            text-overflow: ellipsis;
+            /*超出自动加小点*/
+            overflow: hidden;
+        }
+
+        #video {
+            width: 100%;
+            height: 200px;
+        }
+
+        #list {
+            width: 100%;
+            /*height: calc(100vh - 200px - 30px - 10px);*/
+	height:100%;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+
+<body>
+<!--
+    <h5 id="videoTitle">标题</h5>
+    <video id="video" controls="controls" width="100%">
+        <source id="video" src="" type="application/x-mpegURL">
+    </video>
+-->
+    <ul id="list"></ul>
+
+    <script src="./jquery.js"></script>
+    <script>
+
+        $.ajax({
+            "type": "get",
+            "url": "/api/getfiles",
+            success: function (res) {
+                console.log(res)
+                if (res.data) {
+                    let len = res.data.length;
+                    for (let i = 0; i < len; i++) {
+
+                        let name = res.data[i].name.replace(/_.+$/, '');
+                        let typeicon = "";
+                        if (/.m3u8$/.test(res.data[i].name)) {
+                            console.log(i, '.m3u8');
+                            typeicon = `<span class='typeicon m3u8'>m3u8</span>`
+                        } else if (/.mp4$/.test(res.data[i].name)) {
+                            console.log(i, '.mp4');
+                            typeicon = `<span class='typeicon mp4'>mp4</span>`
+                        } else {
+                            console.log(i, '其它文件');
+                            typeicon = `<span class='typeicon other'>other</span>`
+                        }
+
+                        $('#list').append(`<li><a href="javascript:openvideo('/api/getvideo?path=${res.data[i].path}','${res.data[i].name}','${i + 1}');">
+                            <p>${(i + 1)}</p>
+                            <p>${name}</p>
+                            <p>${typeicon}</p>
+                        </a></li>`);
+                    }
+                }
+            },
+            error: function () {
+                alert('请求接口失败！');
+            }
+        })
+
+        function openvideo(url, name, index) {
+            console.log(url);
+           // $('#videoTitle').html(index + '、' + name);
+            //$('#video').attr('src', url);
+
+            location.href = './video.html?'+encodeURIComponent('title='+name+'&index='+index+'&url='+url);
+        }
+
+    </script>
+</body>
+
+</html>
