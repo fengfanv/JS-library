@@ -1,5 +1,5 @@
 // 合并手机下载好的m3u8视频
-// 需要配合videoServer使用
+// 需要配合 m3u8VideoServer 使用
 
 const fs = require('fs');
 const path = require('path');
@@ -8,7 +8,7 @@ const child_process = require('child_process');
 //获取文件目录
 let arr = [];//文件列表
 let arr2 = [];//文件夹列表
-let filesPath = path.join(__dirname, '/videoServer/public/cacheFiles/');
+let filesPath = path.join(__dirname, '/m3u8VideoServer/public/cacheFiles/');
 fs.readdirSync(filesPath).forEach(function (file) {
     var pathname = path.join(filesPath, file);
     if (fs.statSync(pathname).isDirectory()) {

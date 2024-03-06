@@ -109,7 +109,25 @@ let outputFilePath = path.join(__dirname, 'public', 'output.mp4');
 // // 合并方式2 start
 
 
-
+/*
+ffmpeg 命令其它用途：
+ffmpeg 命令可以 去掉视频中的音频
+ffmpeg 命令可以 提取视频中的音频
+ffmpeg 命令可以 音 视频 合成
+ffmpeg 命令可以 剪切视频
+ffmpeg 命令可以 视频截图
+ffmpeg 命令可以 视频分解为图片
+ffmpeg 命令可以 将图片合成视频
+ffmpeg 命令可以 视频拼接(合并多个视频)
+ffmpeg 命令可以 将视频转为gif
+ffmpeg 命令可以 将视频前30帧转为gif
+ffmpeg 命令可以 旋转视频
+ffmpeg 命令可以 缩放视频
+ffmpeg 命令可以 视频变速
+ffmpeg 命令可以 音频变速
+ffmpeg 命令可以 视频添加水印
+等等...
+*/
 
 
 //提取m3u8文件里的ts文件地址

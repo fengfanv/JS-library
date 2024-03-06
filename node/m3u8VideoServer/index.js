@@ -1,3 +1,6 @@
+//播放手机下载的m3u8视频
+//请将手机下载的m3u8视频放在 ./public/cacheFiles/ 内 
+
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
