@@ -16,6 +16,8 @@
 
 8、[m3u8视频播放器_m3u8VideoServer](/node/m3u8VideoServer)
 
+9、[node源码获取MP4时长信息_getMp4Info.js](/node/getMp4Info.js)
+
 搭建一个简单的http服务（和https服务）(不使用第三方库)
 
 node控制资源下载速度(不使用第三方库)
