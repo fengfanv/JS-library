@@ -2,7 +2,7 @@
 
 Buffer 的结构和数组很像，操作的方法也和数组类似，数组中不能存储二进制文件，而 Buffer 就是专门用来存储二进制数据的
 
-Buffer 中存储的是二进制数据，但是在显示时，是以16进制的形式显示的（因为二进制显示的太长了，不方便显示，所以用16进制的形式来显示）
+Buffer 中存储的是**二进制数据**，但是在显示时，是以16进制的形式显示的（因为二进制显示的太长了，不方便显示，所以用16进制的形式来显示）
 
 Buffer 中每个元素的范围是从 (16进制 ( 00-ff )) (即10进制 ( 0-255 )) (即2进制 ( 00000000-11111111 ))
 
@@ -66,6 +66,44 @@ buff[0] = 0x68;//英文字母 h
 buff[1] = 0x65;//英文字母 e
 console.log(buff.toString());//he
 console.log(buff.toString('utf-8'));//he
+```
+
+### Buffer.from(string[, encoding])
+```javascript
+/*
+string <string> 要编码的字符串。
+encoding <string> string 的编码。 默认值: 'utf8'。
+*/
+
+var buf1 = Buffer.from('this is a test');
+var buf2 = Buffer.from('7468697320697320612074657374', 'hex');
+
+console.log(buf1.toString());//this is a test
+console.log(buf2.toString());//this is a test
+
+console.log(buf1.toString('hex'));//7468697320697320612074657374
+
+/*
+参考链接：
+https://nodejs.cn/api/buffer/static_method_buffer_from_string_encoding.html
+*/
+```
+
+### Buffer与文件
+```javascript
+var fs = require('fs');
+var path = require('path');
+
+var buf1 = Buffer.from('hello康');
+console.log(buf1.length);//     8个字节     5+3=8
+
+var filePath = path.join(__dirname,'test.test');
+
+fs.writeFileSync(filePath,buf1);
+
+let fileInfo = fs.statSync(filePath);//获取文件信息
+
+console.log(fileInfo.size);//8      文件8个字节大小
 ```
 
 #### 参考链接：
