@@ -1,130 +1,101 @@
 var fs = require('fs');
 var path = require('path');
 
-/*
-zipFile_v2版本，相较于上一个版本，
-v2版本解决了，上一个版本，受字符串长度限制，最多只能保存500MB左右的数据的问题。
-v2版本修复了，因为randomStr16的bug导致，边界字符串长度有时可能超过40的问题。
 
-使用提示：
-保存1000个以上文件，保存时间可能会有点长，请耐心等待。
-*/
-
-
-/*制作formData数据 start*/
-
-//formData普通key:value数据
-var keyValueArr = [
-    {
-        key: "a1",
-        value: '1234'
+//压缩FormData二进制文件
+exports.zipFile = function (keyValueArr, filesArr, zipFilePath, callback) {
+    //keyValueArr formData普通key:value数据
+    // keyValueArr = [
+    //     {
+    //         key: "a1",
+    //         value: '1234'
+    //     },
+    //     ...
+    // ]
+    //filesArr    formData文件数据
+    // filesArr = [
+    //     {
+    //         fileName: "xxx.mp3",
+    //         filePath: "c:/xxx/xxx/xxx.mp3"
+    //     },
+    //     {
+    //         fileName: "xxx/xxx.mp3",
+    //         filePath: "c:/xxx/xxx/xxx.mp3"
+    //     },
+    //     ...
+    // ]
+    //zipFilePath  压缩的二进制文件保存地址 C:\\merkan\\aaa\\xxxx.ext
+    //callback     回调函数
+    if (Array.isArray(keyValueArr) == false) {
+        keyValueArr = [];
     }
-];
 
-//formData文件数据
-var dirArr = ['C:', 'Users', 'merka', 'Desktop', '测试容器'];//文件夹地址。会将文件夹内的所有文件读取成formdata数据。这里会将“测试容器”内的所有文件保存成formdata数据。注意：这里被保存的文件路径不包含“测试容器”这一级。
-var dir = dirArr.join(path.sep);
-var filesArr = [];
-scan(dir, function (fileDir) {
-    // console.log(fileDir)
-    var fileDirObj = path.parse(fileDir)
-    // console.log(fileDirObj)
-    var fileDirArr = fileDirObj.dir.split(path.sep)
-    fileDirArr.push(fileDirObj.base)
-    // console.log(fileDirArr)
-    fileDirObj.fileDirArr = fileDirArr
-    fileDirObj.fileArr = fileDirArr.slice(dirArr.length, fileDirArr.length)
-    // console.log(fileDirObj)
-    filesArr.push(fileDirObj)
-})
-// console.log(filesArr)
-
-
-
-//hash值
-var hashValue = randomStr16();
-
-//边界字符串
-var boundaryString = `------WebKitFormBoundary${hashValue}`;
-
-//formData数据开始
-var formDataBuff = Buffer.from(`${boundaryString}\r\n`);
-
-//处理普通(key:value)数据
-for (let i = 0; i < keyValueArr.length; i++) {
-    let item = keyValueArr[i];
-    let itemBuff = Buffer.from(`Content-Disposition: form-data; name="${item.key}"\r\n\r\n${item.value}\r\n${boundaryString}\r\n`);
-    formDataBuff = Buffer.concat([formDataBuff, itemBuff], formDataBuff.length + itemBuff.length);
-}
-
-//处理文件类数据
-for (let i = 0; i < filesArr.length; i++) {
-    let item = filesArr[i];
-    let itemFileName = item.fileArr.join('/');
-    let itemFilePath = item.fileDirArr.join('/');
-    let itemFileData = fs.readFileSync(itemFilePath);
-    let startBuff = Buffer.from(`Content-Disposition: form-data; name="files${i}"; filename="${itemFileName}"\r\nContent-Type: ${'none'}\r\n\r\n`);
-    let endBuff = Buffer.from(`\r\n${boundaryString}\r\n`);
-    formDataBuff = Buffer.concat([formDataBuff, startBuff, itemFileData, endBuff], formDataBuff.length + startBuff.length + itemFileData.length + endBuff.length);
-}
-
-//formData数据结束
-//将formdata尾部\r\n替换成--
-let tempFormDataBuff = Buffer.alloc(formDataBuff.length - 2);
-formDataBuff.copy(tempFormDataBuff, 0, 0, formDataBuff.length - 2);//将formDataBuff内的0至formDataBuff.length-2的数据复制到tempFormDataBuff中
-let formDataEndBuff = Buffer.from('--');
-formDataBuff = Buffer.concat([tempFormDataBuff, formDataEndBuff], tempFormDataBuff.length + formDataEndBuff.length);
-
-/*制作formData数据 end*/
-
-
-
-
-// parseFormData(formDataBuff,path.join(__dirname,"测试容器2")).then((res)=>{
-//     console.log('res',res)
-// })
-
-
-// //将formdata数据保存成二进制文件
-// saveFile(path.join(__dirname, 'wenjianming.k99'), formDataBuff).then((resPath) => {
-//     console.log('k99文件保存成功', resPath)
-
-//     //读取解析formdata二进制文件
-//     let fileData = fs.readFileSync(resPath)
-//     parseFormData(fileData, path.join(__dirname,"测试容器2"))
-
-// }).catch((err) => {
-//     console.log('k99文件保存失败')
-// })
-
-
-
-
-//扫描文件夹内所有文件
-function scan(dir, callback) {
-    fs.readdirSync(dir).forEach(function (file) {
-        var pathname = path.join(dir, file);
-        if (fs.statSync(pathname).isDirectory()) {
-            //fs.statSync(pathname).isDirectory()检查是否是目录
-            scan(pathname, callback);
-        } else {
-            callback(pathname);
-        }
-    });
-}
-
-//生成随机字符串16位
-function randomStr16() {
-    let chars = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];
-    let nums = "";
-    for (let i = 0; i < 16; i++) {
-        let index = Math.round(Math.random() * chars.length);
-        if (index < 0 || index >= chars.length) {
-            index = 0;
-        }
-        nums += chars[index];
+    if (Array.isArray(filesArr) == false) {
+        filesArr = [];
     }
-    return nums;
+
+    if (!zipFilePath) {
+        return false;
+    }
+
+    /*制作formData数据 strat*/
+
+    //hash值
+    var hashValue = randomStr16();
+
+    //边界字符串
+    var boundaryString = `------WebKitFormBoundary${hashValue}`;
+
+    //formData数据开始
+    var formDataBuff = Buffer.from(`${boundaryString}\r\n`);
+
+    //处理普通(key:value)数据
+    for (let i = 0; i < keyValueArr.length; i++) {
+        let item = keyValueArr[i];
+        let itemBuff = Buffer.from(`Content-Disposition: form-data; name="${item.key}"\r\n\r\n${item.value}\r\n${boundaryString}\r\n`);
+        formDataBuff = Buffer.concat([formDataBuff, itemBuff], formDataBuff.length + itemBuff.length);
+    }
+
+    //处理文件类数据
+    for (let i = 0; i < filesArr.length; i++) {
+        let item = filesArr[i];
+        let itemFileName = item.fileName;
+        let itemFilePath = item.filePath;
+        let itemFileData = fs.readFileSync(itemFilePath);
+        let startBuff = Buffer.from(`Content-Disposition: form-data; name="files${i}"; filename="${itemFileName}"\r\nContent-Type: ${'none'}\r\n\r\n`);
+        let endBuff = Buffer.from(`\r\n${boundaryString}\r\n`);
+        formDataBuff = Buffer.concat([formDataBuff, startBuff, itemFileData, endBuff], formDataBuff.length + startBuff.length + itemFileData.length + endBuff.length);
+    }
+
+    //formData数据结束
+    //将formdata尾部\r\n替换成--
+    let tempFormDataBuff = Buffer.alloc(formDataBuff.length - 2);
+    formDataBuff.copy(tempFormDataBuff, 0, 0, formDataBuff.length - 2);//将formDataBuff内的0至formDataBuff.length-2的数据复制到tempFormDataBuff中
+    let formDataEndBuff = Buffer.from('--');
+    formDataBuff = Buffer.concat([tempFormDataBuff, formDataEndBuff], tempFormDataBuff.length + formDataEndBuff.length);
+
+    /*制作formData数据 end*/
+
+    //二进制数据保存成文件
+    saveFile(zipFilePath, formDataBuff).then((resPath) => {
+        callback && callback(null, resPath);
+    }).catch((err) => {
+        callback && callback(err);
+    })
+}
+
+
+//读取解析FormData文件
+exports.parseZipFile = function (zipFilePath, parseToDir, callback) {
+    //zipFilePath  压缩的二进制FormData文件地址 C:\\merkan\\aaa\\xxxx.ext
+    //parseToDir   压缩文件，解压到哪里，解压到那个文件夹下 C:\\merkan\\aaa
+    //callback     回调函数
+
+    let fileData = fs.readFileSync(zipFilePath)
+    parseFormData(fileData, parseToDir).then((res) => {
+        callback && callback(res)
+    })
+
 }
 
 
@@ -153,26 +124,26 @@ function parseFormData(formdataBuff, storageFilePath) {
         var isLoop = true;
         var start_position = 0;
         while (isLoop) {
-            let index = postData.indexOf(boundaryStringBuff,start_position);
-            if(index!=-1){
+            let index = postData.indexOf(boundaryStringBuff, start_position);
+            if (index != -1) {
                 boundaryStringIndexArr.push(index);
-                //start_position=index+40;
+                // start_position = index + 40;
                 start_position = index + boundaryStringLen;//这里把40改成boundaryStringLen，是因为边界字符串因为之前randomStr16的bug，可能会导致边界字符串长度大于40，所以才改成这样。
-            }else{
-                start_position+=1;
+            } else {
+                start_position += 1;
             }
-            if(start_position>postData.length){
+            if (start_position > postData.length) {
                 isLoop = false;
             }
         }
         // console.log('boundaryStringIndexArr',boundaryStringIndexArr);
-        if(boundaryStringIndexArr.length>1){
+        if (boundaryStringIndexArr.length > 1) {
             //已知，如果formdata里有数据，则边界字符串至少有2个以上
             //formdata里不包含数据时，是这个样子(------WebKitFormBoundaryk6lbnizWoclsvxPJ--)，仅存在一个边界字符串。
-            for(let i=0;i<boundaryStringIndexArr.length-1;i++){
+            for (let i = 0; i < boundaryStringIndexArr.length - 1; i++) {
                 let start = boundaryStringIndexArr[i];
-                let end = boundaryStringIndexArr[i+1];
-                let itemSize = end-start;
+                let end = boundaryStringIndexArr[i + 1];
+                let itemSize = end - start;
                 let itemBuff = Buffer.alloc(itemSize);
                 postData.copy(itemBuff, 0, start, end);//将postData里start位置到end位置的数据，复制到itemBuff中。
                 dataArr.push(itemBuff);
@@ -194,10 +165,10 @@ function parseFormData(formdataBuff, storageFilePath) {
 
         //3、分析分割后的数据，把formdata中每一个参数的数据状态信息(数据名称、数据类型等)和数据本体提取出来
         var dataBody = {}; //dataBody是用来存放，formdata里每条数据的状态信息和数据体
-        if(dataArr.length == 0){
+        if (dataArr.length == 0) {
             //没有数据，直接返回
             resolve(dataBody);
-        }else{
+        } else {
             //有数据，则开始分析formdata里每条数据
             eachArr(0);
         }
@@ -215,8 +186,8 @@ function parseFormData(formdataBuff, storageFilePath) {
 
             //首先清除formdata每条数据 首部的(边界字符串和\r\n)(------WebKitFormBoundarywoc0ZgNQ2b4ntunb\r\n)
             //然后再清除formdata每条数据 尾部的(\r\n)
-            //var valueData = Buffer.alloc(item.length-(40+2)-2);//(40+2)是首部边界字符串和\r\n的长度。2是尾部\r\n的长度。//console.log(Buffer.from(`\r\n`).length)//2
-            //item.copy(valueData,0,(40+2),item.length-2);//提取去除了(首部边界字符串及\r\n)和(尾部\r\n)后的数据。
+            // var valueData = Buffer.alloc(item.length - (40+2) - 2);//(40+2)是首部边界字符串和\r\n的长度。2是尾部\r\n的长度。//console.log(Buffer.from(`\r\n`).length)//2
+            // item.copy(valueData, 0, (40+2), item.length - 2);//提取去除了(首部边界字符串及\r\n)和(尾部\r\n)后的数据。
             var valueData = Buffer.alloc(item.length - (boundaryStringLen+2) - 2);//这里把(40+2)改成(boundaryStringLen+2)，是因为边界字符串因为之前randomStr16的bug，可能会导致边界字符串长度大于40，所以才改成这样。
             item.copy(valueData, 0, (boundaryStringLen+2), item.length - 2);
 
@@ -224,10 +195,10 @@ function parseFormData(formdataBuff, storageFilePath) {
             //将每条数据的 数据状态信息(数据名称、数据类型等) 和 数据值本体 分离开来
             //数据状态信息 与 数据值本体 之间通过 \r\n\r\n 分隔开来
             var fenGeFuIndex = valueData.indexOf(Buffer.from('\r\n\r\n'));//获取分隔符(\r\n\r\n)坐标位置
-            var valueDataHeader = Buffer.alloc(fenGeFuIndex-0);//数据状态信息(数据名称、数据类型等)
-            valueData.copy(valueDataHeader,0,0,fenGeFuIndex);
-            var valueDataSelf = Buffer.alloc(valueData.length-fenGeFuIndex-4);//数据值本体    (valueData.length-fenGeFuIndex是减去(数据状态信息)的大小)(又减4是减去分隔符(\r\n\r\n)的大小)
-            valueData.copy(valueDataSelf,0,fenGeFuIndex+4,valueData.length);
+            var valueDataHeader = Buffer.alloc(fenGeFuIndex - 0);//数据状态信息(数据名称、数据类型等)
+            valueData.copy(valueDataHeader, 0, 0, fenGeFuIndex);
+            var valueDataSelf = Buffer.alloc(valueData.length - fenGeFuIndex - 4);//数据值本体    (valueData.length-fenGeFuIndex是减去(数据状态信息)的大小)(又减4是减去分隔符(\r\n\r\n)的大小)
+            valueData.copy(valueDataSelf, 0, fenGeFuIndex + 4, valueData.length);
 
 
             //解析每条数据的 数据状态信息
@@ -252,7 +223,6 @@ function parseFormData(formdataBuff, storageFilePath) {
                     param[paramArrItemkey] = paramArrItemvalue;
                 }
             }
-
 
             //根据提取的 数据状态信息，处理 数据本体
             if (typeof param['Content-Type'] != 'undefined') {
@@ -353,6 +323,33 @@ function parseFormData(formdataBuff, storageFilePath) {
 }
 
 
+//扫描文件夹内所有文件
+function scan(dir, callback) {
+    fs.readdirSync(dir).forEach(function (file) {
+        var pathname = path.join(dir, file);
+        if (fs.statSync(pathname).isDirectory()) {
+            //fs.statSync(pathname).isDirectory()检查是否是目录
+            scan(pathname, callback);
+        } else {
+            callback(pathname);
+        }
+    });
+}
+
+//生成随机字符串16位
+function randomStr16() {
+    let chars = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];
+    let nums = "";
+    for (let i = 0; i < 16; i++) {
+        let index = Math.round(Math.random() * chars.length);
+        if (index < 0 || index >= chars.length) {
+            index = 0;
+        }
+        nums += chars[index];
+    }
+    return nums;
+}
+
 //保存文件
 function saveFile(path, data) {
     return new Promise((resolve, reject) => {
@@ -362,15 +359,14 @@ function saveFile(path, data) {
         writerStream.end();//标记文件末尾
 
         writerStream.on('finish', function () {
-            //finish 写入文件结束
-            console.log('保存文件成功', path);
+            // finish 写入文件结束
+            // console.log('保存文件成功', path);
             resolve(path)
         });
         writerStream.on('error', function (err) {
-            console.log('保存文件失败', path, err);
+            // console.log('保存文件失败', path, err);
             // console.log(err.stack);
             reject(err)
         });
     })
 }
-

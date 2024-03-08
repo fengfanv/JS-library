@@ -39,8 +39,8 @@ fileArr.sort((a, b) => a.fileSize - b.fileSize);
 // console.log(fileArr)
 
 //文件分组，将多个小于500MB的文件，组装成一个大约500MB的文件
-// var maxSize = 500 * 1024 * 1024;//最大500MB，500MB转字节是524288000
-var maxSize = 500 * 1000 * 1000;
+var maxSize = 500 * 1024 * 1024;//最大500MB，500MB转字节是524288000
+// var maxSize = 500 * 1000 * 1000;
 let groupArr = [
     // [
     //     {fileName:xxx,filePath:xxx,fileSize:xxx},
@@ -293,5 +293,5 @@ function scan(dir, callback) {
 // 第130分组，1个文件，压缩成功，压缩文件名是1709715412570_130.fdco
 // 第131分组，1个文件，压缩成功，压缩文件名是1709715417165_131.fdco
 // 第132分组，1个文件，压缩成功，压缩文件名是1709715421595_132.fdco
-
+// 第133分组，1个文件，压缩成功，压缩文件名是1709715421595_133.fdco
 
