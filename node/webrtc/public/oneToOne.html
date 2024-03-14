@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebRTC</title>
+    <style>
+        .video_box {
+            width: 100%;
+            height: auto;
+
+        }
+
+        .video_box video {
+            width: 200px;
+            background-color: black;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="local" class="video_box">
+        <p>本地</p>
+        <video autoplay controls></video>
+    </div>
+    <hr>
+    <div id="remote" class="video_box">
+        <p>远端</p>
+        <video autoplay controls></video>
+    </div>
+    <hr>
+    <input type="text" id="remoteUser">
+    <button id="call">呼叫</button>
+
+    <script src="./vconsole.min.js"></script>
+    <script>
+        var vConsole = new window.VConsole();
+
+        var localVideo = document.querySelector('#local video');
+        var remoteVideo = document.querySelector('#remote video');
+
+        var remoteUser = null;//远端用户编号，如，270
+
+        //初始化，本地，你自己
+        var self = Math.random().toString().split('.')[1].slice(3, 6);//你的编号，如，270
+        document.querySelector('#local p').innerHTML = `本地（${self}）`;
+        var selfIdentity = 'offer';//你本地是 发起方(offer) 还是 应答方(answer)
+
+        var peer = null;
+        setTimeout(() => {
+            !RTCPeerConnection && alert('浏览器不支持WebRTC！');
+            peer = new RTCPeerConnection();
+            // peer = new RTCPeerConnection({ "iceServers": [{ "url": "stun:stun.l.google.com:19302" }] });
+            // peer = new RTCPeerConnection({ "iceServers": [{ "url": "stun:stun.voxgratia.org" }] });
+
+            navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+                .then(function (stream) {
+                    localVideo.srcObject = stream;
+                    if (peer.addStream) {
+                        peer.addStream(stream);
+                    } else {
+                        //兼容苹果
+                        stream.getTracks().forEach(function (track) {
+                            peer.addTrack(track, stream);
+                        })
+                    }
+                })
+
+
+
+            //ice
+            peer.addEventListener('icecandidate', function (e) {
+                if (e.candidate) {
+                    console.log('搜集并发送候选人!');
+                    ws.send(JSON.stringify({
+                        data: JSON.stringify({
+                            type: `${selfIdentity}_ice`,
+                            iceCandidate: e.candidate
+                        }),
+                        from: self,
+                        to: remoteUser
+                    }));
+                } else {
+                    console.log('候选人收集完成！');
+                }
+            })
+            peer.addEventListener("icegatheringstatechange", function (e) {
+                switch (peer.iceGatheringState) {
+                    case "new":
+                        console.log('ice 采集刚刚开始或已重置');
+                        break;
+                    case "gathering":
+                        console.log('ice 采集已开始或正在进行');
+                        break;
+                    case "complete":
+                        console.log('ice 采集已经结束');
+                        break;
+                }
+            })
+            peer.addEventListener("icecandidateerror", function (e) {
+                console.log('ice 采集错误', e);
+            })
+
+
+            peer.addEventListener('addstream', function (e) {
+                if (e) {
+                    console.log('addstream 收到远端用户音视频流数据');
+                    remoteVideo.srcObject = e.stream;
+                }
+            })
+            peer.addEventListener('track', function (e) {//兼容苹果
+                if (e && e.streams) {
+                    console.log('track 收到远端用户音视频流数据');
+                    remoteVideo.srcObject = e.streams[0];
+                }
+            })
+        })
+
+        //------------------------------------------------------------------------------
+        //------------------------------------------------------------------------------
+        //------------------------------------------------------------------------------
+
+        //呼叫远端用户
+        document.getElementById('call').onclick = function () {
+            remoteUser = document.getElementById('remoteUser').value || '';
+            if (!remoteUser) {
+                return alert('请输入远端用户！');
+            }
+
+            createSDP();
+        }
+
+        //------------------------------------------------------------------------------
+        //------------------------------------------------------------------------------
+        //------------------------------------------------------------------------------
+
+        //创建ws服务
+        var ws = new WebSocket(`wss://${location.hostname}:3000?user=${self}`);
+
+        ws.onopen = function () {
+            console.log("websocket连接成功！");
+        }
+        ws.onclose = function () {
+            console.log("websocket连接关闭！");
+        }
+        ws.onerror = function (e) {
+            console.log("websocket连接发生错误！");
+        }
+        ws.onmessage = function (res) {
+            console.log("接收到服务端发来的消息！", JSON.parse(res.data));
+
+            let { data, from, to, } = JSON.parse(res.data);
+
+            let { type, sdp, iceCandidate } = JSON.parse(data);
+
+            remoteUser = from;
+
+            if (type === 'answer') {
+                peer.setRemoteDescription(new RTCSessionDescription({ type, sdp }));
+            } else if (type === 'answer_ice') {
+                peer.addIceCandidate(new RTCIceCandidate(iceCandidate));
+            } else if (type === 'offer') {
+                createSDP(new RTCSessionDescription({ type, sdp }));
+            } else if (type === 'offer_ice') {
+                peer.addIceCandidate(new RTCIceCandidate(iceCandidate));
+            }
+        }
+
+        // ws.close();  //关闭ws连接
+
+        // ws.send('string');   //给服务端发消息
+
+        //------------------------------------------------------------------------------
+        //------------------------------------------------------------------------------
+        //------------------------------------------------------------------------------
+
+        async function createSDP(offerSDP) {
+            if (!offerSDP) {
+                selfIdentity = 'offer';
+
+                console.log('创建本地SDP');
+                const offer = await peer.createOffer();
+                await peer.setLocalDescription(new RTCSessionDescription(offer));
+
+                console.log(`传输发起方本地SDP`);
+                ws.send(JSON.stringify({
+                    data: JSON.stringify(offer),
+                    from: self,
+                    to: remoteUser
+                }));
+
+            } else {
+                selfIdentity = 'answer';
+
+                console.log('接收到发送方SDP');
+                await peer.setRemoteDescription(offerSDP);
+
+                console.log('创建接收方（应答）SDP');
+                const answer = await peer.createAnswer();
+
+                await peer.setLocalDescription(new RTCSessionDescription(answer));
+
+                console.log(`传输接收方（应答）SDP`);
+                ws.send(JSON.stringify({
+                    data: JSON.stringify(answer),
+                    from: self,
+                    to: remoteUser
+                }));
+            }
+        }
+    </script>
+</body>
+
+</html>
