@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>录视频</title>
+    <style>
+        video {
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- 预览 -->
+    <video autoplay controls></video>
+
+    <button id="start">录制</button>
+    <button id="end">结束录制</button>
+
+    <script>
+
+        //使用navigator.mediaDevices.getUserMedia()方法来获取摄像头媒体流。然后，使用 MediaRecorder 对象将媒体流录制为视频文件。
+        let media_stream = null;
+        navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then(function (stream) {
+            console.log("stream", stream);
+            media_stream = stream;
+            document.querySelector("video").srcObject = stream;
+        })
+
+        let mediaRecorder = null;
+        document.querySelector("#start").addEventListener("click", function () {
+
+            //MediaRecorder.isTypeSupported(mimeTypeValue) 查看当前环境所支持的屏幕录制文件类型 
+
+            //创建一个媒体录制实例
+            mediaRecorder = new MediaRecorder(media_stream, {
+                mimeType: "video/webm"
+            });
+
+            let chunks = [];
+
+            mediaRecorder.addEventListener("dataavailable", function (e) {
+                //停止录制 的时候 会先触发 dataavailable 事件 然后触发 stop 事件
+                chunks.push(e.data);
+            });
+
+            mediaRecorder.addEventListener("stop", function () {
+                //停止录制 的时候 会先触发 dataavailable 的事件 然后触发 stop 事件
+
+                let blob = new Blob(chunks, {
+                    type: chunks[0].type,
+                });
+
+                // 获取 可用的 url
+                let url = URL.createObjectURL(blob);
+
+                // 下载
+                let a = document.createElement("a");
+                a.href = url;
+                a.download = "video.webm";
+                a.click();
+            });
+
+            // 开始录制
+            mediaRecorder.start();
+        });
+
+        document.querySelector("#end").addEventListener("click", function () {
+            //结束录制
+            mediaRecorder && mediaRecorder.stop();
+        });
+    </script>
+
+</body>
+
+</html>
+
+<!--
+参考链接：
+
+https://juejin.cn/post/7052289456455286821
+
+https://juejin.cn/post/7293462197386592283
+
+-->

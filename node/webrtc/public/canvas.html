@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>canvas to video</title>
+</head>
+
+<body>
+    <!--
+        在线教育类的产品中经常会遇到的一个场景就是实时显示学生的答题过程并且支持回溯，
+        通常我们想到的做法就是通过记录坐标和重新绘制来达到产品的要求，
+        再查看了相关资料后知道了Canvas元素的captureStream()API可以实时返回捕捉的画布，
+        那我们就来了解一下这个API的使用吧。
+    -->
+
+    <p>画板区</p>
+    <canvas></canvas>
+
+    <hr>
+
+    <p>视频区</p>
+    <video autoplay controls></video>
+
+    <script>
+        //初始化canvas
+        var c = document.querySelector('canvas');
+        var canvasSize = 200;
+        c.width = canvasSize;
+        c.height = canvasSize;
+        var ctx = c.getContext("2d");
+        ctx.fillRect(0, 0, canvasSize, canvasSize);
+
+        //绑定鼠标按下，移动，松开事件
+        let hasTouched = false;
+        c.onmousedown = function (e) {
+            hasTouched = true
+            e.stopPropagation();
+            e.preventDefault();
+        };
+        c.onmousemove = function (e) {
+            if (hasTouched) {
+                let offsetX = e.offsetX;
+                let offsetY = e.offsetY;
+
+                ctx.fillStyle = "orange";
+                ctx.fillRect(offsetX - 5, offsetY - 5, 10, 10);
+
+            }
+            e.stopPropagation();
+            e.preventDefault();
+        };
+        c.onmouseup = function (e) {
+            hasTouched = false;
+            e.stopPropagation();
+            e.preventDefault();
+        };
+
+        //captureStream()实时捕获画布(的内容)。
+        stream = c.captureStream(25);
+        document.querySelector('video').srcObject = stream;
+
+    </script>
+</body>
+
+</html>
+
+<!--
+参考链接：
+https://juejin.cn/post/6999307641084182564
+-->

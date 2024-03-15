@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>录屏</title>
+    <style>
+        video{
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- 预览 -->
+    <video autoplay controls></video>
+
+    <!-- 开启录制 -->
+    <button id="btn">录制</button>
+
+    <script>
+
+        document.querySelector("#btn").addEventListener("click", async function () {
+            //使用navigator.mediaDevices.getDisplayMedia()方法来获取屏幕的媒体流。然后，使用 MediaRecorder 对象将媒体流录制为视频文件。
+            let stream = await navigator.mediaDevices.getDisplayMedia({
+                video: true,
+                audio: true
+            });
+            console.log("stream", stream);
+
+            //MediaRecorder.isTypeSupported(mimeTypeValue) 查看当前环境所支持的屏幕录制文件类型 
+
+            //创建一个媒体录制实例
+            let mediaRecorder = new MediaRecorder(stream, {
+                mimeType: "video/webm"
+            });
+
+            let chunks = [];
+
+            mediaRecorder.addEventListener("dataavailable", function (e) {
+                //停止录制 的时候 会先触发 dataavailable 事件 然后触发 stop 事件
+                chunks.push(e.data);
+            });
+
+            mediaRecorder.addEventListener("stop", function () {
+                //停止录制 的时候 会先触发 dataavailable 的事件 然后触发 stop 事件
+
+                let blob = new Blob(chunks, {
+                    type: chunks[0].type,
+                });
+
+                // 获取 可用的 url
+                let url = URL.createObjectURL(blob);
+
+                // 预览
+                let video = document.querySelector("video");
+                video.src = url;
+
+                // 下载
+                let a = document.createElement("a");
+                a.href = url;
+                a.download = "video.webm";
+                a.click();
+            });
+
+            // 手动执行
+            mediaRecorder.start();
+        });
+    </script>
+
+</body>
+
+</html>
+
+<!--
+参考链接：
+
+https://juejin.cn/post/7052289456455286821
+
+https://juejin.cn/post/7293462197386592283
+
+-->
