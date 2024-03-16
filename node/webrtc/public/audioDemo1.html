@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>音频可视化demo1</title>
+</head>
+
+<body>
+
+    <canvas></canvas>
+
+
+
+    <script>
+        //初始化canvas
+        var c = document.querySelector('canvas');
+        var width = 200;
+        var height = 200;
+        c.width = width;
+        c.height = height;
+        var canvasCtx = c.getContext("2d");
+
+
+        //使用navigator.mediaDevices.getUserMedia()方法来获取麦克风媒体流。
+        navigator.mediaDevices.getUserMedia({ video: false, audio: true }).then(function (stream) {
+            console.log("stream", stream);
+
+
+            var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            var analyser = audioCtx.createAnalyser();
+            source = audioCtx.createMediaStreamSource(stream);
+            source.connect(analyser);
+            // analyser.connect(distortion);
+
+            analyser.fftSize = 2048;
+            var bufferLength = analyser.frequencyBinCount;
+            var dataArray = new Uint8Array(bufferLength);
+
+            function draw() {
+                canvasCtx.clearRect(0, 0, width, height);
+
+                drawVisual = requestAnimationFrame(draw);
+
+                analyser.getByteFrequencyData(dataArray);
+
+                var barWidth = (width / bufferLength) * 2.5;
+                var barHeight;
+                var x = 0;
+
+                for (var i = 0; i < bufferLength; i++) {
+                    barHeight = dataArray[i] / 2;
+
+                    canvasCtx.fillStyle = 'rgb(' + (barHeight + 100) + ',50,50)';
+                    canvasCtx.fillRect(x, height - barHeight / 2, barWidth, barHeight);
+
+                    x += barWidth + 1;
+                }
+            }
+            draw();
+
+        })
+
+
+
+
+
+
+
+
+    </script>
+
+</body>
+
+</html>
+
+<!--
+参考链接：
+
+https://www.jianshu.com/p/7c4f58ee8972
+
+https://developer.mozilla.org/zh-CN/docs/Web/API/Web_Audio_API/Visualizations_with_Web_Audio_API
+
+https://mdn.github.io/voice-change-o-matic
+
+https://developer.mozilla.org/zh-CN/docs/Web/API/AnalyserNode/getByteFrequencyData
+
+https://developer.mozilla.org/zh-CN/docs/Web/API/AnalyserNode/getByteTimeDomainData
+
+https://developer.mozilla.org/zh-CN/docs/Web/API/AnalyserNode/getFloatFrequencyData
+
+https://developer.mozilla.org/en-US/docs/Web/API/AnalyserNode/getFloatTimeDomainData
+
+-->
