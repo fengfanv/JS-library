@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>videoCanvas</title>
+</head>
+
+<body>
+    <button>播放</button>
+
+    <canvas></canvas>
+
+
+
+
+    <script>
+        document.querySelector('button').onclick = function () {
+
+            //创建video
+            var videoEle = document.createElement('video');
+            videoEle.src = "./video.mp4";
+            videoEle.autoplay = true;
+            videoEle.controls = true;
+            document.body.appendChild(videoEle);
+
+
+            videoEle.oncanplay = function () {
+                var videoWidth = videoEle.videoWidth;//视频宽
+                var videoHeight = videoEle.videoHeight;//视频高
+                console.log(videoWidth, videoHeight);
+
+
+                //初始化canvas
+                var c = document.querySelector('canvas');
+                c.width = videoWidth;
+                c.height = videoHeight;
+                var ctx = c.getContext("2d");
+
+
+
+                var timer = null;
+                videoEle.addEventListener('play', function () {
+                    timer = setInterval(function () {
+                        ctx.drawImage(videoEle, 0, 0, videoWidth, videoHeight);//将video画面绘制到canvas上
+
+
+                        getCanvasPixelData(ctx, 0, 0, videoWidth, videoHeight);//获取canvas像素数据
+                    }, 100);
+                });
+                videoEle.addEventListener('pause', function () {
+                    clearInterval(timer);
+                });
+                videoEle.addEventListener('ended', function () {
+                    clearInterval(timer);
+                });
+
+
+            }
+
+
+        }
+
+        //获取canvas像素数据
+        function getCanvasPixelData(ctx, x, y, width, height) {
+            let imgData = ctx.getImageData(x, y, width, height);
+            let imgRgbaData = Array.from(imgData.data);//如果是3*3大小的图像，则输出长度是36的数组，因为36=3*3*4，4是有四个通道，r(红)，g(绿)，b(蓝)，a(透明度)
+            // console.log('imgRgbaData', imgRgbaData);
+
+
+            let pixel_size = width * height;//图像有多少个像素
+            let pixelArr = [];
+            for (let i = 0; i < pixel_size; i++) {
+                let start = i * 4
+                let end = start + 4
+                pixelArr.push(imgRgbaData.slice(start, end))
+            }
+            // console.log(pixelArr)
+            // for(let i=0;i<pixelArr.length;i++){
+            //     console.log(pixelArr[i]); //[255, 0, 0, 255]  //[red,green,blue,alpha]
+            // }
+
+            //然后通过websocket将像素数据发送到后端
+            /*
+            width:宽,
+            height:高,
+            pixel:pixelArr
+            */
+
+        }
+
+    </script>
+
+
+
+</body>
+
+</html>
