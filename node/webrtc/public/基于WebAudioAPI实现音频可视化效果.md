@@ -7,7 +7,7 @@
 
 ## 基本概念
 
-要从你的音频源获取数据，你需要一个 {{ domxref("AnalyserNode") }}节点，它可以用 {{ domxref("AudioContext.createAnalyser()") }} 方法创建，比如：
+要从你的音频源获取数据，你需要一个 AnalyserNode 节点，它可以用 AudioContext.createAnalyser() 方法创建，比如：
 
 ```js
 var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -25,15 +25,15 @@ analyser.connect(distortion);
 
 > **备注：** 分析器节点 (Analyser Node) 不一定输出到另一个节点，不输出时也可以正常使用。但前提是它必须与一个声源相连（直接或者通过其他节点间接相连都可以）。
 
-分析器节点 (Analyser Node) 将在一个特定的频率域里使用[快速傅立叶变换](https://zh.wikipedia.org/wiki/%E5%BF%AB%E9%80%9F%E5%82%85%E9%87%8C%E5%8F%B6%E5%8F%98%E6%8D%A2)(Fast Fourier Transform (FFT) ) 来捕获音频数据，这取决于你给 {{ domxref("AnalyserNode.fftSize") }} 属性赋的值（如果没有赋值，默认值为 2048）。
+分析器节点 (Analyser Node) 将在一个特定的频率域里使用[快速傅立叶变换](https://zh.wikipedia.org/wiki/%E5%BF%AB%E9%80%9F%E5%82%85%E9%87%8C%E5%8F%B6%E5%8F%98%E6%8D%A2)(Fast Fourier Transform (FFT) ) 来捕获音频数据，这取决于你给 AnalyserNode.fftSize 属性赋的值（如果没有赋值，默认值为 2048）。
 
-> **备注：** 你也可以为 FFT 数据缩放范围指定一个最小值和最大值，使用{{ domxref("AnalyserNode.minDecibels") }} 和{{ domxref("AnalyserNode.maxDecibels") }}进行设置，要获得不同数据的平均常量，使用 {{ domxref("AnalyserNode.smoothingTimeConstant") }}。阅读这些页面以获得更多如何使用它们的信息。
+> **备注：** 你也可以为 FFT 数据缩放范围指定一个最小值和最大值，使用 AnalyserNode.minDecibels 和 AnalyserNode.maxDecibels 进行设置，要获得不同数据的平均常量，使用 AnalyserNode.smoothingTimeConstant。
 
-要捕获数据，你需要使用 {{ domxref("AnalyserNode.getFloatFrequencyData()") }} 或 {{ domxref("AnalyserNode.getByteFrequencyData()") }} 方法来获取频率数据，用 {{ domxref("AnalyserNode.getByteTimeDomainData()") }} 或 {{ domxref("AnalyserNode.getFloatTimeDomainData()") }} 来获取波形数据。
+要捕获数据，你需要使用 AnalyserNode.getFloatFrequencyData() 或 AnalyserNode.getByteFrequencyData() 方法来获取频率数据，用 AnalyserNode.getByteTimeDomainData() 或 AnalyserNode.getFloatTimeDomainData() 来获取波形数据。
 
-这些方法把数据复制进了一个特定的数组当中，所以你在调用它们之前要先创建一个新数组。第一个方法会产生一个 32 位浮点数组，第二个和第三个方法会产生 8 位无符号整型数组，因此一个标准的 JavaScript 数组就不能使用——你需要用一个 {{ domxref("Float32Array") }} 或者 {{ domxref("Uint8Array") }} 数组，具体需要哪个视情况而定。
+这些方法把数据复制进了一个特定的数组当中，所以你在调用它们之前要先创建一个新数组。第一个方法会产生一个 32 位浮点数组，第二个和第三个方法会产生 8 位无符号整型数组，因此一个标准的 JavaScript 数组就不能使用——你需要用一个 Float32Array 或者 Uint8Array 数组，具体需要哪个视情况而定。
 
-那么让我们来看看例子，比如我们正在处理一个 2048 尺寸的 FFT。我们返回 {{ domxref("AnalyserNode.frequencyBinCount") }} 值，它是 FFT 的一半，然后调用 Uint8Array()，把 frequencyBinCount 作为它的长度参数——这代表我们将对这个尺寸的 FFT 收集多少数据点。
+那么让我们来看看例子，比如我们正在处理一个 2048 尺寸的 FFT。我们返回 AnalyserNode.frequencyBinCount 值，它是 FFT 的一半，然后调用 Uint8Array()，把 frequencyBinCount 作为它的长度参数——这代表我们将对这个尺寸的 FFT 收集多少数据点。
 
 ```js
 analyser.fftSize = 2048;
@@ -47,7 +47,7 @@ var dataArray = new Uint8Array(bufferLength);
 analyser.getByteTimeDomainData(dataArray);
 ```
 
-现在我们就获取了那时的音频数据，并存到了我们的数组里，而且可以把它做成我们喜欢的可视化效果了，比如把它画在一个 HTML5 {{ htmlelement("canvas") }} 画布上。
+现在我们就获取了那时的音频数据，并存到了我们的数组里，而且可以把它做成我们喜欢的可视化效果了，比如把它画在一个 HTML5 canvas 画布上。
 
 下面让我们来看一些具体的例子。
 
@@ -193,6 +193,8 @@ var x = 0;
 
         x += barWidth + 1;
       }
+
+
     };
 ```
 
@@ -206,7 +208,7 @@ draw();
 
 ![a series of red bars in a bar graph, showing intensity of different frequencies in an audio signal](./readme_image/bar-graph.png)
 
-> **备注：** 本文中的案例展现了 {{ domxref("AnalyserNode.getByteFrequencyData()") }} 和 {{ domxref("AnalyserNode.getByteTimeDomainData()") }} 的用法。如果想要查看 {{ domxref("AnalyserNode.getFloatFrequencyData()") }} 和 {{ domxref("AnalyserNode.getFloatTimeDomainData()") }} 的用法，请参考我们的 [Voice-change-O-matic-float-data](http://mdn.github.io/voice-change-o-matic-float-data/) 演示（也能看到 [源代码](https://github.com/mdn/voice-change-o-matic-float-data) ）——它和本文中出现的 [Voice-change-O-matic](http://mdn.github.io/voice-change-o-matic/) 功能完全相同，唯一区别就是它使用的是浮点数作数据，而不是本文中的无符号整型数。
+> **备注：** 本文中的案例展现了 AnalyserNode.getByteFrequencyData() 和 AnalyserNode.getByteTimeDomainData() 的用法。如果想要查看 AnalyserNode.getFloatFrequencyData() 和 AnalyserNode.getFloatTimeDomainData() 的用法，请参考我们的 [Voice-change-O-matic-float-data](http://mdn.github.io/voice-change-o-matic-float-data/) 演示（也能看到 [源代码](https://github.com/mdn/voice-change-o-matic-float-data) ）——它和本文中出现的 [Voice-change-O-matic](http://mdn.github.io/voice-change-o-matic/) 功能完全相同，唯一区别就是它使用的是浮点数作数据，而不是本文中的无符号整型数。
 
 # 参考链接
 
