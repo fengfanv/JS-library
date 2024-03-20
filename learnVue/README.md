@@ -3,8 +3,8 @@ vue-cli，axios，vue-router，vuex
 
 ## jquery与vue区别
 ```
-vue数据操作dom
-jquery直接修改dom
+jquery 事件驱动
+vue 数据驱动
 ```
 ## 更新变化
 ```
@@ -143,8 +143,8 @@ npm config set cache [地址]	//设置地址
 ```
 ## 获取和设置npm全局 node_global地址
 ```
-npm config get prefix		//获取地址
-npm config set prefix [地址]	//设置地址
+npm config get prefix           //获取地址
+npm config set prefix [地址]    //设置地址
 ```
 ## npm安装模块
 
@@ -165,7 +165,7 @@ npm install 模块名
 ```
 ## 查看版本
 ```
-vue -V
+vue -V //注意大写的V
 ```
 ## 安装脚手架2版本
 ```
@@ -180,69 +180,90 @@ npm uninstall vue-cli -g //卸载脚手架2版本的命令
 ```
 vue init webpack 项目名称
 ```
-## 脚手架3或更高版本安装
+## 脚手架2版本启动项目
+```
+npm run dev
+```
+## 安装脚手架3或更高版本
 ```
 npm install @vue/cli -g
 ```
-## 脚手架3或更高版本卸载
+## 卸载脚手架3或更高版本
 ```
 npm uninstall @vue/cli -g
 ```
 ## 脚手架3或更高版本创建一个项目
 ```
 vue create 项目名称
+
+上下键 切换选择项
+空格键 是否选中/取消选中
+回车键 确认(next)
 ```
-## 脚手架2版本开发环境解决跨域问题
-1、修改项目“config/index.js”文件
+## 脚手架3或更高版本启动项目
+```
+npm run serve
+```
+## 项目打包命令
+```
+npm run build
+```
+## 脚手架2版本解决开发环境跨域问题
+1、修改项目 config/index.js 文件
 ```javascript
 module.exports = {
-	dev: {
-		// Paths
-		assetsSubDirectory: 'static',
-		assetsPublicPath: '/',
-		proxyTable: {
-			'/api': {							       //匹配的路径								
-				target: "http://xxx.com",	 //跨域的地址
-				changeOrigin: true,				 //允许跨域
-				pathRewrite: {
-					'^/api': '/xpg'				   //路径重写：请求地址 /api/abc 转化成 /xpg/abc
-				}
-			}
-		},
-		//...
-	}
-	//...
+    dev: {
+        //Paths
+        assetsSubDirectory: 'static',
+        assetsPublicPath: '/',
+
+        //解决跨域问题
+        proxyTable: {
+            '/api': {                       //匹配的路径								
+                target: "http://xxx.com",   //跨域的地址
+                changeOrigin: true,         //允许跨域
+                pathRewrite: {
+                    '^/api': '/xpg'         //路径重写：请求地址 /api/abc 转化成 /xpg/abc
+                }
+            }
+        },
+        //...
+    }
+    //...
 }
 ```
-## 脚手架3或更高版本开发环境解决跨域问题
-1、最新版本脚手架不提供build、config等项目配置文件，此版本用vue.config.js代替
+## 脚手架3或更高版本解决开发环境跨域问题
+1、最新版脚手架创建的项目删除了config，build配置脚手架的文件，最新版用vue.config.js代替了
 ```javascript
 module.exports = {
-    publicPath: process.env.NODE_ENV === 'production'
-        ? './'
-        : '/',//解决打包后访问不到资源文件的问题
-		
-    devServer: {//解决跨域问题
+    //解决打包后访问不到资源文件的问题
+    publicPath: process.env.NODE_ENV == 'production' ? './' : '/',
+
+    //解决跨域问题
+    devServer: {
         open: true,
         proxy: {
             '/api': {
-                target: 'http://localhost:80/', //设置你调用的接口域名和端口号 别忘了加http
-                changeOrigin: true, //允许跨域
+                target: 'http://localhost:80/', //设置你调用的接口域名和端口号 别忘了加http
+                changeOrigin: true,             //允许跨域
                 pathRewrite: {
-                    '^/api': '/' // 这里理解成用‘/api’代替target里面的地址，后面组件中我们掉接口时直接用api代替 比如我要调用'http://localhost:8090/users'，直接写‘/api/users’即可
+                    '^/api': '/'                //这里理解成用‘/api’代替target里面的地址，后面组件中我们掉接口时直接用api代替 比如我要调用'http://localhost:8090/users'，直接写‘/api/users’即可
                 }
             }
         }
     }
 }
 ```
-## Vue-API  Vue.config.devtools
-获取vue2环境当前是开发环境还是生产环境
-```javascript
-//javascript
-console.log(Vue.config.devtools);
-//true:开发环境
-//false:生产环境
+## 创建项目 报错 系统禁止运行脚本
+```
+set-ExecutionPolicy RemoteSigned
+```
+![无法创建项目](./images/无法创建项目.png)
+
+## VSCode里Vue代码高量插件
+```
+vetur 针对vue2版本
+volar(Vue - Official) 针对vue3版本
 ```
 ## v-if和v-show
 v-if,在html中是否加载（创建）元素
@@ -1441,200 +1462,395 @@ export default router
 
 ```
 
-## vue3组合式api
+## 组合式API (Composition API)
+
+声明响应式状态 ref() / reactive()
+```
+声明响应式状态，声明式渲染，通过扩展标准 HTML 的语法，我们可以根据 JavaScript 的状态来描述 HTML 应该是什么样子的。当状态改变时，HTML 会自动更新。能在改变时触发更新的状态被称作是响应式的。我们可以使用 ref() / reactive() 来声明响应式状态。
+
+---
+
+ref可以接受任何数据类型，但主要用于包装JavaScript的基本类型数据（如字符串、数字、布尔值等）。
+reactive用于包装对象和数组等复杂类型的数据。它不能包装（如字符串、数字、布尔值等）这样的基本类型数据。
+
+在js里，访问或修改ref声明的值，需要通过 .value 属性来访问或修改。因为在ref接收参数后，会将其包裹在一个带有 .value 属性的 ref对象 中。
+在模板template中使用ref声明的值，不需要通过 .value 属性。
+
+当ref的值是一个对象时，ref会在内部调用reactive，但使用时仍需要通过 .value 属性来访问或修改。
+```
+组合式API script setup
+```html
+<script setup>
+import { ref } from 'vue'
+
+//使用ref声明一个响应式状态
+const count = ref(0)
+
+//在js里使用ref，需要加 .vlaue 属性
+console.log(count.value)
+
+</script>
+
+<template>
+    <!--注意，在模板template中使用ref时，不需要附加 .value 属性-->
+    <button @click="count++">
+        {{ count }}
+    </button>
+</template>
+```
+组合式API中使用计算属性(computed)
+```html
+<script setup>
+import { ref, computed } from 'vue'
+
+const a1 = ref('a1')
+const a2 = ref('a2')
+
+const a3 = computed(() => {
+    return a1.value + ' ' + a2.value
+})
+</script>
+
+<template>
+  <div>
+    <p>a1：{{a1}}</p>
+    <p>a2：{{a2}}</p>
+    <p>a3：{{a3}}</p>
+  </div>
+</template>
+```
+```html
+<script setup>
+import { ref, computed } from 'vue'
+
+const a1 = ref('a1')
+const a2 = ref('a2')
+
+const a3 = computed({
+  get() {
+    return a1.value + ' ' + a2.value
+  },
+  set(newValue) {
+    [a1.value, a2.value] = newValue.split(' ')
+  }
+})
+a3.value = 'xiao zhang'
+</script>
+
+<template>
+  <div>
+    <p>a1：{{a1}}</p>
+    <p>a2：{{a2}}</p>
+    <p>a3：{{a3}}</p>
+  </div>
+</template>
+```
+组合式API中使用侦听器(watch)
+```html
+<script setup>
+import { ref, watch } from 'vue'
+
+const todoId = ref(1)
+const todoData = ref(null)
+
+watch(todoId, async () => {
+    const res = await fetch(`https://jsonplaceholder.typicode.com/todos/${todoId.value}`)
+    todoData.value = await res.json()
+}, {
+    immediate: true,
+    //deep: true
+})
+</script>
+
+<template>
+    <p>todoId: {{ todoId }}</p>
+    <button @click="todoId++">Fetch next todo</button>
+    <pre>{{ todoData }}</pre>
+</template>
+```
+组合式API中使用组件(components)
+```html
+<!--父组件-->
+<script setup>
+import { ref } from 'vue'
+
+import ChildComp from './ChildComp.vue'
+  
+const parentMsg = ref('msg from parent')
+const childMsg = ref('No child msg')
+</script>
+
+<template>
+  <p>右边这条消息，是从子级传来的：{{ childMsg }}</p>
+  <hr>
+  <ChildComp @response="(msg)=>childMsg=msg" :msg="parentMsg" />
+</template>
+
+
+<!--子组件 ChildComp.vue-->
+<script setup>
+//注意defineProps()是一个编译时宏，并不需要导入，可直接使用。
+const props = defineProps({
+  msg: String
+})
+
+const emit = defineEmits(['response'])
+emit('response', 'msg from child')
+</script>
+
+<template>
+  <h2>这里是子组件</h2>
+  <p>右边这条消息，是从父级传来的：{{msg}}</p>
+</template>
+```
+组合式API中DOM元素模板引用(ref)
+```html
+<script setup>
+import { ref, onMounted } from 'vue'
+
+//要访问在DOM里ref模板引用，我们需要在js里声明一个同名的ref
+const pElementRef = ref(null)
+onMounted(()=>{
+  console.log(pElementRef.value.textContent)//hello
+})
+</script>
+
+<template>
+  <p ref="pElementRef">hello</p>
+</template>
+```
+组合式API中插槽(slot)
+```html
+<!--父组件-->
+<script setup>
+import { ref } from 'vue'
+
+import ChildComp from './ChildComp.vue'
+
+const msg = ref('msg from parent')
+</script>
+<template>
+  <ChildComp>{{msg}}</ChildComp>
+</template>
+
+
+<!--子组件 ChildComp.vue-->
+<template>
+    <!--如果插槽内没有值，则下面这个 Fallback content 是插槽的默认内容-->
+    <slot>Fallback content</slot>
+</template>
+```
+组合式API中使用vue-router
+```html
+<script setup>
+import { useRoute, useRouter } from 'vue-router'
+
+const route = useRoute()
+console.log(route.query)
+
+const router = useRouter()
+router.push({path:"/about"})
+
+</script>
+```
+组合式API中使用vuex
+```html
+<script setup>
+import { ref } from 'vue'
+import { useStore } from 'vuex'
+
+const bbb = ref('bbb1')
+
+//注意 这里不是 $store
+const store = useStore();
+console.log(store.state.a);
+store.state.a = bbb.value;
+</script>
+
+<template>
+  <!--注意 在template模板里使用，还是 $store.state.a-->
+  <p>{{ $store.state.a }}</p>
+</template>
+```
+组合式API setup()
+
+setup() 执行时，组件实例尚未被创建，这时组件内 data，computed，methods 还不能使用。
+
+在 setup() 方法里，因为 setup() 方法是运行在解析数据方法之前，所以 setup() 方法里的this和普通vue里this是不一样的，因此在setup方法里调用this，是无法操控组件里数据和方法。
+
+```html
+<script>
+import { ref } from 'vue'
+
+export default {
+  setup(){
+    //使用ref声明一个响应式状态
+    const count = ref(0)
+    
+    //在js里使用ref，需要加 .vlaue 属性
+    console.log(count.value)
+    
+    return {
+      count
+    }
+  }
+}
+</script>
+
+<template>
+    <!--注意，在模板template中使用ref时，不需要附加 .value 属性-->
+    <button @click="count++">
+        {{ count }}
+    </button>
+</template>
+```
+组合式API setup() 父子组件
+```html
+<!--父组件-->
+<script>
+import { ref } from 'vue'
+
+import ChildComp from './ChildComp.vue'
+
+export default {
+  components:{
+    ChildComp
+  },
+  setup(){
+    const parentMsg = ref('msg from parent')
+    const childMsg = ref('No child msg')
+    
+    return {
+      parentMsg,
+      childMsg
+    }
+  }
+}
+</script>
+
+<template>
+  <p>右边这条消息，是从子级传来的：{{ childMsg }}</p>
+  <hr>
+  <ChildComp @response="(msg)=>childMsg=msg" :msg="parentMsg" />
+</template>
+
+
+<!--子组件 ChildComp.vue-->
+<script>
+export default {
+  props:{
+    msg: String
+  },
+  emits: ['response'],
+  setup(props, context) {
+    
+    context.emit('response', 'msg from child')
+  }
+}
+</script>
+
+<template>
+  <h2>这里是子组件</h2>
+  <p>右边这条消息，是从父级传来的：{{msg}}</p>
+</template>
+```
+
+## 利用Vue.extend实现全局插件
+
+插件目录结构
+
+![](./images/img-1.png)
+
+插件模板组件（plugin/alert.vue）
 ```html
 <template>
-  <div class="main">
-    <div>{{name}}</div>
-	
-    <hr>
-    <h1>title：</h1>
-    <div>{{title}}</div>
-	
-    <hr>
-    <h1>正常数组：</h1>
-    <ul>
-      <li v-for="(item, index) of arr" :key="index">{{ item }}</li>
-    </ul>
-	
-    <hr>
-    <h1>删除1后的数组：</h1>
-    <ul>
-      <li v-for="(item,index) of arrWhichDeleteNumber1" :key="index">{{item}}</li>
-    </ul>
-    <button @click="getArrData">获取数组数据</button>
-  </div>
+    <div v-if="isShow">
+        alert组件
+        <button @click="onButtonOk()">确认</button>
+    </div>
 </template>
 
 <script>
-import { ref,toRefs, onMounted, watch, computed} from "vue";
 export default {
-  name: "组合式api测试",
-  components: {},
-  props: {
-    title:{
-      type:String,
-      default:""
+    name: "alert",
+    data() {
+        return {
+            isShow: false,
+        }
+    },
+    methods: {
+        onButtonOk() {
+            //给调用的地方返回一个提示
+            this.callback && this.callback('你单击了确定按钮')
+        },
+        callback() { }//代绑定的callback
     }
-  },
-  data() {
-    return {
-		
-    };
-  },
-  //执行setup时，组件实例尚未被创建，这时组件内data，computed，methods还不能使用
-  //在setup方法里，因为setup方法是运行在解析数据方法之前，所以setup方法里的this和普通vue里this是不一样的，因此在setup方法里调用this，是无法操控组件里数据和方法
-  setup(props, context) {
-    
-    console.log(context.attrs) //Attribute(非响应式对象)
-    console.log(context.slots)//插槽 (非响应式对象)
-    console.log(context.emit)//触发事件 (方法)
-
-    //let title = props.title;//虽然这里的props是响应式的，但是已这种方式导出，再渲染到页面上，如title值发生变化时，这里是无法监听到变化的
-
-    let {title} = toRefs(props);//上面的问题可以用toRefs方法解决，这个方法是把对象里所有的参数，都通过ref进行响应式变量声明，声明后，当props里参数发生变化后，在这里导出，页面上就能动态变化
-
-    let name = 'kang';
-
-    // let arr = []; //1
-    let arr = ref([]);//ref方法，将参数声明成响应式变量，导出后的数据，是动态的，当数据发生变化时，导出的数据也会跟着变化。反之直接声明的变量，是静态的数据，导出后，数据发生变化，页面上不会跟着变化
-    
-    
-    let getArrData = function () {
-      arr.value = arr.value.concat([1, 2, 3]);
-    };
-
-    //setup里使用声明周期函数
-    //onBeforeMount(); //选项式api里的beforeMount声明周期函数
-    //使用方式1
-    //onMounted(getArrData); //选项式api里的mounted声明周期函数，在setup方法里使用mounted生命周期函数，在mounted时调用getArrData方法
-    //使用方式2
-    onMounted(() => {
-      getArrData()
-    })
-    //onBeforeUpdate(); //选项式api里的beforeUpdate声明周期函数
-    //onUpdated; //选项式api里的updated声明周期函数
-    //onBeforeUnmount; //选项式api里的beforeUnmount声明周期函数
-    //onUnmounted; //选项式api里的unmounted声明周期函数
-    //还有好几个，详见vue3api文档
-
-    //在setup方法里使用watch
-    watch(
-      arr,
-      function (newValue, oldValue) {
-        console.log("arr数据发生变化：", arr.value);
-      },
-      { deep: true }
-    );
-
-    //在setup方法里使用computed
-    let arrWhichDeleteNumber1 = computed(() => {
-      let arrStr = arr.value.join(',');
-      let workStr = arrStr.replace(/(1|,)/g,'');
-      return workStr.split('');
-    });
-
-    return {
-      title,
-      name,
-      arr,
-      getArrData,
-      arrWhichDeleteNumber1,
-    };
-  },
-  mounted() {},
-  methods: {},
 };
 </script>
-
-<style scoped>
-</style>
-
+<style scoped></style>
 ```
-
-## vue中自定义插件（利用Vue.extend实现一个插件）
-文件目录
-
-![](/images/img-1.png)
-
-1、在目录下创建一个plugin文件夹
-
-2、把写完的.vue格式的文件放到里面
-
-3、创建一个index.js文件
-
-4、写代码
-
-**插件配置文件（/plugin/index.js）**
+插件配置文件（plugin/index.js）
 ```javascript
-//引入组件
-import loadingFrom from './loading'
-import alertFrom from './alert'
+import alertFrom from './alert.vue'
 
 export default {
   install: function (Vue, options) {
-    // 利用扩展实例构造器生成一个Vue的子类
-    const loading = Vue.extend(loadingFrom);
-    // 生成一个该子类的实例
-    const loading_content = new loading();
-    // 将这个实例挂载在我创建的div上
-    loading_content.$mount(document.createElement('div'));
-    // 并将此div加入全局挂载点内部
-    document.body.appendChild(loading_content.$el);
+    //利用扩展实例构造器生成一个Vue的子类
+    const alert2 = Vue.extend(alertFrom);
+    //生成一个该子类的实例
+    const alert_content = new alert2();
+    //将这个实例挂载在我创建的div上
+    alert_content.$mount(document.createElement('div'));
+    //并将此div加入全局挂载点内部
+    document.body.appendChild(alert_content.$el);
     //在vue原型上写方法，调用使
-    Vue.prototype.loading_main = {
-      showLoading: function (callback) {
-        loading_content.isShow = true;
+    Vue.prototype.alert_main = {
+      showAlert: function (callback) {
+        alert_content.isShow = true;
         //给插件模板里绑一个回调函数，
         //可利用callback向使用的地方返回参数
         //可利用callback执行一些业务操作
-        loading_content.callback = callback;
+        alert_content.callback = callback;
       },
-      hideLoading: function (callback) {
-        loading_content.isShow = false;
-        loading_content.callback = callback;
+      hideAlert: function (callback) {
+        alert_content.isShow = false;
+        alert_content.callback = callback;
       }
     }
   }
 }
 ```
-**插件模板（/plugin/alert.vue）**
-```html
-<template>
-  <div v-if="isShow">
-    组件
-    <button @click="onButtonOk()">确认</button>
-  </div>
-</template>
-
-<script>
-export default {
-  name: "alert",
-  data() {
-    return {
-      isShow:false,
-    }
-  },
-  methods:{
-	onButtonOk(){
-		this.callback&&this.callback('你单击了确定按钮');
-		//给调用的地方返回一个提示。
-	}
-    callback(){}//代绑定的callback
-  }
-};
-</script>
-<style scoped></style>
-```
-在程序里调用时
+在（main.js）中进行绑定
 ```javascript
-Vue.loading_main.showLoading(function (data) {
+import Vue from 'vue'
+
+import alertPopups from '@/plugin/index.js'
+Vue.use(alertPopups)
+```
+在纯js文件中使用
+```javascript
+import Vue from 'vue'
+
+Vue.alert_main.showAlert(function (data) {
   //通过绑定callback，返回某些操作后需要返回的信息
 
   //也可以利用callback，执行某些操作
   //比如这是个弹窗插架，你需要在单击插架ok按钮后执行某些操作
   //这时，你可以利用callback来执行这些操作。
 });
+```
+在vue文件中使用
+```html
+<template></template>
+<script>
+export default {
+  mounted(){
+    this.alert_main.showAlert(function (data) {
+      //回调函数
+    })
+  }
+}
+</script>
 ```
 ## 其它问题
 #### vue里render渲染函数
@@ -1783,4 +1999,12 @@ export default {
 </script>
 <style scoped>
 </style>
+```
+## Vue-API  Vue.config.devtools
+获取vue2环境当前是开发环境还是生产环境
+```javascript
+//javascript
+console.log(Vue.config.devtools);
+//true:开发环境
+//false:生产环境
 ```
