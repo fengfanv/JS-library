@@ -93,15 +93,17 @@ Vue双向数据绑定原理基于 Vue响应式原理。
 ## Object.defineProperty 和 Proxy
 1、Object.defineProperty
 ```javascript
+var aValue = 0
 var obj = {}
 //当对象中不存在指定的属性时，可根据属性名，为对象创建一个新的属性
 Object.defineProperty(obj, "a", {
   set: function (newValue) {
     console.log("监听到给a赋值:" + newValue);
+    aValue = newValue;
   },
   get: function () {
     console.log("监听到要读取a的值");
-    return 9999;//这里不写return，下面obj.a时将会打印undefined
+    return aValue;//这里不写return，下面obj.a时将会打印undefined
   }
 })
 obj.a = 9999;//将触发set方法
@@ -154,11 +156,11 @@ npm config set prefix [地址]    //设置地址
 
 "--save-dev"表示安装包时，会把包的信息记录到package.json文件中（devDependencies）下
 
-在安装包时，不加 -g，--save，--save-dev，默认会执行 --save 的操作，将包的信息记录到（dependencies）下
+在安装包时，不加 -g，--save，--save-dev 默认会执行 --save 的操作
 
-保证项目正常运行或生产环境下需要的包信息，会被记录到（dependencies）下
+保证 项目正常运行/生产环境 需要的包，请将包信息记录到（dependencies）下
 
-项目开发时需要的一些工具包，如单元测试包，会被记录到（devDependencies）下。项目生产打包时，不会将（devDependencies）下的包 打包进去
+项目开发时需要的一些工具包，如单元测试包，请将包信息记录到（devDependencies）下。项目生产打包时，不会将记录在（devDependencies）下的包 打包进去
 
 ```
 npm install 模块名
@@ -247,14 +249,14 @@ module.exports = {
                 target: 'http://localhost:80/', //设置你调用的接口域名和端口号 别忘了加http
                 changeOrigin: true,             //允许跨域
                 pathRewrite: {
-                    '^/api': '/'                //这里理解成用‘/api’代替target里面的地址，后面组件中我们掉接口时直接用api代替 比如我要调用'http://localhost:8090/users'，直接写‘/api/users’即可
+                    '^/api': '/xpg'             //路径重写：请求地址 /api/abc 转化成 /xpg/abc
                 }
             }
         }
     }
 }
 ```
-## 创建项目 报错 系统禁止运行脚本
+## 创建项目报错 系统禁止运行脚本
 ```
 set-ExecutionPolicy RemoteSigned
 ```
@@ -370,30 +372,34 @@ v-bind:href等于:href
 <!--绑定样式 不包引号则为data里属性-->
 <h1 :style="h1Style">I am Index</h1>
 <!--绑定样式 不包引号则为data里属性
-data: {
+data(){
+  return {
+
     h1Style: {
       background: "red"
     }
+    
+  }
 }
 -->
 ```
 ## 绑定class样式
 ```html
 <h1 :class="'normalWeight'">I am Index</h1>
-<!--有引号，为class，style样式名-->
+<!--有引号，为style，class样式名-->
 
 <h1 :class="normalWeight">I am Index</h1>
-<!--没有有引号，为数据的属性名，需要data里有normalWeight这个属性-->
+<!--没有有引号，为data数据的属性名，需要data里有normalWeight这个属性-->
 ```
 ## 三元运算符和绑定多个样式
 ```html
 方式1 通过数组
-<div v-bind:class="[isActive ? activeClass : '', 'errorClass','content']"></div>
-<!--如果isActive为true则渲染 activeClass(外面不包引号则为数据属性) 'errorClass'(包引号为style样式名) 'content'这三个样式。如果isActive为false则渲染 errorClass content这两个样式-->
+<div v-bind:class="[isActive ? 'activeClass' : 'errorClass', 'content']"></div>
+<!--如果isActive为true，则渲染style样式'activeClass'，否则渲染style样式'errorClass'。不论isActive是true还是false，style样式'content'一直都渲染-->
 
 方式2 通过对象
-<div v-bind:class="{color1:true,background1:true}"></div>
-<!--这时这个div会被添加一个名为color1的class样式，和一个为名为background1的class样式。如果color1为false，则不会添加名为color1的样式-->
+<div v-bind:class="{'styleClassName1':true,'styleClassName2':false}"></div>
+<!--因为styleClassName1后面是true，所以这时这个div会被添加一个名为styleClassName1的class样式。因为styleClassName2后面是false，所以这时这个div不会添加一个名为styleClassName2的样式-->
 ```
 ## vue代码结构
 ```javascript
@@ -445,7 +451,7 @@ export default {
       aaa: "home",
       count: 0,
       obj: {a: 1},
-    };
+    }
   },
   methods: {
     addCount() {
@@ -481,72 +487,67 @@ export default {
 ## methods与computed与watch的区别
 ```
 1、methods 方法
-methods有些时候，可以干和computed一样的事，但在使用methods方法时，每次使用都需要重新执行方法，这点没有computed好。而使用computed数据的时候，所依赖的数据没有发生变化，会读取缓存
-methods方法需要主动去调用
+methods有些时候，可以干和computed一样的事，但在使用methods方法时，每次使用都需要重新执行方法，这点没有computed好。而在使用computed计算属性的时候，会优先读取缓存，而不是重新运算。当computed计算属性所依赖的数据发生变化时，computed计算属性会自动变化，而不是等到调用时才变化
 
 2、computed 计算属性
 当某一个数据受多个数据影响时，这时用计算属性
-计算数据性有缓存。如这个数据被计算后，会被存入缓存里。如依赖的数据没有发生变化，使用数据时是直接从缓存里拿。只有当依赖的别的数据有发生变化时，这个数据才会被重新计算
-computed不适合做异步操作
+计算属性有缓存。如某个数据被计算后，会被存入缓存里。如依赖的数据没有发生变化，使用数据时是直接从缓存里拿。只有当依赖的别的数据有发生变化时，这个数据才会被重新计算
+computed内不适合做异步操作
 computed方法内必须得写return
 
 3、watch 监听
 当某一条数据影响多条数据的时候，使用watch
-watch某些时候，可以干和computed一样的事，但在是需要额外的在data里定义一个属性来接收值，watch监听的数据发生变化，每次变化都需要重新执行方法，这点没有computed好
-watch监听的数据发生变化，每次变化都需要执行函数
-watch比较适合做异步的操作，如某个数据发生变化后，想让这个数据变化的2秒后，控制一个弹窗弹出一个提示
+watch某些时候，可以干和computed一样的事，但是需要额外的在data里定义一个属性来接收值，watch监听数据发生变化，每次变化都需要重新执行方法，这点没有computed好
+watch内可以做异步操作，如某个数据发生变化后，重新调用接口
 ```
-## computed里的get，set
+## computed计算属性里的get，set
 
 vue computed默认写法下是没有set方法的，只有get方法
 
 ```html
 <template>
-  <div>result：{{result}}</div>
+    <div>result：{{ result }}</div>
 </template>
 <script>
 export default {
-  data() {
-    return {
-      a: 20,
-      b: 100,
-    };
-  },
-  mounted(){
-    console.log(this.result);
-    /*
-    打印如下内容：
-    1、get方法执行了（这个其实在调用console.log(this.result)之前就被打印出来了，也就是vue加载好后就调用了get方法，然后把结果存入了vue缓存里）
-    2、120
-    */
-   this.result = '10 20';
-   /*
-    打印如下内容：
-    1、set方法执行了
-    2、get方法执行了
-
-    vue检测到result被修改，于是调用set方法，打印 set方法执行了，并且把 10 和 20 分别赋值给 a 和 b，vue检测到计算result所依赖的 a 和 b 被修改了，于是重新触发get方法，打印 get方法执行了，并且把计算出来的新的 result 的值渲染到页面上
-    */
-  },
-  computed:{
-    result:{
-      get(){
-        console.log('get方法执行了');
-        return this.a + this.b;
-      },
-      set(value){
-        console.log('set方法执行了');
-        let arr = value.split(' ')
-        this.a = arr[0]
-        this.b = arr[1]
-      }
+    data() {
+        return {
+            a: 20,
+            b: 100,
+        }
+    },
+    mounted() {
+        console.log(this.result);
+        //打印如下内容：
+        //1、get方法执行了（这个其实在调用console.log(this.result)之前就被打印出来了，也就是vue加载好后就调用了get方法，然后把结果存入了vue缓存里）
+        //2、120
+        
+        this.result = '10 20';
+        //打印如下内容：
+        //1、set方法执行了
+        //2、get方法执行了
+     
+        //vue检测到result被修改，于是调用set方法，打印 set方法执行了，并且把 10 和 20 分别赋值给 a 和 b，vue检测到计算result所依赖的 a 和 b 被修改了，于是重新触发get方法，打印 get方法执行了，并且把计算出来的新的 result 的值渲染到页面上
+    },
+    computed: {
+        result: {
+            get() {
+                console.log('get方法执行了');
+                return this.a + this.b;
+            },
+            set(value) {
+                console.log('set方法执行了');
+                let arr = value.split(' ')
+                this.a = arr[0]
+                this.b = arr[1]
+            }
+        }
     }
-  }
 };
 </script>
-<style scoped>
-</style>
+<style scoped></style>
 ```
+# 组件
 ## 父组件和子组件生命周期函数执行顺序
 ```
 加载渲染过程：
@@ -568,29 +569,28 @@ Vue.component('base-board', {
   template: `<div>1111</div>`
 });
 
+
 //vue3写法
 const app = Vue.createApp({
   template: `
     <h1>Vue3实例</h1>
     <a1 /><!--全局组件-->
-    <base-board /><!--局部组件-->
-  `,
+    <base-board /><!--局部组件-->`,
   components: {
     baseBoard //这里局部组件需要在这里绑定一下，才能使用。这里虽然是驼峰写法，但在html中使用时，需要转换成<base-board />这里因为在js变量中不能使用 “ - ”，html组件可以使用。这样做可以有个区分
   }
 })
+app.$mount('#app');//挂载vue3实例
 
-//全局组件，只要定义了，处处可以使用，性能不高，但是使用起来简单。为什么性能不高，全局组件就是你一旦定义了，就会占用系统资源，不管你用不用
+//vue3全局组件，只要定义了，处处可以使用，性能不高，但是使用起来简单。为什么性能不高，全局组件就是你一旦定义了，就会占用系统资源，不管你用不用
 app.component('a1', {
   template: `<h1>我是全局组件</h1>`
 });
 
-//局部组件，定义了，不占资源。只有使用了才占资源
+//vue3局部组件，定义了，不占资源。只有使用了才占资源
 const baseBoard = {
   template: `<div>局部组件</div>`
 };
-
-app.$mount('#app');//挂载vue3实例
 ```
 ## 组件单向数据流
 ```
@@ -599,9 +599,9 @@ app.$mount('#app');//挂载vue3实例
 
 一个被多次复用的子组件，子组件改变了引用的父组件数据，没有单项数据流机制，其它子组件的数值也跟着变化，这会让页面内这个多次被复用的子组件的数据耦合在一起，没办法独立使用
 ```
-## 父子传值props
+## 父向子传值props
 
-编写
+定义组件
 ```javascript
 Vue.component('base-board', {
   props: ['value'],//使用props方式1
@@ -610,7 +610,7 @@ Vue.component('base-board', {
       type: String,//注意，这里String两边没有单引号啥的
       required: true,//是否必填
       default: 'abc',//默认参数，当数据为 对象 或 数组 时，默认值需要以一个工厂函数返回，如: default:function(){return {"a":1}}
-      validator(a) {//自定义检验方法，上面type检验类型，这里可以在加一些自定义判断，如value制必须是‘abc’
+      validator(a) {//自定义检验方法，上面type检验类型，这里可以在加一些自定义判断，如value值必须是‘abc’
         console.log(a);
         return a == 'abc'
       }
@@ -619,52 +619,76 @@ Vue.component('base-board', {
   template: `<div>{{value}}</div>`
 })
 ```
-使用
+使用组件
 ```html
 <!--v-bind绑属性值-->
 <base-board v-bind:value="值"></base-board>
 ```
-## 子组件调用父组件绑定的方法$emit
+## 子组件自定义事件$emit
 
-编写
+定义组件
 ```javascript
 Vue.component('base-button', {
   data: function () {
     return {}
   },
   props: ['value'],
-  emits: ['方法名1'],//vue3新增，也不是必须写，这是一个类似props的东西，主要是定义子传父事件的。vue2不需要。
-  emits: {//emits写法2，对子传父的值进行自定义校验，如果这时这个value小于10，则会被警告
-    '方法名1'(value) {
+  emits: ['子组件自定义事件名1'],//vue3新增，不是必须写，这是一个类似props的东西，主要是定义子组件自定义事件。vue2不需要。
+  emits: {//emits写法2，子传父的值进行自定义校验，如果这时这个value小于10，则会被警告
+    '子组件自定义事件名1'(value) {
       return value > 10 ? true : false
     }
   },
-  template: `
-		<div>{{value}}</div>
-		<button v-on:click="diaoyong">按钮</button>
-	`,
+  template: `<div>{{value}}</div>
+		<button v-on:click="diaoyong">按钮</button>`,
   methods: {
     diaoyong: function () {
-      //给这个组件绑定的自定义事件  方法1
-      this.$emit('方法名1'[, 传递的参数])
+      //触发子组件自定义事件
+      this.$emit('子组件自定义事件名1'[, 传递的参数])
     }
   }
 })
 ```
-使用
+使用组件
 ```html
-<base-button v-on:方法名1="父组件里方法"></base-button>
+<base-button v-on:子组件自定义事件名1="父组件里方法名"></base-button>
 ```
 ## 在父组件中使用子组件中的方法或数据
 
-子组件
+
 ```html
+<!--父组件-->
+<template>
+  <div>这里是父组件</div>
+
+  <baseButton ref="baseButton" />
+</template>
+
+<script>
+//引入子组件
+import baseButton from "./BaseButton.vue";
+export default {
+  components: {
+    baseButton
+  },
+  mounted() {
+    this.$baseButton = this.$refs.baseButton;
+
+    this.$baseButton.alert("wang", 1); //调用子组件里方法
+    console.log(this.$baseButton.a); //打印子组件中data里的数据 120
+  }
+};
+</script>
+
+
+
+<!--子组件BaseButton.vue-->
 <template>
   <div>我是子组件</div>
 </template>
+
 <script>
 export default {
-  props: ["value"],
   data: function () {
     return {
       a: 120,
@@ -674,43 +698,15 @@ export default {
     alert(name, value) {
       console.log("触发子组件中的方法");
       console.log(name, value);
-    },
-  },
+    }
+  }
 };
 </script>
-<style scoped>
-</style>
 ```
-父组件
-```html
-<template>
-  <div>父组件</div>
-  <baseButton ref="baseButton" />
-</template>
-<script>
-//引入子组件
-import baseButton from "./components/BaseButton.vue";
-export default {
-  data: function () {
-    return {};
-  },
-  components: {
-    baseButton,
-  },
-  mounted() {
-    this.$baseButton = this.$refs.baseButton;
 
-    this.$baseButton.alert("父组件", 1); //调用子组件里方法
-    console.log(this.$baseButton.a); //打印 120
-  },
-};
-</script>
-<style scoped>
-</style>
-```
-## 组件slot（插槽）
+## 组件插槽（slot）
 
-编写
+定义组件
 ```javascript
 //一个插槽
 Vue.component('baseButton', {
@@ -726,46 +722,51 @@ Vue.component('baseButton', {
   template: `
   <div>
       <p>我是组件</p>
-      <slot name="one"></slot> //多个插槽需要在slot标签上指定name来区分，
+      <slot name="one"></slot> //多个插槽需要在slot标签上指定name来区分
       <slot name="two"></slot>
   </div>`
 })
 ```
-使用
+使用组件
 ```html
 <!--一个插槽-->
 <base-button>
-  <input type="text" :value="inputValue" />
+  <p>我是插槽内容</p>
 </base-button>
 
 <!--多个插槽-->
 <base-button>
   <template v-slot:one>
-    <input type="text" :value="inputValue" />
+    <p>我是插槽内容one</p>
   </template>
   <template v-slot:two>
-    <input type="text" :value="inputValue + 2" />
+    <p>我是插槽内容two</p>
   </template>
 </base-button>
 ```
-## 组件Non-props属性
+## 组件Non-props特性
 
 给子组件v-bind绑数据，子组件如果不props接收数据，绑的数据会变成子组件的属性，子组件接收了数据就不会变成子组件的属性。这也就是为什么可以给组件或标签绑定style样式。
+
+定义组件
+```javascript
+Vue.component('baseButton', {
+  template: `<div>123</div>`
+})
+```
+使用组件
 ```html
-<!--假如value1这时是1，且组件没有接收这个index值，这时组件的跟标签是div-->
+<!--假如value1这时是1，且base-button组件没有props接收这个index值，则这个index会变成属性-->
 <base-button :index="value1"></base-button>
 ```
 渲染结果
 ```html
-<div index="1"></div>
+<div index="1">123</div>
 ```
-## 自定义部组件绑v-model属性
-编写
+## 自定义组件使用v-model
+定义组件
 ```javascript
-Vue.component('peng-input', {
-  data: function () {
-    return {}
-  },
+Vue.component('pengInput', {
   props: ["value"],
   template: `
 	<input
@@ -774,14 +775,36 @@ Vue.component('peng-input', {
 	/>`
 })
 ```
-使用
+使用组件
 ```html
-//自定义组件peng-input
 <peng-input v-model="input_text"></peng-input>
 ```
-## 组件.sync修饰符
-子组件
+## 组件修饰符.sync
 ```html
+<!--父组件-->
+<template>
+  <div>父组件</div>
+  <!--通过修饰符.sync，子组件可以更方便的向父组件传输数据。不用通过之前接收事件的方式传输数据。这种其实是之前(emit,props)的语法糖-->
+  <child-component :value.sync="faterValue" />
+</template>
+<script>
+//引入子组件
+import childComponent from "./childComponent.vue";
+export default {
+  components: {
+    childComponent
+  },
+  data() {
+    return {
+      faterValue:456
+    }
+  }
+};
+</script>
+
+
+
+<!--子组件childComponent.vue-->
 <template>
   <div>我是子组件</div>
   <button @click="updateData">更新数据</button>
@@ -790,49 +813,40 @@ Vue.component('peng-input', {
 export default {
   props: ["value"],
   data: function () {
-    return {};
+    return {}
   },
   methods: {
     updateData(){
       //因为value是通过.sync绑定进来的，所以可以使用下面，这种方式更新value
       this.$emit('update:value',123)
     }
-  },
-};
-</script>
-<style scoped>
-</style>
-```
-父组件
-```html
-<template>
-  <div>父组件</div>
-  <!--通过.sync修饰符，子组件可以更方便的修改父组件里数据。不用通过之前接收事件的方式更新数据-->
-  <child-component :value.sync="faterValue" />
-</template>
-<script>
-//引入子组件
-import childComponent from "./components/childComponent.vue";
-export default {
-  components: {
-    childComponent,
-  },
-  data() {
-    return {
-      faterValue:456
-    };
   }
 };
 </script>
-<style scoped>
-</style>
 ```
-## 组件name属性，自己调用自己
+## 组件属性name 可自己调用自己
 ```html
-子组件
+<!--父组件-->
 <template>
   <div>
-    <!--子组件里调用navList自己调用自己-->
+    <nav-list :haveChild="true"/>
+  </div>
+</template>
+<script>
+import navList from './navList.vue'
+export default {
+  components:{
+    navList
+  }
+};
+</script>
+
+
+
+<!--子组件navList.vue-->
+<template>
+  <div>
+    <!--子组件里通过属性name="navList"，自己调用自己-->
     <nav-list :haveChild="false"/>
   </div>
 </template>
@@ -844,49 +858,23 @@ export default {
       type:Boolean,
       default:false
     }
-  },
-  data: function () {
-    return {};
-  },
+  }
 };
 </script>
-<style scoped>
-</style>
 ```
-父组件
-```html
-<template>
-  <div>
-    <!--父组件里调用navList子组件-->
-    <nav-list :haveChild="true"/>
-  </div>
-</template>
-<script>
-import navList from '@/components/navList.vue'
-export default {
-  components:{
-    navList
-  },
-  data: function () {
-    return {};
-  },
-};
-</script>
-<style scoped>
-</style>
-```
+
 ## vue动画
 css样式
 ```css
-/*打开过渡时*/
+/*打开过渡时 enter-active */
 .slide-fade-enter-active {
   transition: all 0.5s;
 }
-/*关闭过渡时*/
+/*关闭过渡时 leave-active */
 .slide-fade-leave-active {
   transition: all 0.15s linear;
 }
-/*打开开始时，关闭结束时*/
+/*打开开始时 enter，关闭结束时 leave-to */
 .slide-fade-enter,
 .slide-fade-leave-to {
   transform: translateY(100px);
@@ -900,28 +888,32 @@ css样式
 </transition>
 ```
 
-## 在vue里使用axios
+## vue里使用axios
 1、在项目内创建一个文件夹request
 
 2、在文件夹内创建一个index.js文件
 
-index.js
+request/index.js
 ```javascript
 import axios from 'axios';
 
 //import store from '@/store' //导入 vuex
 
-// 环境的切换
-// if (process.env.NODE_ENV == 'development') {
-//开发环境
-// 	axios.defaults.baseURL = '';
-// } else if (process.env.NODE_ENV == 'debug') {
-//测试环境
-// 	axios.defaults.baseURL = '';
-// } else if (process.env.NODE_ENV == 'production') {
-//生产环境
-// 	axios.defaults.baseURL = '';
-// }
+/*
+if (process.env.NODE_ENV == 'development') {
+  //开发环境
+  axios.defaults.baseURL = '';
+} else if (process.env.NODE_ENV == 'debug') {
+  //测试环境
+  axios.defaults.baseURL = '';
+} else if (process.env.NODE_ENV == 'production') {
+  //生产环境
+  axios.defaults.baseURL = '';
+}
+*/
+
+// 请求url公共部分
+axios.defaults.baseURL = 'https://192.168.31.95';
 
 // 请求超时时间
 axios.defaults.timeout = 10000;
@@ -929,152 +921,123 @@ axios.defaults.timeout = 10000;
 // post请求头
 axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded;charset=UTF-8';
 
+// 配置token
+axios.defaults.headers.common['Authorization'] = 'token_value';
+
 // 请求拦截器
 axios.interceptors.request.use(function (config) {
-  // console.log(config);
-  return config;
+    // console.log(config);
+    return config;
 }, function (error) {
-  return Promise.reject(error);
+    return Promise.reject(error);
 });
 
 // 响应拦截器
 axios.interceptors.response.use(function (response) {
-  if (response.status === 200) {
-    return Promise.resolve(response.data);
-  } else {
-    return Promise.reject(response);
-  }
-},
-  // 服务器状态码不是200的情况    
-  function (error) {
-    if (error.response.status) {
-      //error.response.status  401,403,404
-      return Promise.reject(error.response);
+    if (response.status === 200) {
+        return Promise.resolve(response.data);
+    } else {
+        return Promise.reject(response);
     }
-  }
+},
+    // 服务器状态码不是200的情况    
+    function (error) {
+        if (error.response.status) {
+            //error.response.status  401,403,404
+            return Promise.reject(error.response);
+        }
+    }
 );
 export default axios;
 ```
 vue main.js
 ```javascript
 //vue2配置方式
-//引入request配置
-import a_request from './request'
-//创建一个vue原型方法
+import a_request from './request';
 Vue.prototype.$request = a_request;
 
 //vue3配置方式
 import a_request from './request'
 const app = createApp(App)
 app.config.globalProperties.$request = a_request
-app.use(router).mount('#app')
+app.mount('#app')
 ```
 项目中使用
 ```javascript
 export default {
-  name: 'home',
-  mounted() {
-    //get请求
-    this.$request.get('http://localhost/abc', {
-      params: {
-        a: 1
-      }
-    })
-      .then(function (data) {
-        console.log(data)
-      }).catch(function (err) {
-        console.log(err)
-      });
-    //post请求
-    this.$request.post('http://localhost/testPost', {
-      a: 1
-    })
-      .then(function (data) {
-        console.log(data)
-      }).catch(function (err) {
-        console.log(err)
-      })
-  },
-  data() {
-    return {}
-  },
-  methods: {}
+    name: 'home',
+    mounted() {
+        //get请求
+        this.$request({
+            url: '/api/getData',
+            method: 'GET',
+            params: {
+                'a': 10,
+                'b': 20
+            },
+            headers: { 'yourHeaderFeild': '1111' },//自定义请求头参数
+        }).then(function (data) {
+            console.log(data)
+        }).catch(function (err) {
+            console.log(err)
+        });
+
+
+        //post请求
+        this.$request({
+            url: '/api/postData',
+            method: 'POST',
+            data: {
+                'a': 1000,
+                'b': 2000
+            },
+            headers: { 'yourHeaderFeild': '1111' },//自定义请求头参数
+        }).then(function (data) {
+            console.log(data)
+        }).catch(function (err) {
+            console.log(err)
+        });
+    }
 }
 ```
-axios自定义请求头参数
+如上请注意：post方式自定义请求头信息，会触发**复杂请求**。复杂请求会在post请求之前，会向服务端发送一个OPTIONS的请求权限信息的请求，来向服务端要服务端的请求权限信息。拿到服务端的请求权限信息后，浏览器会将这个与post方式的请求头，请求方式，请求域名进行检验。如果满足条件发送post请求，如不满足会触发跨域，不会进行post请求。[Nodejs处理复杂请求](https://github.com/fengfanv/JS-library/tree/master/node#node处理复杂请求)
 
-注意：post方式自定义请求头信息，会触发**复杂请求**。复杂请求会在post请求之前，会向服务端发送一个OPTIONS的请求权限信息的请求，来向服务端要服务端的请求权限信息。拿到服务端的请求权限信息后，浏览器会将这个与post方式的请求头，请求方式，请求域名进行检验。如果满足条件发送post请求，如不满足会触发跨域，不会进行post请求
 
-[Nodejs处理 复杂请求](https://github.com/fengfanv/JS-library/tree/master/node#node处理复杂请求)
-```javascript
-export default {
-  name: "home",
-  mounted() {
-    //get请求
-    this.$request
-      .get("http://localhost/abc", {
-        params: {
-          a: 1,
-        },
-        headers: {
-          token: "I_am_token",
-        },
-      })
-      .then(function (data) {
-        console.log(data);
-      })
-      .catch(function (err) {
-        console.log(err);
-      });
 
-    //post请求
-    this.$request
-      .post(
-        "http://localhost/testPost",
-        {
-          a: 1,
-        },
-        {
-          headers: {
-            token: "I_am_token",
-          },
-        }
-      )
-      .then(function (data) {
-        console.log(data);
-      })
-      .catch(function (err) {
-        console.log(err);
-      });
-  },
-};
-```
-在vue里使用axios的小窍门
+### vue里使用axios的小窍门
 
-1、把所有接口都写在一个文件内，方便管理接口
+把所有接口都写在一个js文件内，方便管理接口
 
-1.1、在request文件夹下创建一个query.js文件，写下如下代码
+在request文件夹下创建一个query.js文件，并写下如下代码：
 ```javascript
 //query.js文件
 import request from './index.js';
 
-export function queryOrder() {
-  let params = new URLSearchParams();//解决post方式后台接收不到参数问题
-  params.append("orderid", orderid);
-  return request.post("http://localhost:5000/queryOrder", params)
-    .then(function (res) {
-      return Promise.resolve(res);
+export function queryOrder(orderid) {
+    let params = new URLSearchParams();//解决post方式后台接收不到参数问题
+    params.append("orderid", orderid);
+    return request({
+        url: 'http://localhost:5000/queryOrder',
+        method: 'POST',
+        data: params
+    }).then(function (res) {
+        return Promise.resolve(res);
     }).catch(function (err) {
-      return Promise.reject(err);
+        return Promise.reject(err);
     });
 }
 
-export function queryOrder2() {
-  //...
+export function queryOrder2(data) {
+    return request({
+        url: 'http://localhost:5000/queryOrder2',
+        method: 'POST',
+        data
+    })
 }
 
+//...
 ```
-1.2、在项目中使用
+在项目中使用
 ```html
 <template>
   <div></div>
@@ -1083,20 +1046,17 @@ export function queryOrder2() {
 import { queryOrder } from "../request/query.js";
 export default {
   data: function () {
-    return {this.a:1};
+    return { a: 1 };
   },
   mounted() {
-	  queryOrder(this.a).then((res)=>{
-		  console.log(res);
-	  }).catch((err)=>{
-		  console.log(err);
-	  })
+    queryOrder(this.a).then((res) => {
+      console.log(res);
+    }).catch((err) => {
+      console.log(err);
+    })
   },
-  methods: {},
 };
 </script>
-<style scoped>
-</style>
 ```
 ## vue-router使用
 1、在项目内创建一个文件夹router
@@ -1248,9 +1208,9 @@ this.$router.go(-1);//和JavaScript里的history.go(-1)功能基本一样
 
 this.$router.replace("/home");//跟 router.push 很像，不同的是，它不会向 history 添加新记录，而是跟它的方法名一样，会替换掉当前的 history 记录
 
-this.$router.push({"path":'/home',query:{"a","dad"}});//地址    /home?a=dad
+this.$router.push({"path":'/home',query:{"a","123"}});//地址    /home?a=123
 
-this.$router.push({"name":'index',params:{"id","dad"}});//地址    /home/dad   使用这种需要预先配置好，才能使用
+this.$router.push({"name":'index',params:{"id","123"}});//地址    /home/123   使用这种需要预先配置好，才能使用
 
 this.$route.query  //获取query里面传过来的值
 
@@ -1263,45 +1223,49 @@ this.$route.params  //获取params里面传过来的值
 
 index.js
 ```javascript
+//state：存储的数据(状态)，在项目中使用 this.$store.state.参数名
+
+//getters：可以将getters理解为vuex的计算属性，getters的返回值会被缓存起来，只有当它依赖的数据发生改变时才会被重新计算。在项目中使用 this.$sotre.getters.方法名
+
+//mutations：官网建议专门用来修改数据(状态)，mutations的方法里仅支持同步的方法（如：在方法里面不能使用setTimeout这种异步操作）。在项目中使用 this.$store.commit('方法名',params)
+
+//actions：官方不建议我们直接调用mutations下方法来改数据，所以提供了另一种方法，主要用于调用mutations下的方法，actions里可以使用异步操作（如：在actions的方法里面可以使用setTimeout等，区别上面mutations），在项目中使用 this.$store.dispatch('方法名',params)
+
+//modules：由于使用单一状态树，web应用的所有状态会集中到一个比较大的对象。当应用变得非常复杂时，store对象就会变得很臃肿。为了解决这个问题，vuex允许我们将store分割成模块(module)。每个模块拥有自己的state、mutation、action、getter
+
+
 //vue2版本
 import Vue from 'vue'
 import Vuex from 'vuex'
 
 Vue.use(Vuex)
 
-// state：存储的数据（状态） ，我们在项目中使用 this.$store.state.参数名
-// getters：可以将getters理解为store的计算属性，getters的返回值会根据它的依赖被缓存起来，且只有当它的依赖值发生了改变才会被重新计算。我们在项目中使用 $sotre.getters.方法名
-// mutations：官网建议专门用来修改数据（状态），mutations的方法里仅支持同步的方法（如：在方法里面不能使用setTimeout这种）。我们在项目中使用 $store.commit('方法名',params)
-// actions：官方不建议我们直接调用mutations下方法来改数据，所以提供了另一种方法，主要用于调用mutations下的方法，actions里可以使用异步操作（如：在actions的方法里面可以使用setTimeout等，区别上面mutations），我们在项目中使用 $store.dispatch('方法名',params)
-// modules：由于使用单一状态树，应用的所有状态会集中到一个比较大的对象。当应用变得非常复杂时，store对象就会变得很臃肿。为了解决这个问题，Vuex允许我们将store分割成模块（module）。每个模块拥有自己的state、mutation、action、getter，一般用于权限管理
-
 const store = new Vuex.Store({
-  //数据存在里面
-  state: {
-    count: 0
-  },
-  getters: {
-    getStateCount: function (state) {
-      return state.count + 1;
-    }
-  },
-  mutations: {
-    addCount(state, n = 0) {
-      state.count += n;
-    }
-  },
-  actions: {
-    addFun: function (context,value) {
-      context.commit("addCount", value);
+    state: {
+        count: 0
     },
-    //actions可以使用promise返回值（区别于mutations，mutations里不可以使用promise返回值）
-    //调用时，this.$store.dispatch('promiseTest',123).then((res)=>{console.log(res)})
-    promiseTest: function (context,value) {
-    	return new Promise((resolve,reject)=>{
-		resolve('啦啦啦')
-	})
+    getters: {
+        getStateCount: function (state) {
+            return state.count + 1;
+        }
+    },
+    mutations: {
+        addCount(state, n = 0) {
+            state.count += n;
+        }
+    },
+    actions: {
+        addFun: function (context, value) {
+            context.commit("addCount", value);
+        },
+        //actions可以使用promise返回值（区别于mutations，mutations里不可以使用promise返回值）
+        //调用时 this.$store.dispatch('promiseTest',123).then((res)=>{console.log(res)})
+        promiseTest: function (context, value) {
+            return new Promise((resolve, reject) => {
+                resolve('啦啦啦')
+            })
+        }
     }
-  }
 })
 export default store
 
@@ -1358,6 +1322,7 @@ this.$store.dispatch("addFun",1);
 index.js
 ```javascript
 import { createStore } from 'vuex'
+
 import app from './app_modules'
 
 export default createStore({
@@ -1372,7 +1337,8 @@ export default createStore({
 app_modules.js
 ```javascript
 export default {
-    namespaced: true, //开启命名空间，默认情况下，模块内部的 action 和 mutation 是注册在全局命名空间内的，这样可以使得多个模块能够对同一个 action 或 mutation 作出响应。Getter同样也是默认注册在全局命名空间，所以必须要注意，不要在不同的、无命名空间的模块中定义两个相同的 getter 从而导致错误。namespaced: true使其成为带命名空间的模块，当模块被注册后，它的所有 getter、action、mutation都会自动根据模块注册的路径调整命名
+    namespaced: true, //开启命名空间。默认情况下，模块内部的 action 和 mutation 是注册在全局命名空间内的，这样可以使得多个模块能够对同一个 action 或 mutation 作出响应。getter 同样也是默认注册在全局命名空间，所以必须要注意，不要在不同的、无命名空间的模块中定义两个相同的 getter 从而导致错误。
+    //namespaced: true 使其成为带命名空间的模块，当模块被注册后，它的所有 getter、action、mutation 都会自动根据模块注册的路径调整命名
     state() {
         return {
             //在页面中使用 this.$store.state.app.count
@@ -1406,7 +1372,7 @@ export default {
     }
 }
 ```
-## keep-alive组件缓存
+## 组件缓存keep-alive
 
 ```
 keep-alive是vue内置的一个组件，而这个组件的作用就是能够缓存不活动的组件，我们能够知道，一般情况下，组件进行切换的时候，默认会进行销毁，如果有需求，某个组件切换后不进行销毁，而是保存之前的状态，那么就可以利用keep-alive来实现
@@ -1419,20 +1385,30 @@ keep-alive是vue内置的一个组件，而这个组件的作用就是能够缓�
 
 2、deactivated ：离开页面的时候会触发deactivated，不会触发页面或组件的卸载生命周期钩子（如beforeUnmount，unmounted）
 ```
+App.vue
+```html
+<template>
+  <router-view v-slot="{ Component }">
+    <keep-alive>
+      <component :is="Component" v-if="$route.meta.keepAlive" />
+    </keep-alive>
+    <component :is="Component" v-if="!$route.meta.keepAlive" />
+  </router-view>
+</template>
 
-使用
+<style>
+nav {
+  padding: 30px;
+}
+
+nav a {
+  font-weight: bold;
+  color: #2c3e50;
+}
+</style>
+```
+router/index.js
 ```javascript
-vue3内使用keep-alive组件缓存
-
-//app.vue文件的配置
-<router-view v-slot="{ Component }">
-	<keep-alive>
-		<component :is="Component"  v-if="$route.meta.keepAlive" :key="$route.path"/>
-	</keep-alive>
-	<component :is="Component"  v-if="!$route.meta.keepAlive"/>
-</router-view> 
-
-//router/index.js的配置
 import { createRouter, createWebHashHistory } from 'vue-router'
 const routes = [
     //重定向的地址
@@ -1442,7 +1418,7 @@ const routes = [
         name: 'a',
         component: () => import ('../pages/a.vue'),
         meta: {
-            keepAlive: true //根据meta属性里的keepAlive，来判断，这个页面用不用，进行组件缓存
+            keepAlive: true //根据meta属性里的keepAlive来判断，这个页面用不用进行缓存
         }
     },
     {
@@ -1478,7 +1454,7 @@ reactive用于包装对象和数组等复杂类型的数据。它不能包装（
 
 当ref的值是一个对象时，ref会在内部调用reactive，但使用时仍需要通过 .value 属性来访问或修改。
 ```
-组合式API script setup
+组合式API &lt;script setup&gt;
 ```html
 <script setup>
 import { ref } from 'vue'
@@ -1672,7 +1648,7 @@ store.state.a = bbb.value;
   <p>{{ $store.state.a }}</p>
 </template>
 ```
-组合式API setup()
+组合式API setup() 钩子函数
 
 setup() 执行时，组件实例尚未被创建，这时组件内 data，computed，methods 还不能使用。
 
@@ -1690,6 +1666,7 @@ export default {
     //在js里使用ref，需要加 .vlaue 属性
     console.log(count.value)
     
+    //将声明的响应式状态 暴露给模板
     return {
       count
     }
@@ -1743,7 +1720,7 @@ export default {
   },
   emits: ['response'],
   setup(props, context) {
-    
+    console.log(props.msg)
     context.emit('response', 'msg from child')
   }
 }
