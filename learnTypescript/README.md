@@ -16,6 +16,8 @@ npm init -y //-y的意思是生成的package文件内容是默认的，这样我
 ```
 tsc xxxx.ts //编译一个文件，.ts可填可不填
 tsc xxxx.ts xxxx.ts //编译多个ts文件，.ts可填可不填
+
+node xxxx.js //运行编译好的.js文件
 ```
 ### 安装ts-node
 ```
@@ -81,7 +83,7 @@ null是一个只有一个值的特殊类型。表示一个空对象引用。
 用 typeof 检测 null 返回是 object。
 
 10、undefined
-用于初始化变量为一个未定义的值
+用于表示变量未定义值
 
 11、never
 never 其它类型。
@@ -105,11 +107,11 @@ console.log("字符串为 " + val)
 ### 日期类型使用
 ```javascript
 var d1:Date = new Date();
-console.log(d1);//2020-06-299T11:02:14.369Z，这个时间不是本地的事件，需要设置时区
+console.log(d1);//2020-06-299T11:02:14.369Z，这个时间不是本地的时间，需要设置时区
 
 //传递一个毫秒数
 var d2:Date = new Date(2000);
-console.log(d2);//时间是从1970,1,1开始，回1000毫秒等于1秒
+console.log(d2);//时间是从1970,1,1开始。1000毫秒等于1秒
 //所以打印：1970-01-01T00:00:02.000Z
 
 //传递一个字符串
@@ -143,7 +145,7 @@ class dog {
 }
 
 //根据 狗 类，生成一个 名叫a的 狗。
-var dog_a = new dog('a');//使用 new关键字 创建类的对象
+var dog_a = new dog('a');//使用 new关键字 创建类的实例(对象)
 dog_a.say();//汪汪。我叫a
 ```
 ### 类的使用
@@ -161,8 +163,9 @@ class renlei{
     }
 }
 let wangleilei:renlei = new renlei('王雷雷',18)
-console.log(wangleilei);//打印：renlei { name: '王雷雷', age: 18 }
-wangleilei.say();//打印：你好！我叫王雷雷,今年18岁
+console.log(wangleilei);//renlei { name: '王雷雷', age: 18 }
+wangleilei.say();//你好！我叫王雷雷,今年18岁
+
 
 //编译成js后的样子
 var renlei = /** @class */ (function () {
@@ -179,11 +182,11 @@ var wangleilei = new renlei('王雷雷', 18);
 console.log(wangleilei);
 wangleilei.say();
 ```
-### 类访问控制修饰符(public，protected，private)
+### 类的访问控制修饰符(public，protected，private)
 ```javascript
 class ren{
     public sex:string//公共属性sex，可以在任何地方被访问。
-    protected name:string//受保护的属性name，只能在 类ren本身内 或 类ren的子类中 使用
+    protected name:string//受保护的属性name，只能在 类ren自己 或 类ren的子类 中使用
     private age:number//私有属性age，只能在类ren中使用
     public readonly tall:number=180//公共的，只读的，tall属性
     public constructor(sex:string,name:string,age:number){
@@ -194,7 +197,7 @@ class ren{
     public sayHello(){//公共方法，在哪里都可以访问
         console.log('你好！我叫'+this.name+',今年'+this.age+'岁');
     }
-    protected sayLove(){//受保护的方法，只能在类ren或类ren的子类中使用
+    protected sayLove(){//受保护的方法，只能在 类ren自己 或 类ren的子类 中使用
         console.log('loves you!');
     }
 }
@@ -229,7 +232,7 @@ class Ren {
 ```javascript
 TypeScript 一次只能继承一个类，不支持继承多个类，但 TypeScript 支持多重继承（C 继承 B，B 继承 A）
 
-子类除了不能继承父类的私有成员(方法和属性)，其他的都可以继承。
+子类除了不能继承父类的私有成员(属性和方法)，其他的都可以继承。
 
 class me{
     public name:string
@@ -258,15 +261,13 @@ son.sayHello();//打印：你好！我叫我儿子,今年10岁
 //使用mySon类中的zhuanqian方法
 son.zhuanqian();//打印：我会赚钱
 ```
-### 类继承属性方法的重写
+### 类继承属性和方法的重写
 ```javascript
 子类可以继承父类的属性和方法，并且子类可以重写（或称为覆盖）父类的非私有属性和方法。
 
 如果父类中的属性或方法被声明为private，则它们不能在子类中被访问或重写。如果它们被声明为protected，则它们可以在子类中被访问，但不能在子类之外被访问。如果它们被声明为public或没有明确的访问修饰符（默认为public），则它们可以在任何地方被访问。
 
 在子类中，可以使用super关键字来访问父类的属性和方法。
-
-子类不能重写父类的静态成员（静态属性和静态方法）。静态成员属于类本身，而不是类的实例。因此，它们不能被子类继承或重写。但是，子类可以声明自己的静态成员，这些成员与父类的静态成员是独立的。
 
 子类可以重写（实际上是提供自己的实现）父类的构造函数。但是，在子类的构造函数中，通常需要使用super()来调用父类的构造函数，以确保父类的初始化代码得到执行。
 
@@ -285,12 +286,15 @@ class me{
 //mySon继承（复制）了me的所以属性和方法
 class mySon extends me{
     public yangzi:string = '帅'
+    constructor(name:string,age:number){//重写类的，构造函数
+        super(name,age)//调用父类构造函数
+    }
     public sayHello(){//重写me类中的sayHello方法
         super.sayHello();//调用me类中的sayHello方法
         console.log('我是'+this.name+'，我在，mySon类中');
     }
     public zhuanqian(){
-        console.log('我会赚钱');
+        console.log(this.name,'我会赚钱');
     }
 }
 
@@ -410,7 +414,7 @@ function search(content:string='aaaaa'):string{
 console.log(search());//aaaaa
 
 //声明一个有剩余参数的方法
-//剩余参数语法允许我们将一个不确定数量的参数作为一个数组传入。//类似将多个形参转换成数组来进行访问。类似调用js里arguments属性。
+//剩余参数语法允许我们将一个不确定数量的参数作为一个数组传入。//类似将多个形参转换成数组来进行访问。类似使用js里arguments方式来获取形参。
 function 方法名(...参数名称:参数类型):方法返回值类型/void{
 	return xxx;
 }
@@ -448,7 +452,7 @@ var a = (content:string):string => {
 ### 接口
 ```javascript
 接口(interface)与类(class)的区别
-类：类是蓝图或模板。类定义了对象的属性和方法，并且可以包含实现细节（即方法的具体代码）。
+类：类是蓝图或模板。类定义了对象的属性和方法，并且包含实现细节（即方法的具体代码）。
 接口：接口是一个类型定义，它描述了对象应该具有的形状（即属性和方法的签名）。接口不包含任何实现细节，只是声明了对象应该有的结构。
 
 类：类可以被实例化
@@ -491,7 +495,7 @@ interface IParent2 {
  
 interface Child extends IParent1, IParent2 { } 
 var Iobj:Child = { v1:12, v2:23} 
-console.log("value 1: "+Iobj.v1+" value 2: "+Iobj.v2)
+console.log("value 1: "+Iobj.v1+" value 2: "+Iobj.v2)//value 1: 12 value 2: 23
 ```
 ### 接口使用
 ```ts
@@ -572,8 +576,103 @@ fatDehua.sayHello();//我是胖德华
 thinDehua.sayHello();//我是瘦德华
 ```
 ### ts泛型
-```
+```ts
+泛型是一种编程语言特性，允许在定义函数、类、接口等时使用占位符来表示类型，而不是具体的类型。
 
+泛型最重要的功能是，代码重用，这样可以编写与特定类型无关的通用代码，提高代码的复用性。
+
+//泛型函数案例
+//使用泛型来创建一个可以处理不同类型数据的函数
+//如下，identity是一个泛型函数，使用 T 表示泛型类型
+function identity<T>(arg: T): T {
+    return arg;
+}
+//使用string代表T
+let result = identity<string>("Hello");
+console.log(result); //Hello
+//使用number代表T
+let numberResult = identity<number>(42);
+console.log(numberResult); //42
+
+
+//泛型接口案例
+//这里定义了一个泛型接口 Pair，它有两个类型参数 T 和 U。
+interface Pair<T, U> {
+    first: T;
+    second: U;
+}
+//使用string代表T。使用number代表U。
+let pair: Pair<string, number> = { first: "hello", second: 42 };
+console.log(pair); // { first: 'hello', second: 42 }
+
+
+//泛型类案例
+//使用 T 表示泛型类型。
+class Box<T> {
+    private value: T;
+
+    constructor(value: T) {
+        this.value = value;
+    }
+
+    getValue(): T {
+        return this.value;
+    }
+}
+
+//使用string代表T
+let stringBox = new Box<string>("TypeScript");
+console.log(stringBox.getValue()); //TypeScript
+```
+### 泛型约束
+```ts
+有时候你想限制泛型的类型范围，可以使用泛型约束
+
+interface Lengthwise {
+    length: number;
+}
+
+function logLength<T extends Lengthwise>(arg: T): void {
+    console.log(arg.length);
+}
+
+// 正确的使用
+logLength("hello"); // 5
+
+// 错误的使用，因为数字没有 length 属性
+logLength(42); // 错误
+
+//在这个例子中，定义了一个泛型函数 logLength，它接受一个类型为 T 的参数，但有一个约束条件，即 T 必须实现 Lengthwise 接口，该接口要求有 length 属性。因此，可以正确调用 logLength("hello")，但不能调用 logLength(42)，因为数字没有 length 属性。
+```
+### 泛型与默认值
+```ts
+可以给泛型设置默认值，使得在不指定类型参数时能够使用默认类型
+
+function defaultValue<T = string>(arg: T): T {
+    return arg;
+}
+
+// 使用带默认值的泛型函数
+let result1 = defaultValue("hello"); // 推断为 string 类型
+let result2 = defaultValue(42);      // 推断为 number 类型
+
+//这个例子展示了带有默认值的泛型函数。函数 defaultValue 接受一个泛型参数 T，并给它设置了默认类型为 string。在使用时，如果没有显式指定类型，会使用默认类型。在例子中，第一个调用中 result1 推断为 string 类型，第二个调用中 result2 推断为 number 类型。
+```
+### ts声明文件
+```ts
+在 TypeScript 中，声明文件（.d.ts 文件）用于描述 JavaScript 库的类型信息，这样 TypeScript 编译器就能理解这些js库中的函数、变量和类的类型。这对于使用纯 JavaScript 库或者第三方库时特别有用，因为这些库通常没有内置的类型定义。
+
+假如我们想使用第三方js库，比如 jQuery，我们通常这样获取一个 id 是 foo 的元素
+
+但是在 TypeScript 中，我们并不知道 $ 或 jQuery 是什么东西：
+jQuery('#foo');//报错。index.ts(1,1): error TS2304: Cannot find name 'jQuery'.
+
+这时，我们需要使用 declare 关键字来定义它的类型，帮助 TypeScript 判断我们传入的参数类型对不对：
+declare var jQuery: (selector: string) => any;
+
+jQuery('#foo');//正常运行
+
+declare 定义的类型只会用于编译时的检查，编译结果中会被删除。
 ```
 ### ts编译成js的小bug1
 ```javascript
@@ -587,6 +686,8 @@ function aFun(){
     console.log(a);
 }
 aFun();
+
+
 //编译成.js后
 function aFun(){
     {
@@ -598,3 +699,6 @@ function aFun(){
 }
 aFun();
 ```
+### 参考链接
+
+[菜鸟教程 - TypeScript 教程](https://www.runoob.com/typescript/ts-tutorial.html)
