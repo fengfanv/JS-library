@@ -142,6 +142,10 @@ console.log(proxyObj.name);//get方法
 obj.name = 456;//值可以修改，但不会触发set方法
 console.log(obj.name);//值可以获取，但不会触发get方法
 ```
+## Vue Diff算法
+```
+
+```
 ## 设置npm镜像源地址
 ```
 https://registry.npmjs.org      npm官方镜像地址
@@ -1810,6 +1814,68 @@ export default {
   <h2>这里是子组件</h2>
   <p>右边这条消息，是从父级传来的：{{msg}}</p>
 </template>
+```
+toRefs工具函数
+```html
+<!--错误案例-->
+<template>
+  <button v-for="(item, index) of girls" :key="index" @click="selectGirlFun(index)">{{ item }}</button>
+  <div>{{ selectGirl }}</div>
+</template>
+
+<script lang="ts">
+import { defineComponent, reactive } from 'vue';
+
+export default defineComponent({
+  name: 'App',
+  setup() {
+    const data = reactive({
+      girls: ['大脚', '刘英', '小红'],
+      selectGirl: '',
+      selectGirlFun: (index: number) => {
+        data.selectGirl = data.girls[index]
+      }
+    })
+
+    return {
+      //虽然data是响应式的。
+      //但如下这样直接，解构暴露data属性，所暴露的data属性不是响应式的。
+      ...data
+    }
+  }
+});
+</script>
+
+
+
+<!--问题解决-->
+<template>
+  <button v-for="(item, index) of girls" :key="index" @click="selectGirlFun(index)">{{ item }}</button>
+  <div>{{ selectGirl }}</div>
+</template>
+
+<script lang="ts">
+import { defineComponent, ref, reactive, toRefs } from 'vue';
+
+export default defineComponent({
+  name: 'App',
+  setup() {
+    const data = reactive({
+      girls: ['大脚', '刘英', '小红'],
+      selectGirl: '',
+      selectGirlFun: (index: number) => {
+        data.selectGirl = data.girls[index]
+      }
+    })
+
+    //如下通过toRefs转换后。解构暴露出来的属性是响应式的。
+    const refData = toRefs(data)
+    return {
+      ...refData
+    }
+  }
+});
+</script>
 ```
 组合式api组件声明周期函数
 
