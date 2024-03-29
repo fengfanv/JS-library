@@ -1628,6 +1628,45 @@ watch(todoId, async () => {
     <pre>{{ todoData }}</pre>
 </template>
 ```
+组合式API中使用侦听器(watch)2
+```html
+<template>
+  <button v-for="(item, index) of girls" :key="index" @click="selectGirlFun(index)">{{ item }}</button>
+  <div>{{ selectGirl }}</div>
+</template>
+
+<script lang="ts">
+import { defineComponent, ref, reactive, toRefs, watch } from 'vue';
+
+export default defineComponent({
+  name: 'App',
+  setup() {
+    const data = reactive({
+      girls: ['大脚', '刘英', '小红'],
+      selectGirl: '',
+      selectGirlFun: (index: number) => {
+        data.selectGirl = data.girls[index]
+      }
+    })
+
+    //这样写监听不到data.selectGirl的变化
+    watch(data.selectGirl, (newValue, oldValue) => {
+      console.log(newValue, oldValue)
+    })
+
+    //需要改成这样才能监听到
+    watch(() => { return data.selectGirl }, (newValue, oldValue) => {
+      console.log(newValue, oldValue)
+    })
+
+
+    const refData = toRefs(data)
+    return {
+      ...refData
+    }
+});
+</script>
+```
 组合式API中使用组件(components)
 ```html
 <!--父组件-->
@@ -1874,6 +1913,101 @@ export default defineComponent({
       ...refData
     }
   }
+});
+</script>
+```
+vue hooks 功能
+```ts
+// src/hooks/nowTime.ts
+
+import { ref } from 'vue';
+
+const nowTime = ref("00:00:00")
+const getNowTime = () => {
+    const now = new Date();
+    const hour = now.getHours() < 10 ? '0' + now.getHours() : now.getHours();
+    const minute = now.getMinutes() < 10 ? '0' + now.getMinutes() : now.getMinutes();
+    const second = now.getSeconds() < 10 ? '0' + now.getSeconds() : now.getSeconds();
+    nowTime.value = hour + ':' + minute + ':' + second
+}
+setInterval(getNowTime, 1000)
+
+export {
+    nowTime,
+    getNowTime
+}
+```
+```ts
+// src/hooks/api.ts
+
+import { ref } from 'vue'
+import axios from 'axios'
+
+function getApiOne(url: string) {
+    const result = ref(null);
+    const loading = ref(true);
+    const loaded = ref(false);
+    const error = ref(null);
+
+    axios({
+        url,
+        method: 'get'
+    }).then((res) => {
+        loading.value = false;
+        loaded.value = true
+        result.value = res.data;
+    }).catch((err) => {
+        error.value = err;
+        loading.value = false;
+    })
+
+    return {
+        result,
+        loading,
+        loaded,
+        error
+    }
+}
+
+export default getApiOne
+```
+```html
+<!-- src/App.vue -->
+
+<template>
+  <div>{{ nowTime }}</div>
+  <hr>
+  <div>
+    result:{{ result }}<br>
+    loading:{{ loading }}<br>
+    loaded:{{ loaded }}<br>
+    error:{{ error }}
+  </div>
+</template>
+
+<script lang="ts">
+import { defineComponent, ref, reactive, toRefs, watch } from 'vue';
+import { nowTime, getNowTime } from './hooks/nowTime';
+import getApiOne from './hooks/api'
+
+
+export default defineComponent({
+  name: 'App',
+  setup() {
+
+    const { result, loading, loaded, error } = getApiOne('https://192.168.31.95/api/getData')
+
+    return {
+      nowTime,
+      getNowTime,
+
+      result,
+      loading,
+      loaded,
+      error
+    }
+  }
+
 });
 </script>
 ```
