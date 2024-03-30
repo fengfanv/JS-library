@@ -142,7 +142,7 @@ console.log(proxyObj.name);//get方法
 obj.name = 456;//值可以修改，但不会触发set方法
 console.log(obj.name);//值可以获取，但不会触发get方法
 ```
-## Vue Diff算法
+## Vue Diff算法 与 key
 ```
 
 ```
@@ -2024,24 +2024,24 @@ export default defineComponent({
 | beforeUnmount | onBeforeUnmount |
 | unmounted     | onUnmounted     |
 
-## 利用Vue.extend实现全局插件
+## vue2全局弹窗插件
 
-插件目录结构
+目录结构
 
 ![](./images/img-1.png)
 
-插件模板组件（plugin/alert.vue）
+/dialog/index.vue
 ```html
 <template>
-    <div v-if="isShow">
-        alert组件
+    <div class="dialog" v-if="isShow">
+        dialog组件
         <button @click="onButtonOk()">确认</button>
     </div>
 </template>
 
 <script>
 export default {
-    name: "alert",
+    name: "dialog_name",
     data() {
         return {
             isShow: false,
@@ -2052,60 +2052,72 @@ export default {
             //给调用的地方返回一个提示
             this.callback && this.callback('你单击了确定按钮')
         },
-        callback() { }//代绑定的callback
+        callback() { }//绑定的callback
     }
 };
 </script>
-<style scoped></style>
+<style scoped>
+.dialog {
+    width: 100px;
+    background-color: blanchedalmond;
+    border: 4px solid #ccc;
+    position: fixed;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    margin: auto;
+}
+</style>
 ```
-插件配置文件（plugin/index.js）
+/dialog/index.js
 ```javascript
-import alertFrom from './alert.vue'
+import dialogFrom from './index.vue'
 
 export default {
-  install: function (Vue, options) {
-    //利用扩展实例构造器生成一个Vue的子类
-    const alert2 = Vue.extend(alertFrom);
-    //生成一个该子类的实例
-    const alert_content = new alert2();
-    //将这个实例挂载在我创建的div上
-    alert_content.$mount(document.createElement('div'));
-    //并将此div加入全局挂载点内部
-    document.body.appendChild(alert_content.$el);
-    //在vue原型上写方法，调用使
-    Vue.prototype.alert_main = {
-      showAlert: function (callback) {
-        alert_content.isShow = true;
-        //给插件模板里绑一个回调函数，
-        //可利用callback向使用的地方返回参数
-        //可利用callback执行一些业务操作
-        alert_content.callback = callback;
-      },
-      hideAlert: function (callback) {
-        alert_content.isShow = false;
-        alert_content.callback = callback;
-      }
+    install: function (Vue, options) {
+        //利用扩展实例构造器生成一个Vue的子类
+        const dialog2 = Vue.extend(dialogFrom);
+        //生成一个该子类的实例
+        const dialog_content = new dialog2();
+        //将这个实例挂载在我创建的div上
+        dialog_content.$mount(document.createElement('div'));
+        //并将此div加入全局挂载点内部
+        document.body.appendChild(dialog_content.$el);
+        //在vue原型上写方法，调用使
+        Vue.prototype.dialog_main = {
+            showDialog: function (callback) {
+                dialog_content.isShow = true;
+                //给插件模板里绑一个回调函数，
+                //可利用callback向使用的地方返回参数
+                //可利用callback执行一些业务操作
+                dialog_content.callback = callback;
+            },
+            hideDialog: function (callback) {
+                dialog_content.isShow = false;
+                dialog_content.callback = callback;
+
+                // document.body.removeChild(dialog_content.$el);
+            }
+        }
     }
-  }
 }
 ```
 在（main.js）中进行绑定
 ```javascript
 import Vue from 'vue'
 
-import alertPopups from '@/plugin/index.js'
-Vue.use(alertPopups)
+import dialogPopups from '@/dialog/index'
+Vue.use(dialogPopups)
 ```
 在纯js文件中使用
 ```javascript
 import Vue from 'vue'
 
-Vue.alert_main.showAlert(function (data) {
-  //通过绑定callback，返回某些操作后需要返回的信息
+Vue.dialog_main.showDialog((res) => {
+  console.log(res)//打印：你单击了确定按钮
 
-  //也可以利用callback，执行某些操作
-  //比如这是个弹窗插架，你需要在单击插架ok按钮后执行某些操作
-  //这时，你可以利用callback来执行这些操作。
+  Vue.dialog_main.hideDialog()//点击弹窗内的确定按钮后，关闭弹窗
 });
 ```
 在vue文件中使用
@@ -2114,11 +2126,185 @@ Vue.alert_main.showAlert(function (data) {
 <script>
 export default {
   mounted(){
-    this.alert_main.showAlert(function (data) {
-      //回调函数
+    this.dialog_main.showDialog((res) => {
+      console.log(res)//打印：你单击了确定按钮
+      
+      this.dialog_main.hideDialog()//点击弹窗内的确定按钮后，关闭弹窗
     })
   }
 }
+</script>
+```
+## vue3实现全局弹窗插件
+
+参考链接：https://blog.csdn.net/weixin_45536484/article/details/131188165
+
+目录结构
+
+![](./images/vue3_dialog_1.png)
+
+/dialog/index.vue
+```html
+<template>
+    <div class="dialog">
+        <h1>alert组件</h1>
+        <p>{{ message }}</p>
+        <button @click="onConfirm()">确认</button><br>
+        <button @click="onCancel()">取消</button>
+    </div>
+</template>
+
+<script setup lang='ts'>
+defineProps({
+    message: {
+        type: String,
+        default: "",
+    },
+    onConfirm: {
+        type: Function,
+        default: () => { },
+    },
+    onCancel: {
+        type: Function,
+        default: () => { },
+    }
+})
+</script>
+<style scoped>
+.dialog {
+    width: 100px;
+    background-color: blanchedalmond;
+    border: 4px solid #ccc;
+    position: fixed;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    margin: auto;
+}
+</style>
+```
+/dialog/index.ts
+```ts
+import { createVNode, render } from 'vue'
+
+import notarizeBox from './index.vue'
+
+interface fun {
+    (message: string, onConfirm: () => void, onCancel: () => void): void
+}
+
+const MessageBox: fun = (message, onConfirm, onCancel) => {
+
+    const container = document.createElement('div')
+    document.body.appendChild(container)
+
+    const vnode = createVNode(
+        notarizeBox,
+        {
+            message: message,
+            onConfirm: () => {
+                onConfirm()
+                handleClose()
+            },
+            onCancel: () => {
+                onCancel()
+                handleClose()
+            }
+        }
+    )
+    render(vnode, container)
+
+    // 关闭并删除确认框
+    function handleClose() {
+        render(null, container)
+        document.body.removeChild(container)
+    }
+}
+
+export default MessageBox
+```
+使用方式1（直接引用，然后使用）
+```html
+<template>
+  <button @click="openDialog()">打开弹窗</button>
+</template>
+
+<script lang="ts">
+import { defineComponent } from 'vue'
+
+import dialog from './dialog/index'
+
+export default defineComponent({
+  name: 'App',
+  setup() {
+
+    function openDialog() {
+      dialog("确定要删除吗？",
+        () => {
+          console.log('确认按钮点击事件');
+        },
+        () => {
+          console.log('取消按钮点击事件');
+        }
+      );
+    }
+
+    return {
+      openDialog
+    }
+  }
+
+});
+</script>
+```
+使用方式2（先在项目main.ts文件里注册公共方法，然后使用）
+
+main.ts
+```ts
+import { createApp } from 'vue'
+import App from './App.vue'
+
+
+const app = createApp(App)
+
+import notarizeBox from './dialog/index'
+app.config.globalProperties.notarizeBox = notarizeBox
+
+app.mount('#app')
+```
+页面内使用
+```html
+<template>
+  <button @click="openDialog()">打开弹窗</button>
+</template>
+
+<script lang="ts">
+import { defineComponent, getCurrentInstance } from 'vue';
+
+export default defineComponent({
+  name: 'App',
+  setup() {
+    const { proxy } = getCurrentInstance() as any;//注意这里，这个代码只能写这里（setup方法下）。不能写在openDialog内。
+
+
+    function openDialog() {
+      proxy.notarizeBox("确定要删除吗？",
+        () => {
+          console.log('确认按钮点击事件');
+        },
+        () => {
+          console.log('取消按钮点击事件');
+        }
+      );
+    }
+
+    return {
+      openDialog
+    }
+  }
+
+});
 </script>
 ```
 ## 其它问题
