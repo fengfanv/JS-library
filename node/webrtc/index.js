@@ -6,8 +6,8 @@ var ws = require("nodejs-websocket");
 
 
 var hostname = GET_LAN_IP(); //如192.168.31.95
-var sslKey = fs.readFileSync("./ssl/anxinServerCA.key");
-var sslCert = fs.readFileSync("./ssl/anxinServerCA.crt");
+var sslKey = fs.readFileSync("./ssl/serverCA.key");
+var sslCert = fs.readFileSync("./ssl/serverCA.crt");
 
 
 //http服务
@@ -16,13 +16,48 @@ https.createServer({
     key: sslKey,
     cert: sslCert
 }, function (request, response) {
+    response.setHeader('Access-Control-Allow-Origin', '*');
+    response.setHeader("Access-Control-Allow-Headers", "X-Requested-With");
+    response.setHeader("Access-Control-Allow-Methods", "PUT,POST,GET,DELETE,OPTIONS");
+    response.setHeader("Access-control-max-age", "1000");
+
+    //处理复杂请求的预检请求
+    if (request.method === 'OPTIONS') {
+        response.writeHead(200, {
+            'Content-Type': 'text/plain',
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Headers': 'Content-Type, Content-Length, Authorization, Accept, X-Requested-With , yourHeaderFeild, sessionToken ',
+            'Access-Control-Allow-Methods': 'PUT, POST, GET, DELETE, OPTIONS'
+        });
+        response.end();
+        return false;
+    };
+
     var pathname = url.parse(request.url).pathname;
     var file_address = path.join(PUBLIC_PATH, decodeURI(pathname));
     fs.stat(file_address, function (err, stat) {
         if (err) {
-            response.writeHead(404, { 'Content-Type': 'text/plain;charset=utf-8' })
-            response.end('状态：404，没有这样的文件或目录！')
-            // console.log(err)
+            if (pathname == '/api/getData' && request.method == 'GET') {
+                console.log('/api/getData', 'get', request.headers, url.parse(request.url).query);
+
+                response.writeHead(200, { 'Content-Type': 'application/json' })
+                response.end(JSON.stringify({ 'a': 111, 'b': 222, 'method': 'get' }))
+            } else if (pathname == '/api/postData' && request.method == 'POST') {
+                let postData = '';
+                request.on('data', function (chunk) {
+                    postData += chunk;
+                });
+                request.on('end', function (chunk) {
+                    console.log('/api/postData', 'post', request.headers, postData);
+                });
+
+                response.writeHead(200, { 'Content-Type': 'application/json' })
+                response.end(JSON.stringify({ 'a': 111, 'b': 222, 'method': 'post' }))
+            } else {
+                response.writeHead(404, { 'Content-Type': 'text/plain;charset=utf-8' })
+                response.end('状态：404，没有这样的文件或目录！')
+                // console.log(err)
+            }
         } else {
             var file_type = pathname.split('.')[1];
             //https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types  常见MIME类型列表
