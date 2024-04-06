@@ -182,7 +182,7 @@ parseFloat("a40") //NaN
 ```javascript
 /*
 问：什么是 隐式类型转换？
-答：js偷偷给你转换数据类型。参数在运算时，被转换成能够运行的能到结果的数据类型，如1*"2"=2，这个字符串2在在运算时，被偷偷转换成了数值型。
+答：js偷偷给你转换数据类型。参数在运算时，被转换成能够运行的能得到结果的数据类型，如1*"2"=2，这个字符串2在在运算时，被偷偷转换成了数值型。
 隐式数据类型转换时，也是调用的显式类型转换的方法。
 */
 
@@ -264,18 +264,24 @@ console.log("a" > 10) //false
 //当关系运算符两边都是字符串的时候，这时两边都转成number，然后在比较
 //此时并不是调用Number()转数值，而是按照字符串对应的unicode编码，转成数字
 //使用 '字符串'.charCodeAt() 这个方法来查看字符串unicode编码
-//'2'.charCodeAt() > '10'.charCodeAt() => 50 > 49 => true
-console.log("2" > "10") //true
+console.log("2" > "10") //true '2'.charCodeAt() > '10'.charCodeAt() => 50 > 49 => true
 console.log('10'.charCodeAt()) //49，这里charCodeAt方法，默认返回字符串中，第一个字符的编码，如果想查第二个字符，可传字符的下标，字符下标默认从0开始，也就是charCodeAt(1)会返回字符串里第二个字符的unicode码
 
 //多个字符，从左往往右，依次比较
-//先比较a与b，a与b不等，然后调用charCodeAt方法，'a'.charCodeAt() > 'b'.charCodeAt() => 97 > 98 => false
-console.log("abc" > "b") //false
-console.log("abc" > "a") //true     'b'.charCodeAt() > 'a'.charCodeAt() => 98>97 => true
+console.log("abc" > "b") //false	//先比较a与b，a与b不等，然后调用charCodeAt方法，'a'.charCodeAt() > 'b'.charCodeAt() => 97 > 98 => false
+
+console.log("abc" > "a") //true
+//第一个字符比较："a" 和 "a"。它们相同，所以继续比较下一个字符。
+//第二个字符比较："b" 和没有字符了（因为 "abc" 比 "a" 长）。在这种情况下，JavaScript 会假定缺少的字符的 unicode 值为 0。所以 "b" 的 unicode 值（98）比 0 大，因此 "abc" 中的字符更大。
+
 console.log("abc" < "b") //true
 
-//先比较a与a，两者相等，则继续比较第二个字符，b与a，然后调用charCodeAt方法，'b'.charCodeAt() > 'a'.charCodeAt() => 98 > 97 => true
-console.log("abc" > "aad") //true
+console.log("abc" > "aad") //true	//先比较a与a，两者相等，则继续比较第二个字符，b与a，两者不等，则调用charCodeAt方法，'b'.charCodeAt() > 'a'.charCodeAt() => 98 > 97 => true
+
+console.log("aba" > "ab") //true
+//第一个字符比较："a" 和 "a"。它们相同，所以继续比较下一个字符。
+//第二个字符比较："b" 和 "b"。它们相同，所以继续比较下一个字符。
+//第三个字符比较："a" 和没有字符了（因为 "aba" 比 "ab" 长）。在这种情况下，JavaScript 会假定缺少的字符的 unicode 值为 0。所以 "a" 的 unicode 值（97）比 0 大，因此 "aba" 中的字符更大。
 
 console.log(true > false) //true
 //Number(true) => 1，Number(false) => 0，1>0 => true
@@ -368,21 +374,24 @@ console.log([] == 0) //true
 console.log(![] == 0) //true
 
 
-//这里右边的空对象因为 逻辑非 的优先级高于 关系运算符，右边的空对象在这里会 因为 逻辑非的原因，先把空对象通过 Boolean()方法，直接转成布尔，空对象强转布尔，得到true，逻辑非取反，得到false，然后在调用Number转数值，得到0
-//这里左边的空对象会因为关系运算符的原因，会被转成数值，会先调用valueOf，得到空对象，不是数值，则继续调用toString，得到"[object Object]"，然后把这个字符串，通过Number转成数值，得到NaN
+//这里右边的空对象因为 逻辑非 的优先级高于 关系运算符，右边的空对象在这里会 因为 逻辑非的原因，会先把空对象通过 Boolean()方法，直接转成布尔，空对象强转布尔，得到true，逻辑非取反，得到false
+//这里左边的空对象因为右边对象被逻辑非变成false和关系运算符的原因，会被转成数值，会先调用valueOf，得到空对象，不是数值，则继续调用toString，得到"[object Object]"
+//这时左边对象变成字符串"[object Object]"，右边对象变成布尔值false。如上文所说（当关系运算符两边有一边是字符串的时候，会将字符串通过Number()转换，然后在比较），所以这里变成Number("[object Object]") == Number(false)，最后NaN == 0结果是false
 /*
 变化过程：
-1、{}.valueOf().toString() == !Boolean({})
-2、"[object Object]" == !true
-3、"[object Object]" == false
-4、Number("[object Object]") == Number(false)
-5、NaN == 0
+1、{} == !Boolean({})
+2、{} == !true
+3、{} == false
+4、{}.valueOf().toString() == false
+5、"[object Object]" == false
+6、Number("[object Object]") == Number(false)
+7、NaN == 0
 */
 console.log({} == !{}) //false
 
 
 //引用类型数据存储在 堆中，栈中存的是地址，所以他们的结果是false
-//这里相当于创建了像个空对象比较，两个空对象，地址不一样，所以不相等
+//这里相当于创建了两个空对象比较，两个空对象，地址不一样，所以不相等
 console.log({} == {}) //false
 var a = {};
 console.log(a == a) //true
@@ -391,7 +400,7 @@ console.log(a == a) //true
 //这里左边的空数组 会被转成数值，[].valueOf().toString()，得到空串，空串通过Number转数值，得到0
 //这里右边的空数组，因为逻辑非优先级高于关系运算符的原因，会先被强转布尔，空数组强转布尔，得到得到true，然后取反，得到false，false在转数值，得到0
 console.log([] == ![]) //true
-//这里相当于创建了像个空数组比较，两个空数组，地址不一样，所以不相等
+//这里相当于创建了两个空数组比较，两个空数组，地址不一样，所以不相等
 console.log([] == []) //false
 ```
 ## 逻辑运算符（&&，||，!）
@@ -417,8 +426,8 @@ console.log(!null) //true
 console.log(!NaN) //true
 
 
-//2、逻辑运算符通常 使用布尔值，这种情况下，它们返回一个布尔值
-//逻辑与 和 逻辑或 运算符会返回一个指定 参数的值，因此，这些 逻辑运算符 也用于非布尔值，这时，它们也会返回一个非布尔型值
+//2、逻辑运算符 通常用于布尔值(或使用布尔值)，这种情况下，它们返回一个布尔值
+//逻辑与 和 逻辑或 运算符会返回一个指定 参数的值，因此，这些 逻辑运算符 也可用于非布尔值，这时 它们也会返回一个非布尔型值，如下是，逻辑与 和 逻辑或 用于非布尔值的运算过程(或案例)
 
 //逻辑与（&&），参数1 && 参数2，若 参数1 可转换为 true，则返回 参数2；否则，返回 参数1
 //逻辑与，是从左往右计算的，运算时，是简便运算，即如果第一个参数决定了结果，就不再计算第二个运算数
