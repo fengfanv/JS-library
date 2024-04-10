@@ -254,8 +254,8 @@ module.exports = {
 
         //解决跨域问题
         proxyTable: {
-            '/api': {                       //匹配的路径								
-                target: "http://xxx.com",   //跨域的地址
+            '/api': {                       //匹配的路径
+                target: "http://xxx.com",   //服务端api接口地址
                 changeOrigin: true,         //允许跨域
                 pathRewrite: {
                     '^/api': '/xpg'         //路径重写：请求地址 /api/abc 转化成 /xpg/abc
@@ -278,8 +278,8 @@ module.exports = {
     devServer: {
         open: true,
         proxy: {
-            '/api': {
-                target: 'http://localhost:80/', //设置你调用的接口域名和端口号 别忘了加http
+            '/api': {                           //匹配的路径
+                target: "http://xxx.com",       //服务端api接口地址
                 changeOrigin: true,             //允许跨域
                 pathRewrite: {
                     '^/api': '/xpg'             //路径重写：请求地址 /api/abc 转化成 /xpg/abc
@@ -962,6 +962,31 @@ css样式
   <span v-if="isPageShow"></span>
 </transition>
 ```
+## vue自定义指令
+```js
+import Vue from 'vue'
+
+//全局定义自定义指令
+Vue.directive('hasPermi', (el: any, binding: any) => {
+    //这里 hasPermi 是自定义指令的名字
+    console.log(el)//绑定该指令的元素
+    console.log(binding.value)//绑定该指令时传过来的值
+    if (binding.value) {
+        if (binding.value == 'delete') {
+            //隐藏(清楚)该元素
+            el.parentNode && el.parentNode.removeChild(el)
+        }
+    }
+})
+```
+```html
+<template>
+  <div class="home">
+    <button v-hasPermi="'delete'">123</button><!--<button>123</button>将被移除隐藏-->
+    <button v-hasPermi="'show'">abc</button>
+  </div>
+</template>
+```
 
 ## vue里使用axios
 1、在项目内创建一个文件夹request
@@ -1170,7 +1195,24 @@ const router = new Router({
       path: '/index/:id',//:id配置路由匹配的参数
       name: 'index',
       component: index
+    },
+    {
+      path: '/user',
+      component: () => import('@/components/user.vue'),
+      children: [
+        {
+          path: '/user/home',
+          name: 'userHome',
+          component: () => import('@/components/user/home.vue'),
+        },
+        {
+          path: '/user/profile',
+          name: 'userProfile',
+          component: () => import('@/components/user/profile.vue'),
+        }
+      ]
     }
+
   ]
 })
 
@@ -1275,6 +1317,21 @@ import router from './router'
 
 createApp(App).use(router).mount('#app')
 ```
+App.vue
+```html
+<template>
+  <router-view />
+</template>
+```
+含有子路由的user.vue
+```html
+<template>
+  <div class="user">
+    <h2>user children：</h2>
+    <router-view></router-view>
+  </div>
+</template>
+```
 项目中使用
 ```javascript
 this.$router.push({"path":'/home'});//地址    /home
@@ -1290,6 +1347,13 @@ this.$router.push({"name":'index',params:{"id","123"}});//地址    /home/123   
 this.$route.query  //获取query里面传过来的值
 
 this.$route.params  //获取params里面传过来的值
+
+//动态添加路由
+// let aspath = '@/views' + '/about.vue';//注意，使用import异步获取组件，这样写，这样用，找不到模块。
+// let component = () => import(aspath);
+let component = () => import('../views' + '/about.vue'); //使用import异步获取组件时，你写的代码import()的括号内需要明文显示 @/views 或 ../views 字段。这样写编译器(webpack/vite)才能，才能正确编译。因为编译器是用运行在代码执行之前，编译器会将你编写的代码import('@/views'+...)变成类似import('./views'+...)这种。而如果你编写的代码是import(filePath)这种，则编译器会无法匹配你的代码，导致不能将你的代码改写，导致模块路径错误，运行代码时，出现找不到模块的问题。
+this.$router.addRoute({path: '/about', name: 'about', component: component}) 
+
 ```
 ## vuex使用
 1、在项目内创建一个文件夹store
@@ -2092,9 +2156,9 @@ import dialogFrom from './index.vue'
 
 export default {
     install: function (Vue, options) {
-        //利用扩展实例构造器生成一个Vue的子类
+        //利用 Vue 组件实例构造器生成一个 Vue 组件的构造函数
         const dialog2 = Vue.extend(dialogFrom);
-        //生成一个该子类的实例
+        //使用该构造函数创建一个新的 Vue 实例
         const dialog_content = new dialog2();
         //将这个实例挂载在我创建的div上
         dialog_content.$mount(document.createElement('div'));
@@ -2322,6 +2386,79 @@ export default defineComponent({
 
 });
 </script>
+```
+## Vue.use
+
+[Vue.use()的作用及原理](https://juejin.cn/post/7138216381283205128)
+
+在 Vue 中引入(使用)第三方库时，通常我们会采用 import 的形式引入进来，但是有的组件在引入进来之后做了 Vue.use() 操作，而有的组件引入进来之后进行了 Vue.prototype.$something = something 操作，那么它们之间有什么联系呢？
+
+如：Vue.prototype.$axios = axios 其实是就是单纯的在 Vue 原型上增加了一个 $axios 属性(或方法)。因为被添加在原型上，所以属于一个全局属性(或方法)。
+
+通过全局方法 Vue.use() 使用插件，Vue.use 会自动阻止多次注册相同插件(在使用时，会判断了该插件是不是已经注册过，防止重复注册)，它需要在你调用 new Vue() 启动应用之前完成，Vue.use() 方法至少传入一个参数，该参数类型必须是 Object 或 Function，如果是 Object 那么这个 Object 需要定义一个 install 方法，如果是 Function 那么这个函数就被当做 install 方法。在 Vue.use() 执行时 install 会默认执行，当 install 执行时，其第一个参数就是 Vue，其他参数(options)是 Vue.use() 执行时传入的其他参数。也就是说，使用它之后，调用的是该组件的 install 方法。
+
+```js
+import Vue from "vue"
+
+const = myPlugin = {
+  install(Vue, options){
+    //Vue Vue对象
+    //options 使用Vue.use时传进来的参数
+
+    //添加全局方法或属性
+    Vue.myFun = function () {
+      //...
+    }
+
+    //添加全局定义指令  
+    Vue.directive('my-directive', {  
+      bind (el, binding, vnode, oldVnode) {
+        //...
+      }
+    })
+
+    //注入mixin
+    Vue.mixin({  
+      created: function () {
+        //...
+      },
+      //...
+    })
+
+    //...等等
+  }
+}
+
+const = options = {
+  'a':1,
+  'b':2
+}
+
+// myPlugin 的类型可以是 object 或 Function
+// options 是一个可选的对象
+Vue.use(myPlugin, options)
+```
+## Vue.extend
+
+Vue.extend 是 Vue.js 中用于创建组件构造器的方法。通过 Vue.extend 可以定义一个 Vue 组件的构造函数，然后可以使用该构造函数创建新的 Vue 组件实例。
+
+Vue.extend 方法的参数是一个包含组件选项的对象，用于定义新的 Vue 组件的行为和特性。（组件选项的对象与我们在定义普通 Vue 组件时使用的选项相同，例如 data、methods、computed、components、watch、等等）
+
+```js
+//定义一个新的 Vue 组件构造器（定义一个 Vue 组件构造函数）
+var MyComponent = Vue.extend({
+  template: '<div>This is my custom component!</div>'
+});
+
+//用法1
+//使用该构造器(函数)创建一个新的 Vue 实例
+var vm = new MyComponent();
+//将新创建的实例挂载到 DOM 中
+vm.$mount('#abc');
+
+//用法2
+//将组件构造器(构造函数)注册为全局组件
+Vue.component('my-component', MyComponent);
 ```
 ## 其它问题
 #### vue里render渲染函数
