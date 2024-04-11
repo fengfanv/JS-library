@@ -69,32 +69,31 @@ wx.getSystemInfo({
   success(res) {
     let system = res.system;
     if (/(windows|mac|win)/i.test(system)) {
-      _this.setData({
-        isPc: true,
-      });
+      console.log('当前是pc端')
     }
   },
 });
 ```
 #### 使用下拉刷新
 ```javascript
-//1、在页面json文件里添加"enablePullDownRefresh":true开启下拉刷新
+//1、在页面pageName.json文件里添加"enablePullDownRefresh":true开启下拉刷新
 //2、在页面内使用onPullDownRefresh生命周期函数，监听页面下拉操作
 
 //wx.startPullDownRefresh();//api调用下拉生命周期函数
 //wx.stopPullDownRefresh();//更新完毕，关闭下拉
 ```
-#### 在电脑端设置大屏，或手机端设置横屏
+#### 在电脑端设置大屏 或 手机端设置横屏
 ```javascript
-//设置pc大屏，在项目的app.json中设置"resizable": true（使iPad屏幕旋转的方法）属性，pc端打开时会已横向窗口显示，
-//屏幕大小为1024*768,在按下全屏按钮会已全屏显示
+//设置pc大屏，在项目的app.json中设置"resizable": true（PC是否支持用户任意改变窗口大小）属性
 
-//设置手机横屏，在项目app.json中window中设置"pageOrientation":"auto"（屏幕旋转设置），
-//不过这里的横屏需要用户打开旋转锁后才能看到
+//设置手机横屏，在项目app.json中window中设置"pageOrientation":"auto"（屏幕旋转设置）
 ```
-#### 小程序全局配置(app.json)和页面配置(pagename.json)
+#### 小程序全局配置(app.json)和页面配置(pageName.json)
+
 [框架 -> 小程序配置 -> 全局配置](https://developers.weixin.qq.com/miniprogram/dev/reference/configuration/app.html)
+
 [框架 -> 小程序配置 -> 页面配置](https://developers.weixin.qq.com/miniprogram/dev/reference/configuration/page.html)
+
 #### 绑定多个class或style
 ```html
 <view class="login_view1 button {{isLogin?'login_button':''}}">
@@ -113,12 +112,13 @@ wx.setNavigationBarColor({
 {
   pages: [],
   window: {
-    navigationStyle: "default", //default 默认样式。custom 自定义导航栏，只保留右上角胶囊按钮。
+    navigationStyle: "default", //default 默认样式。custom 自定义导航栏，只保留右上角胶囊按钮
     navigationBarBackgroundColor: "#F6F6F6",
     navigationBarTitleText: "",
     navigationBarTextStyle: "black",
   },
 };
+
 //2、设置页面下页面的json文件
 {
   navigationBarTitleText: "Change",
@@ -129,7 +129,8 @@ wx.setNavigationBarColor({
 #### app.json设置背景注意事项
 ```javascript
 backgroundColor //设置的是小程序背景色，这个是下拉刷新时能看到的那个背景色
-要是设置页面背景色那个背景色，则需要设置css，如下：
+
+要设置页面背景色那个背景色，则需要设置css，如下：
 page {
   background-color: #f7f7f7;
 }
@@ -142,8 +143,8 @@ page {
 [wx:for文档](https://developers.weixin.qq.com/miniprogram/dev/reference/wxml/list.html)
 ```html
 <!--默认情况下，不用指定wx:for-index 与 wx:for-item，默认下为item与index，想自定义可以指定-->
-<view wx:for="{{array}}" wx:for-index="idx" wx:for-item="itemName">
-  {{idx}}: {{itemName.message}}
+<view wx:for="{{array}}" wx:for-index="idx" wx:for-item="itemData">
+  {{idx}}: {{itemData.message}}
 </view>
 ```
 #### 在标签内动态插入html元素 类似v-html的功能
@@ -156,20 +157,18 @@ page {
 <rich-text nodes="{{htmlData}}"></rich-text>
 ```
 #### 使用 button 按钮（组件 -> 表单组件）
-[button微信文档](https://developers.weixin.qq.com/miniprogram/dev/component/button.html)
+[button文档](https://developers.weixin.qq.com/miniprogram/dev/component/button.html)
 ```html
 <button open-type="getUserInfo">微信登录</button>
 ```
 #### 使用 input 按钮（组件 -> 表单组件）
-[input微信文档](https://developers.weixin.qq.com/miniprogram/dev/component/input.html)
+[input文档](https://developers.weixin.qq.com/miniprogram/dev/component/input.html)
 ```html
 <input class="weui-input" maxlength="10" placeholder="最大输入长度为10" />
 ```
 #### 单向数据绑定和双向数据绑定（指南 -> 小程序框架 -> 简易双向数据绑定）
 
-单向，可在js里通过this.setData()改变value1的值，input里也会跟着变化
-
-但是修改input里的值，不会影响data里value1
+单向。可在js里通过this.setData()改变value1的值，input里也会跟着变化。但是修改input里的值，不会影响data里value1
 ```html
 <input value="{{value1}}" />
 ```
@@ -187,7 +186,7 @@ page {
 给方法绑定数据
 ```html
 <view bindtap="handlerName" data-keyname="11"></view>
-<!--keyname就是绑定的数据名字,11是keyname的值-->
+<!--keyname就是绑定的数据名字，11是keyname的值-->
 ```
 在方法内取这个数据
 ```javascript
@@ -202,6 +201,8 @@ Page({
 冒泡   从里向外
 
 除 bind 外，也可以用 catch 来绑定事件。与 bind 不同， catch 会阻止事件向上冒泡。
+
+例如，在下边这个例子中，点击 inner view 会先后调用handleTap3和handleTap2(因为tap事件会冒泡到 middle view，而 middle view 阻止了 tap 事件冒泡，不再向父节点传递)，点击 middle view 会触发handleTap2，点击 outer view 会触发handleTap1。
 ```html
 <view id="outer" bindtap="handleTap1">
   outer view
@@ -213,7 +214,6 @@ Page({
   </view>
 </view>
 ```
-例如在下边这个例子中，点击 inner view 会先后调用handleTap3和handleTap2(因为tap事件会冒泡到 middle view，而 middle view 阻止了 tap 事件冒泡，不再向父节点传递)，点击 middle view 会触发handleTap2，点击 outer view 会触发handleTap1。
 
 #### 请求用户openid
 
@@ -230,7 +230,7 @@ page({
     wx.login({
       success(res) {
         if (res.code) {
-          //网络请求，请求后端接口
+          //请求后端接口，用code换openid
           wx.request({
             url: "https://www.xxx.cn:1000/api/onlogin",
             method: "get",
@@ -253,7 +253,6 @@ page({
   },
 });
 ```
-#### 页面之间使用
 后端代码（服务端 -> 登录 -> auth.code2Session）
 
 [后端api文档](https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/login/auth.code2Session.html)
@@ -292,17 +291,17 @@ function getUserOpenid(code) {
 
 ```
 #### 写入和读取本地缓存（API -> 数据缓存）
-[本地缓存api网址](https://developers.weixin.qq.com/miniprogram/dev/api/storage/wx.setStorageSync.html)
+[本地缓存api文档](https://developers.weixin.qq.com/miniprogram/dev/api/storage/wx.setStorageSync.html)
 ```javascript
 //如：写入本地缓存
-//异步方法，同步见文档
+//这是异步方法，同步方法见文档
 wx.setStorage({
   key:"key",
   data:"value"
 })
 
 //如：读取本地缓存
-//异步方法，同步见文档
+//这是异步方法，同步方法见文档
 wx.getStorage({
   key: 'key',
   success (res) {
@@ -311,7 +310,7 @@ wx.getStorage({
 })
 
 //清楚本地缓存
-//异步，同步见文档
+//这是异步方法，同步方法见文档
 wx.clearStorage()
 ```
 #### 选择图片（API -> 媒体 -> 图片 -> wx.chooseImage）
@@ -320,7 +319,7 @@ page({
 	getImage(){
 		wx.chooseImage({
 		  success (res) {
-		    // tempFilePath可以作为img标签的src属性显示图片
+		    // tempFilePath可以用在img标签的src属性 来显示图片
 		    const tempFilePaths = res.tempFilePaths
 		  }
 		})
@@ -328,7 +327,7 @@ page({
 });
 ```
 #### 发送网络请求（API -> 网络 -> 发起请求 -> wx.request）
-[wx.request文档地址](https://developers.weixin.qq.com/miniprogram/dev/api/network/request/wx.request.html)
+[wx.request文档](https://developers.weixin.qq.com/miniprogram/dev/api/network/request/wx.request.html)
 ```javascript
 page({
 	postMessage(){
@@ -349,7 +348,7 @@ page({
 });
 ```
 #### 上传文件（API -> 网络 -> 上传 -> wx.uploadFile）
-[上传文件api](https://developers.weixin.qq.com/miniprogram/dev/api/network/upload/wx.uploadFile.html)
+[上传文件api文档](https://developers.weixin.qq.com/miniprogram/dev/api/network/upload/wx.uploadFile.html)
 ```javascript
 wx.chooseImage({
   success (res) {
@@ -369,39 +368,38 @@ wx.chooseImage({
   }
 })
 ```
-#### 跳转页面&路由（API -> 路由 -> wx.navigateTo）
+#### 跳转页面/路由（API -> 路由 -> wx.navigateTo）
 [wx.navigateTo文档](https://developers.weixin.qq.com/miniprogram/dev/api/route/wx.navigateTo.html)
 
-//详细见文档，有通过事件方法传值的案例
+#### 页面之间使用事件监听 来 相互传输数据
 
-#### 页面间使用事件监听相互传数据
-
-##### 当前为a页面
+a页面
 ```javascript
 wx.navigateTo({
   url: 'b?id=1',//通过地址传参
   events: {
-    // 为指定事件添加一个监听器，获取被打开页面传送到当前页面的数据
+    //为指定事件添加一个监听器，获取被打开页面传送到当前页面的数据
     'b页面发送给a页面的数据的方法名': function(data) {
       console.log(data)
     }
-    ...
   },
   success: function(res) {
-    // 通过eventChannel向被打开页面传送数据
+    //通过eventChannel向被打开页面传送数据
     res.eventChannel.emit('a页面发送给b页面的数据的方法名', { data: 'test' })
   }
 })
 ```
-##### 当前为b页面
+b页面
 ```javascript
 Page({
   onLoad: function(option){
     console.log(option.query)//打印a页面通过地址传过来的参数
+
+
     const eventChannel = this.getOpenerEventChannel()
-	//向a页面发送数据
+    //向a页面发送数据
     eventChannel.emit('b页面发送给a页面的数据的方法名', {data: 'test'});
-    // 监听’a页面发送给b页面的数据的方法名‘事件，获取上一页面通过eventChannel传送到当前页面的数据
+    //监听‘a页面发送给b页面的数据的方法名’事件，获取上一页面通过eventChannel传送到当前页面的数据
     eventChannel.on('a页面发送给b页面的数据的方法名', function(data) {
       console.log(data)
     })
@@ -438,8 +436,10 @@ Page({
 ```
 
 #### 自定义组件开发（开发 -> 指南 -> 自定义组件）
-[自定义组件-官方文档](https://developers.weixin.qq.com/miniprogram/dev/framework/custom-component/)
-##### 项目内使用自定组件
+
+[自定义组件文档](https://developers.weixin.qq.com/miniprogram/dev/framework/custom-component/)
+
+##### 项目内使用自定义组件
 ```javascript
 //1、在项目里创建组件页面，在这个组件页面内的json文件里添加 "component": true 用于声明组件
 //2、组件编写完成后，在项目中使用
@@ -460,24 +460,21 @@ Page({
 	<slot name="two"></slot>
 </view>
 ```
-##### 什么是slot
-[指南 -> 自定义组件 -> 组件模板和样式](https://developers.weixin.qq.com/miniprogram/dev/framework/custom-component/wxml-wxss.html)
 ##### 组件的js文件
 ```javascript
 Component({
-	options: {
-	    multipleSlots: true // 在组件定义时的选项中启用多slot支持
-	 },
-    /**
-     * 组件的属性列表
-     */
+    options: {
+        multipleSlots: true //在组件定义时的选项中启用多slot支持
+    },
+    //组件的属性列表
     properties: {
         state: {
             type: 'Number',
             value: 0,//默认值
             observer(newValue, oldValue) {
-                console.log('state新值：' + newValue);
-                console.log('state旧值：' + oldValue);
+                //属性值变化时的回调函数
+                console.log('state新值',newValue);
+                console.log('state旧值',oldValue);
                 this.setData({
                     state: newValue
                 });
@@ -502,7 +499,7 @@ Component({
         animationName: ''
     },
     methods: {
-        setValue(state,text){
+        setValue(state, text) {
             let _this = this;
             console.log('设置value值');
             _this.setData({
@@ -526,12 +523,12 @@ Component({
             _this.setData({
                 animationName: 'toHide'
             });
-            // 所有要带到主页面的数据，都装在eventDetail里面
+            //所有要带到主页面的数据，都装在eventDetail里面
             var eventDetail = {
                 name: 'sssssssss',
                 test: [1, 2, 3]
             }
-            // 触发事件的选项 bubbles是否冒泡，composed是否可穿越组件边界，capturePhase 是否有捕获阶段
+            //触发事件的选项 bubbles是否冒泡，composed是否可穿越组件边界，capturePhase是否有捕获阶段
             var eventOption = {
                 composed: true
             }
@@ -539,7 +536,6 @@ Component({
         }
     }
 })
-
 ```
 ##### 组件在项目页面中使用
 ```javascript
@@ -577,11 +573,10 @@ Page({
     }
 });
 ```
-
 ## 云开发
 #### 配置云开发
 
-**在小程序里使用云数据库，云存储，云函数需要现在app.js键入以下内容**
+**在小程序里使用云数据库，云存储，云函数需要在app.js键入以下内容**
 
 ```javascript
 //app.js
@@ -592,11 +587,13 @@ App({
       console.error('请使用 2.2.3 或以上的基础库以使用云能力')
     } else {
       wx.cloud.init({
-        // env 参数说明：
-        //   env 参数决定接下来小程序发起的云开发调用（wx.cloud.xxx）会默认请求到哪个云环境的资源
-        //   此处请填入环境 ID, 环境 ID 可打开云控制台查看
-        //   如不填则使用默认环境（第一个创建的环境）
-        // env: 'my-env-id',
+
+        //env 参数说明：
+        //env 参数决定接下来小程序发起的云开发调用（wx.cloud.xxx）会默认请求到哪个云环境的资源
+        //此处请填入环境 ID, 环境 ID 可打开云控制台查看
+        //如不填则使用默认环境（第一个创建的环境）
+
+        //env: 'my-env-id',
         traceUser: true,
       })
     }
@@ -669,12 +666,12 @@ Page({
             console.log(err);
         })
     },
-    //更新数据库中集合（表）的某条记录的数据
+    //更新数据库中集合(表)的某条记录的数据
     updateCloudDatabase() {
         const db = wx.cloud.database();
         const tabel1 = db.collection('tabel1');
         //这doc是记录中的 _id 
-        //这有个问题，只能改变通过代码方式添加的数据，直接在库里建的记录不行
+        //这有个问题，只能改变通过代码方式添加的数据，直接在库里建的记录不行(因为直接在库里建的记录没有自动生成_id)
         // tabel1.doc('38d78ca75ed1d6c80008f1df68d7d5fd').update({
         //     data:{
         //         name:'齐天大圣'
@@ -685,8 +682,8 @@ Page({
         //     console.log(err);
         // })
 
-        //更新集合（表）中某个记录的多个key的值
-        //这有问题，报错，这个好像只能修改通过代码上传的，直接存云库操作的不行
+        //更新集合(表)中某个记录的多个key的值
+        //这有问题，报错，这个好像只能修改通过代码上传的，直接在库里建的记录不能操作
 		//这doc里的字符串是记录随机生成的_id
         tabel1.doc('4c5846c75ed1deb00008b66e08450e4b').set({
             data: {
@@ -700,7 +697,7 @@ Page({
         })
 
     },
-    //删除集合（表）中某条记录
+    //删除集合(表)中某条记录
     delList() {
         const db = wx.cloud.database();
         const tabel1 = db.collection('tabel1');
@@ -728,14 +725,14 @@ Page({
         wx.chooseImage({
             complete: (res) => {
                 console.log(res);
-                if (res.tempFiles !== undefined && res.tempFiles.length >= 1) {
+                if (res.tempFiles != undefined && res.tempFiles.length >= 1) {
                     //有图片
                     //获取图片信息
                     wx.getImageInfo({
                         src: res.tempFiles[0].path,
                         success(res2) {
-                            //   console.log(res.width)
-                            //   console.log(res.height)
+                            //console.log(res.width)
+                            //console.log(res.height)
                             //console.log(res2);
                             _this.setData({
                                 imageUrl: res.tempFiles[0].path,
@@ -753,7 +750,7 @@ Page({
         let _this = this;
         wx.cloud.uploadFile({
             filePath:_this.data.imageUrl,//被上传的文件地址
-            cloudPath:new Date().getTime()+'.'+_this.data.imageType,//这里设置上传后，在云库里的地址，需要设置文件类型，否则无法显示
+            cloudPath:Date.now()+'.'+_this.data.imageType,//这里设置上传后，在云库里的地址，需要设置文件类型，否则无法显示
             success(res){
                 console.log(res);
             },
@@ -790,26 +787,35 @@ Page({
 ```
 #### 云函数基本操作
 
-1、右键单击 微信开发者工具->资源管理器里项目文件夹 cloudfunctions|xxx环境 然后点击 新建node.js云函数
-![](/image/chuangjian1.png)
-2、创建完毕后 在右键单击 微信开发者工具->资源管理器里项目文件夹 cloudfunctions|xxx环境 点击 同步云函数列表 、、、(这里是为了防止部署到云上后，前端调用时找不到那个方法的问题)
-![](/image/chuangjian2.png)
+右键单击 cloudfunctions|xxx环境
 
-3、在创建好的云函数index.js文件夹里写业务代码
+然后点击 新建node.js云函数
+
+![](./image/chuangjian1.png)
+
+创建云函数完毕后 再右键单击 cloudfunctions|xxx环境
+
+然后点击 同步云函数列表 (这样是为了防止，开发时前端调用，找不到云函数方法的问题)
+
+![](./image/chuangjian2.png)
+
+最后在创建好的云函数index.js文件里写业务代码
+
 ```javascript
 //index.js
-// 云函数入口文件
+//云函数入口文件
 const cloud = require('wx-server-sdk')
 
 cloud.init()
 
-// 云函数入口函数
+//云函数入口函数
 exports.main = async (event, context) => {
     //event前端传来的数据
+
     const wxContext = cloud.getWXContext()
     console.log(wxContext);
-	
-	//return 把数据返回给前端
+    
+    //把数据返回给前端
     return {
         // event,
         // openid: wxContext.OPENID,
@@ -819,12 +825,19 @@ exports.main = async (event, context) => {
     }
 }
 ```
-4、部署到云上 右键点击 你创建的这个云函数文件夹 然后选择 上传并部署：云端安装依赖（不上传node_modules）
-![](/image/chuangjian3.png)
+
+将写好的云函数部署到云上
+
+右键点击 你创建的这个云函数文件夹
+
+然后选择 上传并部署:云端安装依赖(不上传node_modules)
+
+![](./image/chuangjian3.png)
 
 #### 云函数操作数据库
 ```javascript
-// 云函数入口文件
+//index.js
+//云函数入口文件
 const cloud = require('wx-server-sdk')
 
 cloud.init({
@@ -836,7 +849,7 @@ cloud.init({
 //引用数据库
 const db = cloud.database();
 
-// 云函数入口函数
+//云函数入口函数
 exports.main = async (event, context) => {
     const wxContext = cloud.getWXContext()
 
@@ -849,7 +862,7 @@ exports.main = async (event, context) => {
 
     return new Promise(function(resolve,reject){
 		//云函数里操作数据库和在小程序里直接操作数据差不多
-		//获取tabel（集合）表的数据
+		//获取tabel1集合(表)的数据
         db.collection('tabel1').get().then(function(res){
             resolve(res)
         }).catch(function(err){
@@ -864,7 +877,7 @@ Page({
     data: {},
     onLoad: function (options) {},
     shiyong() {
-		//使用运方法
+		//使用云函数方法
         wx.cloud.callFunction({
             name: 'dellist',
             data: {
@@ -880,16 +893,17 @@ Page({
     }
 });
 ```
-#### 云函数里http请求数据(这里是node环境，以前怎么在node里引用模块，写方法，在这里就怎么写)
+#### 云函数里使用http模块请求数据
+
+因为这里是node环境，以前怎样在node里 引模块写方法 在这里就还怎样写
+
 ```javascript
 //index.js
-// 云函数入口文件
+//云函数入口文件
 const cloud = require('wx-server-sdk')
-
 const http = reqire('http')
 
 cloud.init()
-
 
 function getData(option) {
     return new Promise(function (resolve, reject) {
@@ -918,13 +932,14 @@ getData({
    "path": "wangzhi"
 });
 
-// 云函数入口函数
+//云函数入口函数
 exports.main = async (event, context) => {
     //event前端传来的数据
+
     const wxContext = cloud.getWXContext()
     console.log(wxContext);
 
-    //return 把数据返回给前端
+    //return(把数据返回给前端)
     return {
         // event,
         // openid: wxContext.OPENID,
@@ -933,5 +948,4 @@ exports.main = async (event, context) => {
         sum:event.a+event.b
     }
 }
-
 ```
