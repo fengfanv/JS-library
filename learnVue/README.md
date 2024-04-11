@@ -1716,8 +1716,8 @@ watch(todoId, async () => {
 组合式API中使用侦听器(watch)2
 ```html
 <template>
-  <button v-for="(item, index) of girls" :key="index" @click="selectGirlFun(index)">{{ item }}</button>
-  <div>{{ selectGirl }}</div>
+  <button v-for="(item, index) of data.girls" :key="index" @click="data.selectGirlFun(index)">{{ item }}</button>
+  <div>{{ data.selectGirl }}</div>
 </template>
 
 <script lang="ts">
@@ -1744,10 +1744,8 @@ export default defineComponent({
       console.log(newValue, oldValue)
     })
 
-
-    const refData = toRefs(data)
     return {
-      ...refData
+      data
     }
 });
 </script>
@@ -1963,7 +1961,7 @@ export default defineComponent({
 
     return {
       //虽然data是响应式的。
-      //但如下这样直接，解构暴露data属性，所暴露的data属性不是响应式的。
+      //但如下这样 直接 解构暴露data属性，所暴露的data属性不是响应式的。
       ...data
     }
   }
@@ -2464,6 +2462,69 @@ vm.$mount('#abc');
 //用法2
 //将组件构造器(构造函数)注册为全局组件
 Vue.component('my-component', MyComponent);
+```
+## vue内置组件Teleport
+
+一般情况下，组件将被渲染在 createApp().mount('#app') 的#app元素内。如：
+
+```html
+<!--
+  public/index.html
+  渲染结果
+-->
+<html>
+  <head>
+    <meta charset="utf-8">
+  </head>
+  <body>
+    <div id="app">
+      <div>
+        <p>abc</p>
+        <p>123</p>
+      </div>
+    </div>
+  </body>
+</html>
+
+<!--src/App.vue-->
+<template>
+  <div>
+    <p>abc</p>
+    <p>123</p>
+  </div>
+</template>
+```
+Teleport可以将一个组件内部的一部分模板“传送”到该组件的 DOM 结构外层的位置去。
+```html
+<!--
+  public/index.html
+  渲染结果
+-->
+<html>
+  <head>
+    <meta charset="utf-8">
+  </head>
+  <body>
+    <div id="app">
+      <div>
+        <p>abc</p>
+      </div>
+    </div>
+    <div id="app2">
+      <p>123</p>
+    </div>
+  </body>
+</html>
+
+<!--src/App.vue-->
+<template>
+  <div>
+    <p>abc</p>
+    <Teleport to="#app2">
+      <p>123</p>
+    </Teleport>
+  </div>
+</template>
 ```
 ## 其它问题
 #### vue里render渲染函数
