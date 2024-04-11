@@ -14,11 +14,11 @@ vue 数据驱动
 //vue3用的是Proxy，Proxy可以直接监听对象变化，而不是属性，还可以监听数组的变化，性能比Object.defineProperty()好
 
 2、新出了一个组合式api
-组合式api方式，主要就是已setup()钩子函数体现，让我们不必向以前那样写代码，
+组合式api方式，主要是已setup()钩子函数体现，让我们不必向以前那样写代码，
 如：数据必须写在data里，操作data数据里方法得写在methods里的，
 这样写，操作的数据少还行，要是多了，会导致代码很难阅读，
 数据和方法没有写在一起，代码很不内聚，
-为了解决这个问题，出了这个组合式api，这个就是比较省事，在setup方法，
+为了解决这个问题，新出了这个组合式api，这个就是比较省事，在setup方法，
 里定义数据，定义方法，然后暴露出去，就可以使用
 补充：之前数据定义在data，操作数据的方法定义在methods里，这种方式叫选项式api
 
@@ -73,7 +73,7 @@ vue3引用的vuex创建是通过createStore创建的，之前是vuex.store方法
 ```
 MVVM是一种软件设计模式，vue，react都是基于这种设计模式
 
-MVVM把 UI用户界面 与 业务逻辑 分开，这样开发者只需关注，业务逻辑，不需要操作dom
+MVVM把 UI用户界面 与 业务逻辑 分开，这样开发者只需关注，业务逻辑，而不需要操作dom
 
 MVVM 是 Model-View-ViewModel 的缩写
 
@@ -87,7 +87,7 @@ ViewModel 负责将 Model 中的数据同步到 View，并将 View 中的用户�
 ```
 ## Vue响应式原理
 ```
-通过Object.defineProperty()劫持数据属性的访问和修改，与 发布订阅者模式，实现数据的响应式更新。实现数据和视图之间的自动同步关系。这种机制大大简化了数据绑定和事件处理的代码量，提高了开发效率和代码可读性。
+通过Object.defineProperty()劫持数据属性的访问和修改，并联合 发布订阅者模式，实现数据的响应式更新。实现数据和视图之间的自动同步关系。这种机制大大简化了数据绑定和事件处理的代码量，提高了开发效率和代码可读性。
 
 在初始化阶段，Vue会遍历data中的所有属性，并使用Object.defineProperty()把这些属性全部转为getter/setter。
 在getter中，Vue会追踪依赖，即在组件渲染过程中，使用过的数据会被getter收集为依赖；
@@ -403,13 +403,14 @@ v-bind:href等于:href
 <h1 :style="{'background':background,'font-size':'100px'}">I am Index</h1>
 <!--绑定样式 不包引号则为data里属性-->
 <h1 :style="h1Style">I am Index</h1>
-<!--绑定样式 不包引号则为data里属性
+<!--
 data(){
   return {
+    background:'green',
 
     h1Style: {
-      background: "red"
-    }
+      background:'red'
+    },
     
   }
 }
@@ -421,7 +422,7 @@ data(){
 <!--有引号，为style，class样式名-->
 
 <h1 :class="normalWeight">I am Index</h1>
-<!--没有有引号，为data数据的属性名，需要data里有normalWeight这个属性-->
+<!--没有引号，为data里数据的属性名，需要data里有normalWeight这个属性-->
 ```
 ## 三元运算符和绑定多个样式
 ```html
@@ -504,14 +505,15 @@ export default {
       //newValue最新的值
       //oldValue旧的值
     },
-    //watch的一个特点是，最初绑定的时候是不会执行的，要等到属性改变时才执行监听
+    //watch的一个特点是，最初绑定的时候这里的回调是不会执行的，要等到属性改变时这里的回调才会执行
     obj: {
       handler(newValue, oldValue) {
         console.log(newValue);
       },
       immediate: true, //初次绑定时，就执行handler方法
-      deep: true, //实现深度监听,一般情况下，给obj重新赋值也就是obj的这个引用发生变化，watch才能监听到，
-      //但开启deep后修改a的值也能监听到，因为vue也给obj.a加上了监听，但是如果obj有好多key，开启后，会损耗性能
+      deep: true, //开启深度监听
+      //一般情况下，给obj重新赋一个新的值watch能监听到。但修改obj.a属性时，监听不到
+      //开启deep后，修改obj.a的值，也能监听到，因为vue也给obj.a加上了监听，但是如果obj有好多属性，开启后，会损耗性能
     },
   },
 };
@@ -609,7 +611,7 @@ const app = Vue.createApp({
     <a1 /><!--全局组件-->
     <base-board /><!--局部组件-->`,
   components: {
-    baseBoard //这里局部组件需要在这里绑定一下，才能使用。这里虽然是驼峰写法，但在html中使用时，需要转换成<base-board />这里因为在js变量中不能使用 “ - ”，html组件可以使用。这样做可以有个区分
+    baseBoard //这里局部组件需要在这里绑定一下，才能使用。这里虽然是驼峰写法，但在html中使用时，需要转换成<base-board />这样做是因为在js变量中不能使用“-”，html组件可以使用。这样做可以有个区分
   }
 })
 app.$mount('#app');//挂载vue3实例
@@ -627,9 +629,9 @@ const baseBoard = {
 ## 组件单向数据流
 ```
 单向数据流概念：父级 prop 的更新会向下流动到子组件中，但是反过来则不行
-有单向数据流，可以防止从子组件意外改变父级组件的状态，从而防止你应用的 数据流 难以理解
+有单向数据流，可以防止子组件意外改变父级组件的状态，从而防止你应用的 数据流 难以理解
 
-一个被多次复用的子组件，子组件改变了引用的父组件数据，没有单项数据流机制，其它子组件的数值也跟着变化，这会让页面内这个多次被复用的子组件的数据耦合在一起，没办法独立使用
+一个被多次复用的子组件，子组件改变了引用的父组件数据，没有单项数据流机制，其它子组件的数值也会跟着变化，这样会让页面内这个被多次复用的子组件的数据耦合在一起，没办法独立使用
 ```
 ## 父向子传值props
 
@@ -642,7 +644,7 @@ Vue.component('base-board', {
       type: String,//注意，这里String两边没有单引号啥的
       required: true,//是否必填
       default: 'abc',//默认参数，当数据为 对象 或 数组 时，默认值需要以一个工厂函数返回，如: default:function(){return {"a":1}}
-      validator(a) {//自定义检验方法，上面type检验类型，这里可以在加一些自定义判断，如value值必须是‘abc’
+      validator(a) {//自定义检验方法，上面type检验类型，这里可以再额外加一些自定义判断，如value值必须是‘abc’
         console.log(a);
         return a == 'abc'
       }
@@ -1100,7 +1102,7 @@ export default {
     }
 }
 ```
-如上请注意：post方式自定义请求头信息，会触发**复杂请求**。复杂请求会在post请求之前，会向服务端发送一个OPTIONS的请求权限信息的请求，来向服务端要服务端的请求权限信息。拿到服务端的请求权限信息后，浏览器会将这个与post方式的请求头，请求方式，请求域名进行检验。如果满足条件发送post请求，如不满足会触发跨域，不会进行post请求。[Nodejs处理复杂请求](https://github.com/fengfanv/JS-library/tree/master/node#node处理复杂请求)
+如上请注意：自定义请求头信息，会触发**复杂请求**。复杂请求会在请求之前，会向服务端发送一个OPTIONS的请求权限信息的预检请求，来向服务端要服务端的请求权限信息。拿到服务端的请求权限信息后，浏览器会将这个与真正要发送的请求的请求头，请求方式，请求域名进行检验。如果满足条件则请求，如不满足会触发跨域，不会发送请求。[Nodejs处理复杂请求](https://github.com/fengfanv/JS-library/tree/master/node#node处理复杂请求)
 
 
 
@@ -1219,15 +1221,15 @@ const router = new Router({
 //路由钩子函数
 //1、全局前置守卫（跳转前执行）
 router.beforeEach((to, from, next) => {
-  console.log('to:',to);//要到哪里去
-  console.log('from:',from);//从什么地方来
+  console.log('to',to);//要到哪里去
+  console.log('from',from);//从什么地方来
 
   //next() 与next(true)意思一样允许跳转
   //next(true/false) false不允许跳转
   //next('/another') 重定向到指定路由  
 
-  if (to.path === '/index') {//当地址为/index时做处理
-    if (to.query.id !== undefined) {
+  if (to.path == '/index') {//当地址为/index时做处理
+    if (to.query.id != undefined) {
       console.log('有id值，继续');
       next();
     } else {
@@ -1349,11 +1351,13 @@ this.$route.query  //获取query里面传过来的值
 this.$route.params  //获取params里面传过来的值
 
 //动态添加路由
-// let aspath = '@/views' + '/about.vue';//注意，使用import异步获取组件，这样写，这样用，找不到模块。
-// let component = () => import(aspath);
-let component = () => import('../views' + '/about.vue'); //使用import异步获取组件时，你写的代码import()的括号内需要明文显示 @/views 或 ../views 字段。这样写编译器(webpack/vite)才能，才能正确编译。因为编译器是用运行在代码执行之前，编译器会将你编写的代码import('@/views'+...)变成类似import('./views'+...)这种。而如果你编写的代码是import(filePath)这种，则编译器会无法匹配你的代码，导致不能将你的代码改写，导致模块路径错误，运行代码时，出现找不到模块的问题。
-this.$router.addRoute({path: '/about', name: 'about', component: component}) 
+//注意，使用import异步获取组件，如下这样写，这样用，找不到模块
+// let filePath = '@/views' + '/about.vue';
+// let component = () => import(filePath);
 
+//使用import异步获取组件时，你写的代码import()的括号内需要明文显示 @/views 或 ../views 字段。这样写编译器(webpack/vite)才能，才能正确编译。因为编译器是运行在代码执行之前，编译器会将你编写的代码import('@/views'+...)变成类似import('./views'+...)这种。而如果你编写的代码是import(filePath)这种，则编译器会无法匹配你的代码，导致不能将你的代码改写，导致模块路径错误，运行代码时，出现找不到模块的问题
+let component = () => import('../views' + '/about.vue'); 
+this.$router.addRoute({path: '/about', name: 'about', component: component}) 
 ```
 ## vuex使用
 1、在项目内创建一个文件夹store
@@ -1364,13 +1368,13 @@ index.js
 ```javascript
 //state：存储的数据(状态)，在项目中使用 this.$store.state.参数名
 
-//getters：可以将getters理解为vuex的计算属性，getters的返回值会被缓存起来，只有当它依赖的数据发生改变时才会被重新计算。在项目中使用 this.$sotre.getters.方法名
+//getters：可以将getters理解为vuex的计算属性，getters的返回值会被缓存起来，只有当它依赖的数据发生改变时才会被重新计算。在项目中使用 this.$store.getters.方法名
 
 //mutations：官网建议专门用来修改数据(状态)，mutations的方法里仅支持同步的方法（如：在方法里面不能使用setTimeout这种异步操作）。在项目中使用 this.$store.commit('方法名',params)
 
-//actions：官方不建议我们直接调用mutations下方法来改数据，所以提供了另一种方法，主要用于调用mutations下的方法，actions里可以使用异步操作（如：在actions的方法里面可以使用setTimeout等，区别上面mutations），在项目中使用 this.$store.dispatch('方法名',params)
+//actions：官方不建议我们直接调用mutations下方法来改数据，所以提供了另一种方法，主要用于调用mutations下的方法，actions里可以使用异步操作（如：在actions的方法里面可以使用setTimeout、调用api接口等），在项目中使用 this.$store.dispatch('方法名',params)
 
-//modules：由于使用单一状态树，web应用的所有状态会集中到一个比较大的对象。当应用变得非常复杂时，store对象就会变得很臃肿。为了解决这个问题，vuex允许我们将store分割成模块(module)。每个模块拥有自己的state、mutation、action、getter
+//modules：由于使用单一状态树，web应用的所有状态会集中到一个比较大的对象里。当应用变得非常复杂时，store对象就会变得很臃肿。为了解决这个问题，vuex允许我们将store分割成模块(module)。每个模块拥有自己的state、mutation、action、getter
 
 
 //vue2版本
@@ -1546,7 +1550,7 @@ keep-alive是vue内置的一个组件，而这个组件的作用就是能够缓�
 
 1、activated
 第一次进入某个页面的时候，页面或组件内，钩子触发的顺序是 beforeCreate -> created -> BeforeMount -> mounted -> activated
-第二次进入（打开过这个页面，跳到别的页面去了，现在又跳回来了），页面或组件内，钩子触发的顺序是 activated（当再次进入，这个缓存的页面或组件时候，只触发activated）
+第二次进入（打开过这个页面，然后跳到别的页面去了，现在又跳回来了），页面或组件内，钩子触发的顺序是 activated（当再次进入，这个缓存的页面或组件时候，只触发activated）
 
 2、deactivated ：离开页面的时候会触发deactivated，不会触发页面或组件的卸载生命周期钩子（如beforeUnmount，unmounted）
 ```
@@ -1694,6 +1698,7 @@ const todoId = ref(1)
 const todoData = ref(null)
 
 watch(todoId, async () => {
+    //fetch和ajax(XMLHttpRequest)类似，都是用来异步请求api接口数据的。具体区别 请百度。
     const res = await fetch(`https://jsonplaceholder.typicode.com/todos/${todoId.value}`)
     todoData.value = await res.json()
 }, {
@@ -2091,7 +2096,7 @@ export default defineComponent({
 });
 </script>
 ```
-组合式api组件声明周期函数
+组合式api组件生命周期函数
 
 |  选项式api   | 组合式api  |
 |  ----        | ----      |
@@ -2391,11 +2396,11 @@ export default defineComponent({
 
 [Vue.use()的作用及原理](https://juejin.cn/post/7138216381283205128)
 
-在 Vue 中引入(使用)第三方库时，通常我们会采用 import 的形式引入进来，但是有的组件在引入进来之后做了 Vue.use() 操作，而有的组件引入进来之后进行了 Vue.prototype.$something = something 操作，那么它们之间有什么联系呢？
+在 Vue 中引入(使用)第三方库时，通常我们会采用 import 的形式引入进来，但是有的库在引入进来之后做了 Vue.use() 操作，而有的库引入进来之后进行了 Vue.prototype.$something = something 操作，那么它们之间有什么区别呢？
 
-如：Vue.prototype.$axios = axios 其实是就是单纯的在 Vue 原型上增加了一个 $axios 属性(或方法)。因为被添加在原型上，所以属于一个全局属性(或方法)。
+如：Vue.prototype.$axios = axios 其实就是单纯的在 Vue 原型上增加了一个 $axios 属性(或方法)。因为被添加在原型上，所以属于一个全局属性(或方法)。
 
-通过全局方法 Vue.use() 使用插件，Vue.use 会自动阻止多次注册相同插件(在使用时，会判断了该插件是不是已经注册过，防止重复注册)，它需要在你调用 new Vue() 启动应用之前完成，Vue.use() 方法至少传入一个参数，该参数类型必须是 Object 或 Function，如果是 Object 那么这个 Object 需要定义一个 install 方法，如果是 Function 那么这个函数就被当做 install 方法。在 Vue.use() 执行时 install 会默认执行，当 install 执行时，其第一个参数就是 Vue，其他参数(options)是 Vue.use() 执行时传入的其他参数。也就是说，使用它之后，调用的是该组件的 install 方法。
+而通过全局 Vue.use() 方法来注册插件，Vue.use 会自动阻止多次注册相同插件(在使用时，会判断了该插件是不是已经注册过，防止重复注册)，它需要在你调用 new Vue() 启动应用之前完成，Vue.use() 方法至少传入一个参数，该参数类型必须是 Object 或 Function，如果是 Object 那么这个 Object 需要定义一个 install 方法，如果是 Function 那么这个函数就被当做 install 方法。在 Vue.use() 执行时 install 会默认执行，当 install 执行时，其第一个参数是 Vue，第二个参数是其他参数(options)(是调用 Vue.use() 时传入的自定义参数)。也就是说，使用它之后，调用的是该方法的 install 方法。
 
 ```js
 import Vue from "vue"
@@ -2403,7 +2408,7 @@ import Vue from "vue"
 const = myPlugin = {
   install(Vue, options){
     //Vue Vue对象
-    //options 使用Vue.use时传进来的参数
+    //options 使用Vue.use时传进来的自定义参数
 
     //添加全局方法或属性
     Vue.myFun = function () {
@@ -2435,7 +2440,7 @@ const = options = {
 }
 
 // myPlugin 的类型可以是 object 或 Function
-// options 是一个可选的对象
+// options 的类型是一个可选的对象
 Vue.use(myPlugin, options)
 ```
 ## Vue.extend
@@ -2464,9 +2469,6 @@ Vue.component('my-component', MyComponent);
 #### vue里render渲染函数
 ```html
 内容待补充
-
-
-
 ```
 #### import与import()区别是什么
 ```
@@ -2581,7 +2583,7 @@ export default {
 <style scoped>
 </style>
 ```
-#### vue服务器渲染（ssr），区分当前是浏览器环境还是node环境
+#### vue服务器渲染(ssr) 区分当前是 浏览器环境 还是 node环境
 ```html
 <template>
   <div>hahah</div>
@@ -2611,8 +2613,5 @@ export default {
 ## Vue-API  Vue.config.devtools
 获取vue2环境当前是开发环境还是生产环境
 ```javascript
-//javascript
-console.log(Vue.config.devtools);
-//true:开发环境
-//false:生产环境
+console.log(Vue.config.devtools) //true(开发环境) false(生产环境)
 ```
