@@ -87,21 +87,17 @@ ViewModel 负责将 Model 中的数据同步到 View，并将 View 中的用户�
 ```
 ## Vue响应式原理
 ```
-通过Object.defineProperty()劫持数据属性的访问和修改，并联合 发布订阅者模式，实现数据的响应式更新。实现数据和视图之间的自动同步关系。这种机制大大简化了数据绑定和事件处理的代码量，提高了开发效率和代码可读性。
+通过Object.defineProperty()劫持数据属性的访问和修改，配合发布-订阅模式 实现数据和视图之间的响应式更新。实现数据和视图之间的自动同步关系。
 
-在初始化阶段，Vue会遍历data中的所有属性，并使用Object.defineProperty()把这些属性全部转为getter/setter。
-在getter中，Vue会追踪依赖，即在组件渲染过程中，使用过的数据会被getter收集为依赖；
-在setter中，当数据变化时，会触发依赖的更新，即通知watcher重新渲染关联的组件。
-
-采用 数据劫持 结合 发布者-订阅者模式 的方式
-通过Object.defineProperty()来劫持监听data里各个属性的setter，getter，
-当数据发生变动时 通知 订阅者 变化。
+这样开发者只需关注业务逻辑，而无需手动操作 DOM，所以这种机制大大简化了数据绑定和事件处理的代码量，提高了开发效率和代码可读性。
 ```
 ## Vue双向数据绑定原理
 ```
-Vue双向数据绑定原理基于 Vue响应式原理。
+数据层（Model）：应用的数据及业务逻辑
+视图层（View）：应用的展示效果，各类UI组件
+业务逻辑层（ViewModel）：框架核心，它负责将数据与视图关联起来
 
-实现 数据变化自动同步到视图，视图变化自动更新到数据 的双向绑定。
+Vue双向数据绑定说的其实就是MVVM里的 ViewModel，它实现了 数据变化自动同步到视图，视图变化自动更新到数据 的双向绑定。
 ```
 ## Object.defineProperty 和 Proxy
 1、Object.defineProperty
@@ -144,23 +140,15 @@ console.log(obj.name);//值可以获取，但不会触发get方法
 ```
 ## 虚拟DOM 与 Diff算法 与 元素key属性
 ```
-Vue.js 是一个非常流行的前端框架，它使用了虚拟 DOM 和 Diff 算法来提高页面的渲染性能。同时，Vue 也提供了 key 属性来帮助更精确地更新 DOM。下面我将分别解释这三个概念以及它们之间的关系。
+虚拟DOM是对真实DOM的一个抽象表示
+真实DOM哪怕是一个最简单的div也包含着很多属性，很臃肿
+当你某一次操作真实DOM时，需要更新10个DOM节点，但浏览器没这么智能，收到第一个更新DOM请求后，并不知道后续 还有9次更新操作，因此会马上执行更新流程，最终执行10次流程，所以操作真实DOM对性能损耗很大，代价很昂贵，频繁操作真实DOM，容易影响用户体验
 
-虚拟 DOM
-虚拟 DOM（Virtual DOM）是一个编程概念，它是对真实 DOM 的一个内存中的抽象表示。当组件的状态发生变化时，Vue 会创建一个新的虚拟 DOM 树，并与之前的虚拟 DOM 树进行比较。这种比较可以帮助 Vue 确定哪些部分需要更新，然后只更新这些部分，而不是整个 DOM。
 
-Diff 算法
-Diff 算法是 Vue（以及 React 等其他框架）用来比较新旧虚拟 DOM 树并确定最小更新集的策略。Vue 的 Diff 算法会逐层比较节点，以找到差异并生成必要的 DOM 更新操作。
-Diff 算法会尝试重用和重新排序现有元素，以最小化实际的 DOM 操作。例如，如果列表的顺序发生变化，Vue 会尝试通过移动现有元素而不是创建和删除元素来更新 DOM。
+当组件的状态发生变化时，Vue 会创建一个新的虚拟 DOM 树，并通过 Diff 算法与之前(旧)的虚拟 DOM 树进行比较。Diff 算法会逐层比较节点，会尝试重用和重新排序现有元素，而不是创建和删除现有元素，以此来最小化操作真实 DOM，以此来提高性能
 
-元素 key 属性
-key 属性在 Vue 中用于跟踪每个节点的身份，特别是在处理列表渲染时。当列表数据发生变化时，Vue 使用 key 来识别哪些元素是新的、哪些元素是现有的、以及哪些元素已经被删除或重新排序。
-没有 key，Vue 会使用一种就地复用策略来尝试复用和重新排序元素。然而，这可能会导致一些问题，特别是在有状态或复杂组件的列表中。通过使用唯一的 key，Vue 可以更准确地确定每个元素的状态和位置，从而避免不必要的问题和性能下降。
 
-它们之间的关系
-虚拟 DOM、Diff 算法和 key 属性之间的关系非常紧密。虚拟 DOM 提供了对真实 DOM 的抽象表示，使得我们可以更高效地比较和更新页面。Diff 算法是这种比较过程的核心，它决定了如何最小化实际的 DOM 操作。而 key 属性则为 Diff 算法提供了必要的上下文信息，使得它能够更准确地识别和处理列表中的每个元素。
-
-总的来说，这三个概念共同构成了 Vue 中高效渲染页面的基础。通过使用虚拟 DOM 和 Diff 算法，Vue 能够最小化不必要的 DOM 操作，从而提高页面性能。而通过使用 key 属性，我们可以更精确地控制列表的渲染和更新过程，避免潜在的问题和性能下降。
+key 属性在 Vue 中用于跟踪和标记某个节点，在处理列表渲染时。当列表数据发生变化时，Vue 使用 key 来识别哪些元素是新的、哪些元素是现有的、以及哪些元素已经被删除。通过使用 key，Vue 可以更准确地确定每个元素的状态和位置，从而避免不必要的问题和性能下降
 ```
 ## 设置npm镜像源地址
 ```
@@ -268,7 +256,7 @@ module.exports = {
 }
 ```
 ## 脚手架3或更高版本解决开发环境跨域问题
-1、最新版脚手架创建的项目删除了config，build配置脚手架的文件，最新版用vue.config.js代替了
+1、最新版脚手架创建的项目 删除了config，build配置脚手架的文件，最新版用vue.config.js代替了
 ```javascript
 module.exports = {
     //解决打包后访问不到资源文件的问题
@@ -317,7 +305,7 @@ for in 与 for of 区别： for in 可以渲染数组或对象 for of 只能渲�
 
 <span v-for="(item, index) of 99" v-if="item != 2">{{ item }}</span>
 <!-- 注意：这个循环是从1开始的 -->
-<!-- 注意2：v-for 与 v-if 写在一个元素里，这时v-for的优先级高于v-if，在这里v-if会失效 -->
+<!-- 注意2：v-for 与 v-if 写在一个元素里，v-if会失效 -->
 
 <!--解决上面的问题，v-for写在template模板标签上，这个template模板标签是个空的占位符，不会被渲染到页面上-->
 <template v-for="(item, index) of 99">
@@ -512,7 +500,7 @@ export default {
       },
       immediate: true, //初次绑定时，就执行handler方法
       deep: true, //开启深度监听
-      //一般情况下，给obj重新赋一个新的值watch能监听到。但修改obj.a属性时，监听不到
+      //给obj这个变量重新赋一个新值时watch能监听到。但修改obj.a时，监听不到
       //开启deep后，修改obj.a的值，也能监听到，因为vue也给obj.a加上了监听，但是如果obj有好多属性，开启后，会损耗性能
     },
   },
@@ -614,7 +602,7 @@ const app = Vue.createApp({
     baseBoard //这里局部组件需要在这里绑定一下，才能使用。这里虽然是驼峰写法，但在html中使用时，需要转换成<base-board />这样做是因为在js变量中不能使用“-”，html组件可以使用。这样做可以有个区分
   }
 })
-app.$mount('#app');//挂载vue3实例
+app.mount('#app');//挂载vue3实例
 
 //vue3全局组件，只要定义了，处处可以使用，性能不高，但是使用起来简单。为什么性能不高，全局组件就是你一旦定义了，就会占用系统资源，不管你用不用
 app.component('a1', {
@@ -1102,9 +1090,7 @@ export default {
     }
 }
 ```
-如上请注意：自定义请求头信息，会触发**复杂请求**。复杂请求会在请求之前，会向服务端发送一个OPTIONS的请求权限信息的预检请求，来向服务端要服务端的请求权限信息。拿到服务端的请求权限信息后，浏览器会将这个与真正要发送的请求的请求头，请求方式，请求域名进行检验。如果满足条件则请求，如不满足会触发跨域，不会发送请求。[Nodejs处理复杂请求](https://github.com/fengfanv/JS-library/tree/master/node#node处理复杂请求)
-
-
+如上请注意：自定义请求头信息，会触发**复杂请求**。复杂请求会在请求之前，会向服务端发送一个OPTIONS的请求权限信息的预检请求，来向服务端要服务端的请求权限信息。拿到服务端的请求权限信息后，浏览器会将这个与真正要发送的请求的请求头，请求方式，请求域名进行检验。如果满足条件则请求，如不满足会触发跨域，不会发送请求。[Nodejs处理复杂请求](../node/createWebServer/README.md)
 
 ### vue里使用axios的小窍门
 
@@ -1401,7 +1387,7 @@ const store = new Vuex.Store({
         addFun: function (context, value) {
             context.commit("addCount", value);
         },
-        //actions可以使用promise返回值（区别于mutations，mutations里不可以使用promise返回值）
+        //actions可以使用Promise返回值（区别于mutations，mutations里不可以使用Promise返回值）
         //调用时 this.$store.dispatch('promiseTest',123).then((res)=>{console.log(res)})
         promiseTest: function (context, value) {
             return new Promise((resolve, reject) => {
@@ -1775,12 +1761,16 @@ const childMsg = ref('No child msg')
 const props = defineProps({
   msg: String
 })
+console.log(props.msg)//msg from parent
 
+//注意 这里不是 $emit
 const emit = defineEmits(['response'])
 emit('response', 'msg from child')
 </script>
 
 <template>
+  <!--注意 在template模板里使用，还是 $emit-->
+  <button @click="$emit('abcEvent','123')">按钮</button>
   <h2>这里是子组件</h2>
   <p>右边这条消息，是从父级传来的：{{msg}}</p>
 </template>
@@ -1827,13 +1817,22 @@ const msg = ref('msg from parent')
 <script setup>
 import { useRoute, useRouter } from 'vue-router'
 
+//注意 这里不是 $route
 const route = useRoute()
 console.log(route.query)
 
+//注意 这里不是 $router
 const router = useRouter()
 router.push({path:"/about"})
 
 </script>
+
+<template>
+  <div>
+    <!--注意 在template模板里使用，还是 $router / $route-->
+    <button @click="$router.push({path:'/about'})">跳转到about页面</button>
+  </div>
+</template>
 ```
 组合式API中使用vuex
 ```html
@@ -2279,9 +2278,6 @@ interface fun {
 
 const MessageBox: fun = (message, onConfirm, onCancel) => {
 
-    const container = document.createElement('div')
-    document.body.appendChild(container)
-
     const vnode = createVNode(
         notarizeBox,
         {
@@ -2296,6 +2292,10 @@ const MessageBox: fun = (message, onConfirm, onCancel) => {
             }
         }
     )
+
+    const container = document.createElement('div')
+    document.body.appendChild(container)
+
     render(vnode, container)
 
     // 关闭并删除确认框
@@ -2454,13 +2454,13 @@ var MyComponent = Vue.extend({
 });
 
 //用法1
-//使用该构造器(函数)创建一个新的 Vue 实例
+//使用该(组件构造器/组件构造函数)创建一个新的 Vue 实例
 var vm = new MyComponent();
 //将新创建的实例挂载到 DOM 中
 vm.$mount('#abc');
 
 //用法2
-//将组件构造器(构造函数)注册为全局组件
+//将该(组件构造器/组件构造函数)注册为全局组件
 Vue.component('my-component', MyComponent);
 ```
 ## vue内置组件Teleport
