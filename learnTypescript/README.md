@@ -27,65 +27,91 @@ npm install ts-node -g
 ```
 ts-node xxxx.ts
 ```
-### ts数据类型
+### 数据类型
 ```
 1、any 任意类型
 声明为 any 的变量可以赋予任意类型的值。
 
 2、number 数字类型
 双精度 64 位浮点值。它可以用来表示整数和分数。
-let a1: number = 0b1010; // 二进制
-let a2: number = 0o744;  // 八进制
-let a3: number = 6;      // 十进制
-let a4: number = 0xf00d; // 十六进制
+let a1:number = 0b1010; // 二进制
+let a2:number = 0o744;  // 八进制
+let a3:number = 6;      // 十进制
+let a4:number = 0xf00d; // 十六进制
 
-3、string 字符串类型
+3、bigint 大整数类型
+包含所有的‘大’‘整’数
+let x:bigint = 123n;
+let y:bigint = 0xffffn;
+let z:bigint = 3.14;//报错，bigint类型赋值为整数和小数，会报错。
+let k:bigint = 123;//报错，bigint类型赋值为整数和小数，会报错。
+
+4、symbol 类型
+let x:symbol = Symbol();//Symbol()函数的返回值就是 symbol 类型
+
+5、object 类型
+object 类型可以声明(对象、数组、函数)
+let x:object = {foo:123};
+let y:object = [1,2,3];
+let z:object = (n:number) => n + 1;
+
+6、null
+和js里要表达的意思一样
+null是一个只有一个值null的特殊类型。
+表示一个空对象引用。
+用 typeof 检测 null 返回是 object。
+let x:null = null;//表示变量x为空（即此处没有值）
+
+7、undefined
+undefined是一个只有一个值undefined的特殊类型。
+表示未定义（即还未给出定义，以后可能会有定义）
+let x:undefined = undefined;
+
+8、string 字符串类型
 使用单引号（'）或双引号（"）来表示字符串类型。反引号（`）来定义多行文本字符串。
-let name: string = "Kang";
+let name:string = "Kang";
 
-4、boolean 布尔类型
+9、boolean 布尔类型
 表示逻辑值：true 和 false。
-let flag: boolean = true;
+let flag:boolean = true;
 
-5、数组类型
-let arr: number[] = [1, 2]; // 声明数组方式1，在元素类型后面加上[]
-let arr: Array<number> = [1, 2]; // 声明数组方式2，使用数组泛型
+10、数组类型
+let arr:number[] = [1, 2]; // 声明数组方式1，在元素类型后面加上[]
+let arr:Array<number> = [1, 2]; // 声明数组方式2，使用数组泛型
 
-let arr: string[] = new Array('1','2','3');
-let arr: any[] = [1, false, 'fine'];
+let arr:Array<number|string> = [1,1,1,'a'];//数组arr的成员类型是number|string
 
-6、元组
+let arr:string[] = new Array('1','2','3');
+let arr:any[] = [1, false, 'fine'];
+
+let arr:(number|string)[] = [1,1,1,'a'];//数组arr的成员类型是number|string
+
+let arr:number[][] = [[1,2,3],[4,5,6]];//变量arr的类型是number[][]，表示它是一个二维数组，最底层的数组成员类型是number
+
+11、元组
 元组类型用来表示已知元素数量和类型的数组，各元素的类型不必相同，对应位置的类型需要相同。
-let x: [string, number];
+let x:[string, number];
 x = ['kang', 1];    // 运行正常
 x = [1, 'kang'];    // 报错
 console.log(x[0]);  // 输出 kang
 
-7、enum 枚举
+12、enum 枚举
 枚举类型用于定义数值集合。
 
-如，人分为男人和女人，人(男人，女人)
-enum Ren{nan,nv}	//声明一个枚举类型，名称没有大小写限制
-console.log(Ren.nv) //打印：1，对应nv在Ren里的下标
+如，人分为男孩和女孩，人(男孩，女孩)
+enum Ren{boy,girl}	//声明一个枚举类型，名称没有大小写限制
+console.log(Ren.girl) //打印：1，对应girl在Ren里的下标
 
-enum Ren{nan='男人',nv='女人'}	//声明一个枚举类型
-console.log(Ren.nv) //打印：女人，对应nv下的参数
+enum Ren{boy='男孩',girl='女孩'}    //声明一个枚举类型
+console.log(Ren.girl) //打印：女孩，对应girl下的参数
 
-8、void
+13、void
 用于标识方法返回值的类型，表示该方法没有返回值。
-function hello(): void {
+function hello():void {
     alert("Hello Kang");
 }
 
-9、null 空
-和js里要表达的意思一样
-null是一个只有一个值的特殊类型。表示一个空对象引用。
-用 typeof 检测 null 返回是 object。
-
-10、undefined
-用于表示变量未定义值
-
-11、never
+14、never
 never 其它类型。
 
 12、联合类型
@@ -95,12 +121,10 @@ console.log("数字为 "+ val)
 val = "kang" 
 console.log("字符串为 " + val)
 
-
 注意：元组与数组区别
 1、固定长度：元组的长度是固定的，一旦定义了一个元组类型，你就不能再添加或删除元素。
 2、类型化元素：元组的每个位置都有一个特定的类型。这意味着你可以访问元组的特定元素，并且TypeScript会知道该元素的类型。
 3、值可改变：虽然元组的长度是固定的，但是元组中的元素值是可以改变的。你可以修改一个已经存在的元组元素的值，只要新值符合该位置的类型要求。
-
 
 注意：TypeScript 和 JavaScript 没有整数类型。
 ```
@@ -298,7 +322,6 @@ class mySon extends me{
     }
 }
 
-//因为继承了me类的属性和方法，所以可以使用me类中的constructor构造方法
 let son:mySon = new mySon('我儿子',10);
 son.sayHello();//使用了mySon中重写后的sayHello()方法
 son.zhuanqian();//使用mySon类中的zhuanqian方法
@@ -466,6 +489,7 @@ interface ren{
     name:string//在使用时name必须使用
     age:number//在使用时age必须使用
     love?:boolean//可选属性
+    sayHi?:(name:string)=>string //可选方法
 }
 let It:ren = {"name":"弹幕人","age":1};
 console.log(It);//{ name: '弹幕人', age: 1 }
@@ -547,7 +571,7 @@ class Dog extends Animal implements Runnable, Speakable {
 ```
 ### 命名空间
 ```javascript
-命名空间一个最明确的目的就是解决重名问题。
+命名空间，用来解决重名问题。
 
 假设这样一种情况，当一个班上有两个名叫小明的学生时，为了明确区分它们，我们在使用名字之外，不得不使用一些额外的信息，比如他们的姓氏（王 小明，李 小明）
 
@@ -575,11 +599,11 @@ let thinDehua:thin.dehua = new thin.dehua()
 fatDehua.sayHello();//我是胖德华
 thinDehua.sayHello();//我是瘦德华
 ```
-### ts泛型
+### 泛型
 ```ts
-泛型是一种编程语言特性，允许在定义函数、类、接口等时使用占位符来表示类型，而不是具体的类型。
+泛型是一种编程语言特性，允许在定义函数、类、接口等时，使用占位符来表示类型，而不是具体的类型。
 
-泛型最重要的功能是，代码重用，这样可以编写与特定类型无关的通用代码，提高代码的复用性。
+泛型最重要的功能是，代码重用，这样可以编写 与特定类型无关 的通用代码，提高代码的复用性。
 
 //泛型函数案例
 //使用泛型来创建一个可以处理不同类型数据的函数
@@ -594,9 +618,13 @@ console.log(result); //Hello
 let numberResult = identity<number>(42);
 console.log(numberResult); //42
 
+//如下，comb是一个泛型函数，使用 T 表示泛型类型
+function comb<T>(arr:T[]):T[] {
+  return arr
+}
 
 //泛型接口案例
-//这里定义了一个泛型接口 Pair，它有两个类型参数 T 和 U。
+//这里定义了一个泛型接口Pair，它有两个类型参数 T 和 U。
 interface Pair<T, U> {
     first: T;
     second: U;
@@ -606,7 +634,7 @@ let pair: Pair<string, number> = { first: "hello", second: 42 };
 console.log(pair); // { first: 'hello', second: 42 }
 
 
-//泛型类案例
+//泛型 类 案例
 //使用 T 表示泛型类型。
 class Box<T> {
     private value: T;
@@ -656,23 +684,46 @@ function defaultValue<T = string>(arg: T): T {
 let result1 = defaultValue("hello"); // 推断为 string 类型
 let result2 = defaultValue(42);      // 推断为 number 类型
 
-//这个例子展示了带有默认值的泛型函数。函数 defaultValue 接受一个泛型参数 T，并给它设置了默认类型为 string。在使用时，如果没有显式指定类型，会使用默认类型。在例子中，第一个调用中 result1 推断为 string 类型，第二个调用中 result2 推断为 number 类型。
+//这个例子展示了带有默认值的泛型函数。函数 defaultValue 接受一个泛型参数 T，并给它设置了默认类型为 string。在使用时，如果没有显式指定类型，会使用默认类型。
+//在例子中，第一个调用中 result1 推断为 string 类型，第二个调用中 result2 推断为 number 类型。
 ```
-### ts声明文件
+### 类型断言
 ```ts
-在 TypeScript 中，声明文件（.d.ts 文件）用于描述 JavaScript 库的类型信息，这样 TypeScript 编译器就能理解这些js库中的函数、变量和类的类型。这对于使用纯 JavaScript 库或者第三方库时特别有用，因为这些库通常没有内置的类型定义。
+类型断言，是一种手段，允许开发者在代码中“断言”某个值的类型，也就是告诉编译器此处的值是什么类型。
+TypeScript一旦发现存在“类型断言”，就不再对该值进行类型推断，而是直接采用断言给出的类型。
+这种做法的实质是，允许开发者在某个位置“绕过”编译器的类型推断，让本来通不过类型检查的代码能够通过，避免编译器报错。
+这样虽然削弱了TypeScript类型系统的严格性，但是为开发者带来了方便，毕竟开发者比编译器更了解自己的代码。
+类型断言 并不是真的改变一个值的类型，而是提示编译器，应该如何处理这个值
 
-假如我们想使用第三方js库，比如 jQuery，我们通常这样获取一个 id 是 foo 的元素
+type T = 'a'|'b'|'c';
+let foo = 'a';
+let bar:T = foo;//报错，原因是 TypeScript 推断变量foo的类型是string，而变量bar的类型是'a'|'b'|'c'，前者(string)是后者('a'|'b'|'c')的父类型。父类型不能赋值给子类型，所以就报错了。
 
-但是在 TypeScript 中，我们并不知道 $ 或 jQuery 是什么东西：
-jQuery('#foo');//报错。index.ts(1,1): error TS2304: Cannot find name 'jQuery'.
+//上面报错，可以使用‘断言’解决报错。
+let bar:T = foo as T;//这里foo as T表示告诉编译器，变量foo的类型断言为T，所以这一行不再需要类型推断，然后编译器直接把foo的类型当作T，所以就不报错了。
 
-这时，我们需要使用 declare 关键字来定义它的类型，帮助 TypeScript 判断我们传入的参数类型对不对：
-declare var jQuery: (selector: string) => any;
+let bar:T = <T>foo;//foo as T是第一种断言语法。这里<T>foo是第二种断言语法。
+```
+### declare关键字
+```ts
+declare关键字用来告诉编译器，某个类型是存在的，可以在当前文件中使用。
+它的主要作用，就是让当前文件可以使用其他文件声明的类型。举例来说，自己的脚本使用外部库定义的函数，编译器会因为不知道外部函数的类型定义而报错，这时就可以在自己的脚本里面使用declare关键字，告诉编译器外部函数的类型。这样的话，编译单个脚本就不会因为使用了外部类型而报错。
 
-jQuery('#foo');//正常运行
+declare关键字的重要特点是，它只是通知编译器某个类型是存在的，不用给出具体实现。比如，只描述函数的类型，不给出函数的实现，如果不使用declare，这是做不到的。
 
-declare 定义的类型只会用于编译时的检查，编译结果中会被删除。
+declare只能用来描述已经存在的变量和数据结构，不能用来声明新的变量和数据结构。另外，所有 declare 语句都不会出现在编译后的文件里面。
+
+如，当前脚本使用了其他脚本定义的全局变量x，
+x = 123; //报错，因为变量x是其他脚本定义的，当前脚本不知道它的类型，所以编译器报错了。
+
+declare let x:number;//这里使用 declare 命令给出了全局变量x的类型，所以就不报错了。
+x = 123;
+```
+### .d.ts声明文件
+```ts
+单独使用的模块，一般会同时提供一个单独的类型声明文件（declaration file），把本模块的外部接口的所有类型都写在这个文件里面，便于模块使用者了解接口，也便于编译器检查使用者的用法是否正确。
+
+类型声明文件里面只有类型代码，没有具体的代码实现。它的文件名一般为[模块名].d.ts的形式，其中的d表示 declaration（声明）。
 ```
 ### ts编译成js的小bug1
 ```javascript
@@ -702,3 +753,5 @@ aFun();
 ### 参考链接
 
 [菜鸟教程 - TypeScript 教程](https://www.runoob.com/typescript/ts-tutorial.html)
+
+[TypeScript 教程 - 阮一峰](https://typescript.p6p.net/)
