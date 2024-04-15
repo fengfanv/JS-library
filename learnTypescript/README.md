@@ -33,7 +33,7 @@ ts-node xxxx.ts
 声明为 any 的变量可以赋予任意类型的值。
 
 2、number 数字类型
-双精度 64 位浮点值。它可以用来表示整数和分数。
+双精度 64 位浮点值。它可以用来表示整数和小数。
 let a1:number = 0b1010; // 二进制
 let a2:number = 0o744;  // 八进制
 let a3:number = 6;      // 十进制
@@ -229,34 +229,58 @@ let wangleilei:ren = new ren('男','王雷雷',28);
 ```
 ### 类的static关键字
 ```ts
-static关键字用于声明一个类的静态成员，这意味着这个成员是属于类本身的，而不是类的实例。
+static关键字用于 声明类的静态成员，静态成员属于类本身，不属于类的实例。
 
-静态成员是直接在类上定义的属性/方法，而不是在类的实例上。你可以通过类名来访问和修改它，而不需要创建类的实例。
+通过类名来访问和修改类的静态成员。
 
-静态成员不能通过类的实例来访问或调用。
-静态成员不能访问类的非静态成员（属性和方法），因为非静态成员需要类的实例来存在。
-静态成员在类加载时初始化，而不是在创建类的实例时。
-子类可以继承父类的静态成员
+子类可以继承父类的静态成员。
 
-class Ren {  
-    static num:number; 
-    
-    static disp():void { 
-       console.log("num 值为 "+ Ren.num) 
-    } 
- } 
-  
- Ren.num = 12  // 初始化静态变量
- Ren.disp()    // 调用静态方法
+子类可以重写继承自父类的静态成员。
 
- var obj:Ren = new Ren()
-//  console.log(obj.num)//报错，obj实例对象上没有num属性
+class Ren {
+    static num: number = 10
+
+    static disp(): void {
+        console.log(Ren.num)
+    }
+
+    constructor(){
+        console.log(Ren.num)//打印12
+    }
+
+    say(){
+        console.log(Ren.num)//实例方法通过类名，获取类的静态属性
+        Ren.disp()//实例方法通过类名，调用类的静态方法
+    }
+}
+
+console.log(Ren.num)//10
+Ren.num = 12//修改静态属性
+console.log(Ren.num)//12
+Ren.disp()//调用静态方法，12
+
+let obj = new Ren()//打印12
+//console.log(obj.num)//报错，obj实例对象上没有num属性
+obj.say()
+
+
+class God extends Ren {
+    static disp(): void {//重写所继承的静态方法
+        console.log('Ren.disp.num',Ren.num)//12
+        console.log('God.disp.num',God.num)//15
+    }
+}
+console.log('God.num',God.num)//12
+God.num = 15
+console.log('Ren.num',Ren.num)//12
+console.log('God.num',God.num)//15
+God.disp()
 ```
 ### 类的继承
 ```javascript
 TypeScript 一次只能继承一个类，不支持继承多个类，但 TypeScript 支持多重继承（C 继承 B，B 继承 A）
 
-子类除了不能继承父类的私有成员(属性和方法)，其他的都可以继承。
+子类除了不能继承父类的私有成员，其它的都可以继承。
 
 class me{
     public name:string
@@ -475,7 +499,7 @@ var a = (content:string):string => {
 ### 接口
 ```javascript
 接口(interface)与类(class)的区别
-类：类是蓝图或模板。类定义了对象的属性和方法，并且包含实现细节（即方法的具体代码）。
+类：类是蓝图或模板。类定义了对象的属性和方法，并且包含代码实现细节（即方法的具体代码）。
 接口：接口是一个类型定义，它描述了对象应该具有的形状（即属性和方法的签名）。接口不包含任何实现细节，只是声明了对象应该有的结构。
 
 类：类可以被实例化

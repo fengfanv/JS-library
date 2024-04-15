@@ -134,7 +134,7 @@ var proxyObj = new Proxy(obj,{
 	}
 })
 proxyObj.name = 123;//触发set方法
-console.log(proxyObj.name);//get方法
+console.log(proxyObj.name);//触发get方法
 obj.name = 456;//值可以修改，但不会触发set方法
 console.log(obj.name);//值可以获取，但不会触发get方法
 ```
@@ -1707,7 +1707,7 @@ watch(todoId, async () => {
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, reactive, toRefs, watch } from 'vue';
+import { defineComponent, ref, reactive, watch } from 'vue';
 
 export default defineComponent({
   name: 'App',
@@ -2420,7 +2420,7 @@ const = myPlugin = {
       }
     })
 
-    //注入mixin
+    //注入mixin(mix in)
     Vue.mixin({  
       created: function () {
         //...
