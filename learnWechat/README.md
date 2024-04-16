@@ -159,7 +159,7 @@ page {
 #### 使用 button 按钮（组件 -> 表单组件）
 [button文档](https://developers.weixin.qq.com/miniprogram/dev/component/button.html)
 ```html
-<button open-type="getUserInfo">微信登录</button>
+<button open-type="getUserInfo" bindgetuserinfo="getUserInfoCallback">微信登录</button>
 ```
 #### 使用 input 按钮（组件 -> 表单组件）
 [input文档](https://developers.weixin.qq.com/miniprogram/dev/component/input.html)

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>websocketVideo</title>
+</head>
+
+<body>
+    <div id="local">
+        <p>本地</p>
+        <video autoplay controls></video>
+    </div>
+
+    <hr>
+
+    <div id="remote">
+        <input type="text" placeholder="远端用户">
+        <button onclick="beginSendAudio()">发送本地媒体流到远端用户</button>
+        <button onclick="endPushStream()">结束推流</button>
+    </div>
+
+
+
+    <script>
+        //初始化，本地，你自己
+        var self = Math.random().toString().split('.')[1].slice(3, 6);//你的编号，如，270
+        document.querySelector('#local p').innerHTML = `本地（${self}）`;
+
+        var remoteUser = '';
+        document.querySelector('#remote input').addEventListener('input', function (e) {
+            remoteUser = e.target.value;
+        });
+
+        //------------------------------------------------------------------------------
+
+        var localVideo = document.querySelector('#local video');
+        var mediaStream = null;
+        navigator.mediaDevices.getUserMedia({ video: false, audio: true })
+            .then(function (stream) {
+                mediaStream = stream;
+                localVideo.srcObject = mediaStream;
+            })
+
+        //------------------------------------------------------------------------------
+
+        //是否结束推流
+        var timer = null;
+
+        //结束推流
+        function endPushStream() {
+            clearInterval(timer);
+        }
+
+        //推流音频
+        function beginSendAudio() {
+            const audioContext = new AudioContext();
+            const mediaRecorder = new MediaRecorder(mediaStream);
+            const chunks = [];
+
+            mediaRecorder.ondataavailable = event => {
+                chunks.push(event.data);
+            };
+
+            mediaRecorder.onstop = () => {
+                const blob = new Blob(chunks, { 'type': 'audio/ogg; codecs=opus' });
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                    let base64Data = reader.result;
+                    ws.send(JSON.stringify({
+                        data: {
+                            type: 'audio',
+                            data: base64Data
+                        },
+                        from: self,
+                        to: remoteUser
+                    }));
+                };
+                reader.readAsDataURL(blob);
+            };
+
+            mediaRecorder.start();
+
+            //设定一个定时器来停止录制并发送数据，例如每秒钟发送一次  
+            timer = setInterval(() => {
+                mediaRecorder.stop();
+                //重置chunks数组以准备下一次录制  
+                chunks.length = 0;
+                mediaRecorder.start();
+            }, 1000);
+        }
+
+        //------------------------------------------------------------------------------
+
+        //创建ws服务
+        var ws = new WebSocket(`wss://${location.hostname}:3000?user=${self}`);
+
+        ws.onopen = function () {
+            console.log("websocket连接成功！");
+        }
+        ws.onclose = function () {
+            console.log("websocket连接关闭！");
+        }
+        ws.onerror = function (e) {
+            console.log("websocket连接发生错误！");
+        }
+        ws.onmessage = function (res) {
+            // console.log("接收到服务端发来的消息！");
+
+            let { data, from, to } = JSON.parse(res.data);
+
+            if (data.type == 'audio') {
+                playAudio(from, data)
+            }
+
+        }
+
+        // ws.close();  //关闭ws连接
+
+        // ws.send('string');   //给服务端发消息
+
+        //------------------------------------------------------------------------------
+
+        //播放发来的音频推流
+        function playAudio(from, res) {
+            const base64Data = res.data;
+
+            const blob = dataURItoBlob(base64Data);
+            const url = URL.createObjectURL(blob);
+            const audio = new Audio(url);
+            audio.play();
+        }
+
+        function dataURItoBlob(dataURI) {
+            // 将Base64数据转换为Blob对象  
+            const byteString = atob(dataURI.split(',')[1]);
+            const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+            const ab = new ArrayBuffer(byteString.length);
+            const ia = new Uint8Array(ab);
+            for (let i = 0; i < byteString.length; i++) {
+                ia[i] = byteString.charCodeAt(i);
+            }
+            return new Blob([ab], { type: mimeString });
+        }
+    </script>
+</body>
+
+</html>
