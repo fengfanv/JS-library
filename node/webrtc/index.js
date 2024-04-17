@@ -21,8 +21,9 @@ https.createServer({
     response.setHeader("Access-Control-Allow-Methods", "PUT,POST,GET,DELETE,OPTIONS");
     response.setHeader("Access-control-max-age", "1000");
 
-    //处理复杂请求的预检请求
+    //处理CORS复杂请求的预检请求
     if (request.method === 'OPTIONS') {
+        console.log('复杂请求的预检请求')
         response.writeHead(200, {
             'Content-Type': 'text/plain',
             'Access-Control-Allow-Origin': '*',
