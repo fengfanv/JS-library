@@ -1,6 +1,6 @@
 var dgram = require('dgram');
 var udp_client = dgram.createSocket('udp4');
-udp_client.bind(5678); //绑定端口号。不绑定端口号，程序在运行时，系统会为其分配一个临时随机端口号
+udp_client.bind(8998); //绑定端口号。不绑定端口号，程序在运行时，系统会为其分配一个临时随机端口号
 
 var send_data = 'hello world';
 
