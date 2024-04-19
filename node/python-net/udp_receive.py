@@ -1,9 +1,11 @@
 import socket
 
+# udp接收数据案例
+
 # 创建upd 套接字（socket.AF_INET代表ipv4，socket.SOCK_DGRAM代表使用upd协议）
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-# 绑定服务的网络信息
+# 设置此udp的网络信息
 addr = ('', 6789)  # 注意，这里是元组类型，ip是字符串，端口号是数字。不写ip地址，程序在运行时会自动把ip设成本机ip地址。不绑定端口号，程序在运行时系统会为程序分配一个临时随机端口号
 s.bind(addr)
 

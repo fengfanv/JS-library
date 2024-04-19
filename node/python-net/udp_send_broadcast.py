@@ -1,11 +1,11 @@
-# udp 广播
-
 import socket
+
+# udp发送广播消息案例
 
 # 创建upd 套接字（socket.AF_INET代表ipv4，socket.SOCK_DGRAM代表使用upd协议）
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-# 设置upd 套接字允许其广播(注意如果udp 套接字需要广播，则一定要添加此语句)
+# 设置此upd 套接字允许其广播(注意如果udp 套接字需要广播，则一定要添加此语句)
 # setsockopt()是用于设置套接字选项的方法。socket.SOL_SOCKET是套接字选项的级别，表示当前设置的是通用套接字选项。socket.SO_BROADCAST是要设置的选项名称，表示允许套接字发送广播消息。1是选项的值，表示启用广播功能。
 s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
 

@@ -1,5 +1,7 @@
 import socket
 
+# udp给指定电脑发送消息案例
+
 # 创建upd 套接字（socket.AF_INET代表ipv4，socket.SOCK_DGRAM代表使用upd协议）
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
