@@ -30,7 +30,7 @@ while True:
         print('客户端发来的msg', recv_data.decode())  # 打印客户端发来的消息
 
         # 给客户端回复数据
-        ret[0].send('你可真6'.encode())
+        ret[0].send('你可真6'.encode()) # 通道建立后，可以给客户端回复很多次数据
 
     else: # recv_data长度是0，客户端已经执行了tcp_client_socket.close()这个代码，所以现在服务端可以执行ret[0].close()这个代码了。客户端已经关闭通讯通道，现在需要服务端关闭通讯通道
         ret[0].close()  # 与客户端的数据“收/发”完毕，关闭这条与客户端建立的通讯通道
