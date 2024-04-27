@@ -11,7 +11,7 @@ udp.bind(8999, '', function () {
 
 var send_data = 'hello world';
 
-udp.send(send_data, 0, send_data.length, 6789, '', function (error) {
+udp.send(send_data, 0, send_data.length, 6789, '255.255.255.255', function (error) {
     if (error) {
         console.log(error);
         return false;
