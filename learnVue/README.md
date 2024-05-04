@@ -1775,6 +1775,42 @@ emit('response', 'msg from child')
   <p>右边这条消息，是从父级传来的：{{msg}}</p>
 </template>
 ```
+组合式API中组件属性 vue2是 { v-bind:属性名.sync="xxx" }  vue3是 { v-model:属性名="xxx" } 
+```html
+<!--父组件-->
+<script setup>
+import { ref, watch } from 'vue'
+import ChildComp from './ChildComp.vue'
+
+const childMsg = ref('')
+const onResponse = (msg) => {
+    childMsg.value = msg
+}
+
+const childText = ref('')
+watch(childText, (newValue, oldValue) => {
+    console.log(newValue)//haha
+})
+</script>
+
+<template>
+    <ChildComp @response="onResponse" v-model:text="childText" />
+    <p>{{ childMsg }}</p>
+</template>
+
+
+<!--子组件 ChildComp.vue-->
+<script setup>
+const emit = defineEmits(['response','update:text'])
+
+emit('response', 'hello from child')
+emit('update:text', 'haha')
+</script>
+
+<template>
+    <h2>Child component</h2>
+</template>
+```
 组合式API中DOM元素模板引用(ref)
 ```html
 <script setup>
@@ -1996,6 +2032,42 @@ export default defineComponent({
     }
   }
 });
+</script>
+
+
+
+<!--不建议在<script setup>里使用toRefs-->
+<!--如果在<script setup>里使用toRefs，需要注意如下事项-->
+<template>
+    <button v-for="(item, index) of girls" :key="index" @click="selectGirlFun(index)">{{ item }}</button>
+    <div>{{ selectGirl }}</div>
+</template>
+
+<script setup>
+import { reactive, toRefs } from 'vue';
+
+const data = reactive({
+    girls: ['大脚', '刘英', '小红'],
+    selectGirl: '',
+    selectGirlFun: () => {
+        data.selectGirl = data.girls[index]
+    }
+})
+
+//如下这种方式，在<script setup>里不好用
+const refData = toRefs(data)
+defineExpose({
+    ...refData
+})
+
+//如果非得使用toRefs，需要使用如下方式
+const { girls, selectGirl, selectGirlFun } = toRefs(data)
+//写不写defineExpose都行，默认自动导出，但如果你非常想写，那就写
+defineExpose({
+    girls,
+    selectGirl,
+    selectGirlFun
+})
 </script>
 ```
 vue hooks 功能
