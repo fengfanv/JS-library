@@ -9,9 +9,9 @@ udp.bind(8999, '', function () {
     udp.setBroadcast(true);
 });
 
-var send_data = 'hello world';
-
-udp.send(send_data, 0, send_data.length, 6789, '255.255.255.255', function (error) {
+var send_data = 'hello world你好世界';
+var sendData = Buffer.from(send_data, 'utf8');
+udp.send(sendData, 0, sendData.length, 6789, '255.255.255.255', function (error) {
     if (error) {
         console.log(error);
         return false;

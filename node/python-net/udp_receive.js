@@ -14,8 +14,9 @@ udp.on('listening', function () {
 
 //接收消息
 udp.on('message', function (msg, rinfo) {
-    strmsg = msg.toString();
-    console.log(`udp server received data: ${strmsg} from ${rinfo.address}:${rinfo.port}`)
+    let buffer = Buffer.from(msg, 'binary');
+    msgStr = buffer.toString();
+    console.log(`udp server received data: ${msgStr} from ${rinfo.address}:${rinfo.port}`)
 })
 
 //错误处理
