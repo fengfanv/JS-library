@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>camera</title>
+</head>
+
+<body>
+    <div id="local">
+        <p>本地</p>
+        <video autoplay controls></video>
+    </div>
+
+    <hr>
+
+    <div id="remote">
+        <button onclick="startPushStream()">发送本地媒体流到admin</button>
+        <button onclick="endPushStream()">结束推流</button>
+    </div>
+
+
+    <script>
+        //初始化，本地，你自己
+        var self = Math.random().toString().split('.')[1].slice(3, 6);//你的编号，如，270
+        document.querySelector('#local p').innerHTML = `本地（${self}）`;
+
+        //------------------------------------------------------------------------------
+        //------------------------------------------------------------------------------
+        //------------------------------------------------------------------------------
+
+        var remoteUser = 'admin';
+
+        //------------------------------------------------------------------------------
+        //------------------------------------------------------------------------------
+        //------------------------------------------------------------------------------
+
+        var localVideo = document.querySelector('#local video');
+        var mediaStream = null;
+        navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+            .then(function (stream) {
+                mediaStream = stream;
+                localVideo.srcObject = mediaStream;
+            })
+        var canvas = document.createElement('canvas');
+        var ctx = canvas.getContext('2d');
+
+        //------------------------------------------------------------------------------
+        //------------------------------------------------------------------------------
+        //------------------------------------------------------------------------------
+
+        //是否结束推流
+        var endSendStatus = false;
+
+        //结束推流
+        function endPushStream() {
+            endSendStatus = true;
+        }
+
+        //开始推流
+        function startPushStream() {
+            canvas.width = localVideo.videoWidth;
+            canvas.height = localVideo.videoHeight;
+
+            function sendFrame() {
+                ctx.drawImage(localVideo, 0, 0, canvas.width, canvas.height);
+
+                var base64Data = canvas.toDataURL('image/webp', 0.1);//图片格式为image/jpeg或image/webp时，可以设置图片质量(从0到1)
+                ws.send(JSON.stringify({
+                    data: {
+                        type: 'video',
+                        data: base64Data,
+                        width: canvas.width,
+                        height: canvas.height
+                    },
+                    from: self,
+                    to: remoteUser
+                }));
+
+                if (!endSendStatus) {
+                    requestAnimationFrame(sendFrame);
+                } else {
+                    console.log('推流结束');
+                    endSendStatus = false;//把endSendStatus恢复到false，为下一次结束推流做准备
+                }
+            }
+            sendFrame();
+        }
+
+        //------------------------------------------------------------------------------
+        //------------------------------------------------------------------------------
+        //------------------------------------------------------------------------------
+
+        //创建ws服务
+        var ws = new WebSocket(`ws://${location.hostname}:3000?user=${self}`);
+
+        ws.onopen = function () {
+            console.log('websocket连接成功！');
+        }
+        ws.onclose = function () {
+            console.log('websocket连接关闭！');
+        }
+        ws.onerror = function (e) {
+            console.log('websocket连接发生错误！');
+        }
+        ws.onmessage = function (res) {
+            // console.log('接收到服务端发来的消息！');
+
+            let { data, from, to } = JSON.parse(res.data);
+
+        }
+
+        // ws.close();  //关闭ws连接
+
+        // ws.send('string');   //给服务端发消息
+
+    </script>
+
+</body>
+
+</html>

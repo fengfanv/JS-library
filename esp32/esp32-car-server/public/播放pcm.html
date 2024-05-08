@@ -12,29 +12,35 @@
 
     <audio id="player" controls autoplay></audio>
 
+    <a href="./.../xxx.wav" download="xxx.wav" id="downloadDom"></a>
+
     <script>
-        const fileInput = document.getElementById('fileInput');
+        const fileInput = document.getElementById('fileInput')
         fileInput.addEventListener('change', function (event) {
 
             if (event.target.files.length > 0) {
-                const file = event.target.files[0];
+                const file = event.target.files[0]
 
                 //将获取的pcm文件，转成base64字符串
-                const reader = new FileReader();
+                const reader = new FileReader()
                 reader.onload = function (e) {
-                    let data = e.target.result;
+                    let data = e.target.result
+                    console.log('base64结果', data) //"data:application/octet-stream;base64,AAAAAAAAAAAAAP///........"
 
-                    //数据是一个Data URL，不是纯 Base64 编码的字符串。
-                    //Data URL的格式是 data:[<mediatype>][;base64],<data>，其中 <mediatype> 是 MIME 类型，<data> 是编码后的数据。
-                    //为了从这样的 Data URL 中提取出纯 Base64 编码的字符串，需要去掉 Data URL 的前缀部分。
-                    let base64Data = data.split(',')[1];
-                    console.log('我获取到的base64数据是', base64Data);
+                    let base64Data = data.split(',')[1]
+                    console.log('base64数据本体', base64Data) //"AAAAAAAAAAAAAP/////////////////////////........"
 
-                    const blobUrl = pcmToWav(base64Data, 8000, 2, 16);
-                    document.getElementById('player').src = blobUrl;
+                    //音频采样率，音频通道数，音频采样位数 请根据你实际的pcm文件来设置
+                    const blobUrl = pcmToWav(base64Data, 8000, 2, 16)
+                    document.getElementById('player').src = blobUrl
+
+                    let downloadFileName = file.name.split(/\.[0-9|a-z|A-Z]{1,}$/)[0] + '.wav'
+                    document.getElementById('downloadDom').download = downloadFileName
+                    document.getElementById('downloadDom').innerHTML = downloadFileName
+                    document.getElementById('downloadDom').href = blobUrl
                 }
                 //读取文件为DataURL（默认是base64编码）  
-                reader.readAsDataURL(file);
+                reader.readAsDataURL(file)
             }
         })
 
@@ -96,18 +102,18 @@
 
         function base64ToUint8Array(base64Data) {
             // 使用 atob 函数解码 Base64 字符串为二进制字符串  
-            const binaryStr = atob(base64Data);
+            const binaryStr = atob(base64Data)
 
             // 创建一个 Uint8Array，长度与二进制字符串的长度相同  
-            const len = binaryStr.length;
-            const bytes = new Uint8Array(len);
+            const len = binaryStr.length
+            const bytes = new Uint8Array(len)
 
             // 将二进制字符串的每一个字符的字符码存储到 Uint8Array 中  
             for (let i = 0; i < len; i++) {
-                bytes[i] = binaryStr.charCodeAt(i);
+                bytes[i] = binaryStr.charCodeAt(i)
             }
 
-            return bytes;
+            return bytes
         }
 
         //参考链接：https://zhuanlan.zhihu.com/p/401715180

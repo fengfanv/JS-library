@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>index</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+        }
+
+        .keyboard {
+            width: 200px;
+        }
+
+        .keyboard div {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+        }
+
+        .keyboard button {
+            width: 100%;
+            height: 100px;
+
+        }
+    </style>
+</head>
+
+<body>
+    <div id="local">
+        <p></p>
+    </div>
+
+    <!--小车画面-->
+    <img src="" id="car_view" />
+
+    <!--小车声音-->
+    <audio id="player" controls autoplay></audio>
+
+    <!--小车控制键盘-->
+    <div class="keyboard">
+        <button name="car_up">前进</button>
+        <div>
+            <button name="car_left">左转</button>
+            <button name="car_right">右转</button>
+        </div>
+        <button name="car_down">后退</button>
+    </div>
+
+    <hr>
+
+    <input type="text" id="code_input" placeholder="请输入命令代码">
+    <button onclick="runEsp32Code()">运行命令</button>
+
+    <script src="./pcm.js"></script>
+    <script>
+        //初始化，本地，你自己
+        var self = 'admin';//你的编号，如，270
+        document.querySelector('#local p').innerHTML = `本地（${self}）`;
+
+        //------------------------------------------------------------------------------
+        //------------------------------------------------------------------------------
+        //------------------------------------------------------------------------------
+
+        let keyboard = document.getElementsByClassName('keyboard')[0];
+        keyboard.onmousedown = keyboard_touchstart;
+        keyboard.onmouseup = keyboard_touchend;
+        keyboard.ontouchstart = keyboard_touchstart;
+        keyboard.ontouchend = keyboard_touchend;
+
+        let keyboardTimer = null;
+        let delay = 250;//单位，ms毫秒，1000ms=1s
+
+        //按下手指或鼠标
+        function keyboard_touchstart(e) {
+            let target = e.target || e.srcElement;
+            if (target.nodeName.toLowerCase() == 'button') {
+                let keyname = target.getAttribute('name');
+                if (keyname == 'car_up') {
+                    car_up()
+                    keyboardTimer = setInterval(car_up, delay)
+                } else if (keyname == 'car_down') {
+                    car_down()
+                    keyboardTimer = setInterval(car_down, delay)
+                } else if (keyname == 'car_left') {
+                    car_left()
+                    keyboardTimer = setInterval(car_left, delay)
+                } else if (keyname == 'car_right') {
+                    car_right()
+                    keyboardTimer = setInterval(car_right, delay)
+                }
+            }
+            e.stopPropagation()
+            e.preventDefault()
+        }
+
+        //松开手指或鼠标
+        function keyboard_touchend(e) {
+            let target = e.target || e.srcElement;
+            if (target.nodeName.toLowerCase() == 'button') {
+                clearInterval(keyboardTimer)
+            }
+            e.stopPropagation()
+            e.preventDefault()
+        }
+
+        function car_up() {
+            console.log('car_up')
+            ws.send(JSON.stringify({
+                data: {
+                    code: 'car_up'
+                },
+                from: self,
+                to: 'esp32'
+            }));
+        }
+
+        function car_down() {
+            console.log('car_down')
+            ws.send(JSON.stringify({
+                data: {
+                    code: 'car_down'
+                },
+                from: self,
+                to: 'esp32'
+            }));
+        }
+
+        function car_left() {
+            console.log('car_left')
+            ws.send(JSON.stringify({
+                data: {
+                    code: 'car_left'
+                },
+                from: self,
+                to: 'esp32'
+            }));
+        }
+
+        function car_right() {
+            console.log('car_right')
+            ws.send(JSON.stringify({
+                data: {
+                    code: 'car_right'
+                },
+                from: self,
+                to: 'esp32'
+            }));
+        }
+
+        //------------------------------------------------------------------------------
+        //------------------------------------------------------------------------------
+        //------------------------------------------------------------------------------
+
+        //创建ws服务
+        var ws = new WebSocket(`ws://${location.hostname}:3000?user=${self}`);
+
+        ws.onopen = function () {
+            console.log('websocket连接成功！');
+        }
+        ws.onclose = function () {
+            console.log('websocket连接关闭！');
+        }
+        ws.onerror = function (e) {
+            console.log('websocket连接发生错误！');
+        }
+        ws.onmessage = function (res) {
+            // console.log('接收到服务端发来的消息！');
+
+            let { data, from, to } = JSON.parse(res.data);
+
+            if (typeof data.type != 'undefined' && data.type == 'video') {
+                drawCarView(from, data)
+            } else if (typeof data.type != 'undefined' && data.type == 'audio') {
+                playCarAudio(from, data)
+            }
+        }
+
+        // ws.close();  //关闭ws连接
+
+        // ws.send('string');   //给服务端发消息
+
+        //------------------------------------------------------------------------------
+        //------------------------------------------------------------------------------
+        //------------------------------------------------------------------------------
+
+        //渲染小车视频画面
+        let carView = document.getElementById('car_view');
+        function drawCarView(from, res) {
+            var { type, data, width, height } = res;
+            carView.setAttribute('src', data);
+        }
+
+        //实时播放小车声音
+        let player = document.getElementById('player');
+        function playCarAudio(from, res) {
+            var { type, data } = res;
+            let dataBody = data.split(',')[1]; //提取base64数据本体
+            const blobUrl = pcmToWav(dataBody, 8000, 2, 16);
+            player.src = blobUrl;
+        }
+
+        //------------------------------------------------------------------------------
+        //------------------------------------------------------------------------------
+        //------------------------------------------------------------------------------
+
+        let esp32_code = '';
+        document.querySelector('#code_input').addEventListener('input', function (e) {
+            esp32_code = e.target.value;
+        });
+        function runEsp32Code() {
+            if (esp32_code.length != 0) {
+                console.log('运行code', esp32_code)
+                ws.send(JSON.stringify({
+                    data: {
+                        code: esp32_code
+                    },
+                    from: self,
+                    to: 'esp32'
+                }));
+            }
+        }
+    </script>
+
+</body>
+
+</html>
