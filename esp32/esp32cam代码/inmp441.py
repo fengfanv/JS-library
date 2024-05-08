@@ -4,11 +4,11 @@ import time
 # 音频录制函数
 def record_audio():
     # 定义SCK（时钟信号）用于同步数据传输的时钟。
-    sck_pin = Pin(14)
+    sck_pin = Pin(14, Pin.OUT)
     # 定义WS（字选择信号）用于指示数据字的开始和结束。
-    ws_pin = Pin(2)
+    ws_pin = Pin(2, Pin.OUT)
     # 定义SD（数据信号）传输音频数据的信号。
-    sd_pin = Pin(15)
+    sd_pin = Pin(15, Pin.OUT)
 
     # I2S.RX 接收模式
     # I2S.STEREO 双声道(立体声)音频(表示音频通道数有2个。左声道及右声道)。I2S.MONO单声道音频(表示音频通道数有1个。左声道或右声道)
