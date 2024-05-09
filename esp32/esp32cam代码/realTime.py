@@ -18,6 +18,7 @@ print('网络配置:', wlan.ifconfig())
 
 # 摄像头初始化
 try:
+    # camera.init(0, format=camera.JPEG, fb_location=camera.PSRAM) 经过测试得知camera.PSRAM这个参数没啥用，能拍多大分辨率照片（和摄像头有关系）（和camera.PSRAM没关系）
     camera.init(0, format=camera.JPEG)
 except Exception as e:
     camera.deinit()
