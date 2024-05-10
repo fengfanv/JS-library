@@ -74,7 +74,7 @@ function wsSend(msg, from, to) {
 }
 
 
-//udp服务
+//udp服务，端口39990
 var udpServer = require('dgram').createSocket('udp4')
 udpServer.bind(39990, () => {
     udpServer.setBroadcast(true)
@@ -112,41 +112,6 @@ udpServer.on('message', (msg, rinfo) => {
         //     from: esp32cam.name,
         //     to: 'admin'
         // }), esp32cam.name, 'admin')
-
-
-
-
-        // let buffer = Buffer.from(msg, 'binary')
-        // let bufferLen = buffer.length
-        // let mark = String.fromCharCode(buffer[bufferLen - 1])
-        // let data = Buffer.alloc(bufferLen - 1)
-        // buffer.copy(data, 0, 0, bufferLen - 1)
-
-        // if (mark == 'v') {
-        //     //发来的数据是 图像数据(视频)
-        //     var base64Str = 'data:image/jpg;base64,' + data.toString('base64')
-        //     wsSend(JSON.stringify({
-        //         data: {
-        //             type: 'video',
-        //             data: base64Str,
-        //             width: 640,
-        //             height: null
-        //         },
-        //         from: esp32cam.name,
-        //         to: 'admin'
-        //     }), esp32cam.name, 'admin')
-        // } else if (mark == 'a') {
-        //     //发来的数据是 音频数据
-        //     var base64Str = 'data:audio/pcm;base64,' + data.toString('base64')
-        //     wsSend(JSON.stringify({
-        //         data: {
-        //             type: 'audio',
-        //             data: base64Str,
-        //         },
-        //         from: esp32cam.name,
-        //         to: 'admin'
-        //     }), esp32cam.name, 'admin')
-        // }
 
         esp32cam.ip = rinfo.address
     }
