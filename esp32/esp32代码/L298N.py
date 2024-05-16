@@ -1,37 +1,51 @@
-# L298N调速demo
+# L298N pwm调速demo
 # 可以调速，但是L298N会发出类似蜂鸣器的响声
 
 from machine import PWM, Pin
 import utime
 
-# 假设ENA引脚连接到开发板的某个GPIO引脚，这里以GPIO18为例
-ENA_PIN = 18
+# 使用L298N进行pwm调速，需要先拔掉L298N上ENA、ENB的跳线帽
+
+# 然后把ENA、ENB 分别连接到 开发板上的GPIO口
+
+# (IN1,IN2)、(IN3,IN4)还和原来一样能控制电机正反转
+
+# ENA、ENB 控制电机转速
+
+
+# 如下，我使用ENB控制电机转速，使用(IN3,IN4)控制电机转动方向
+
+IN3 = Pin(14, Pin.OUT)
+IN4 = Pin(2, Pin.OUT)
+
+# 正转
+# IN3.value(1)
+# IN4.value(0)
+
+# 反转
+IN3.value(0)
+IN4.value(1)
+
+
+# ENB引脚
+ENB_PIN = 0 # GPIO0
 
 # 创建一个PWM对象，频率为1000Hz（可以根据需要调整）
-pwm = PWM(Pin(ENA_PIN), freq=1000, duty=0)
+pwm = PWM(Pin(ENB_PIN), freq=1000, duty=0)
 
 try:
-    # 设定速度变化步长和速度变化的总时间
-    step = 10
-    max_duty = 1023  # 假设占空比范围是0-1023
-    change_time = 5  # 速度变化总时间，单位为秒
-
-    # 正向增加速度
-    for duty in range(0, max_duty + 1, int(max_duty / (change_time * 100))):
+    for duty in range(0, 1023):
         pwm.duty(duty)
-        utime.sleep_ms(100)  # 稍微等待一下以便平滑变化
-
-    # 等待一段时间以便观察高速旋转
-    utime.sleep(2)
-
-    # 反向减少速度
-    for duty in range(max_duty, -1, -int(max_duty / (change_time * 100))):
-        pwm.duty(duty)
-        utime.sleep_ms(100)  # 稍微等待一下以便平滑变化
-
-    # 可以重复以上过程或者添加其他逻辑
+        print(duty)
+        utime.sleep_ms(50)
+    
+    pwm.deinit()
+    IN3.value(0)
+    IN4.value(0)
 
 except KeyboardInterrupt:
     # 如果按下Ctrl+C，则停止PWM并退出循环
     pwm.deinit()
+    IN3.value(0)
+    IN4.value(0)
     print("PWM stopped")

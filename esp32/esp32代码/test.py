@@ -2,6 +2,7 @@ import machine
 import time
 
 '''
+# 蓝led灯闪10次
 pin2 = machine.Pin(2, machine.Pin.OUT)
 
 count = 0

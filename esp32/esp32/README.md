@@ -1,8 +1,22 @@
-# esp32编程内容，详细请看b站王铭东老师的esp32课程
+# esp32编程教学内容
 
-# 注意，如果无法烧录，请根据thoony的提示，按一下esp32上的boot键(进入下载模式)
+[b站 - 王铭东 - Python+ESP32快速上手](https://www.bilibili.com/video/BV1G34y1E7tE)
 
-# 关于esp32的usb串口驱动问题
+[b站 - 罗大富Bigrich - ESP32+MicroPython教程](https://www.bilibili.com/video/BV1fX4y1q7sk)
+
+[b站 - 罗大富Bigrich - ESP32+Arduino教程](https://www.bilibili.com/video/BV1RM4y1a7J5)
+
+# 烧录microPython运行环境
+
+往esp32里烧录microPython运行环境时，如果无法烧录，请根据thoony的提示，按一下esp32上的boot键(进入下载模式)
+
+# 电脑安装Arduino开发环境
+
+[Arduino中文社区](https://arduino.me)
+
+[软件下载 - Arduino中文社区](https://arduino.me/download)
+
+# usb串口驱动
 
 带有usb口的esp32设备，usb驱动有多种(CP2102、CH340、CH9102、等等)，usb口也有多种(Type-c、Micro-usb)，调试使用时请根据实际情况安装相应驱动。
 
