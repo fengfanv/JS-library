@@ -1,20 +1,24 @@
-## 创建HTTP服务（不使用第三方库）（使用CORS解决跨域问题）
+## 创建HTTP服务（不使用第三方库）（处理跨域请求）
 
-### CORS的简单请求与复杂请求：
+当(浏览器)前端api接口地址不是同源地址，是跨域地址，则会发生跨域请求。跨域请求涉及CORS相关操作，详细请看下面：
 
-- [跨域资源共享 CORS 详解 - 阮一峰](http://www.ruanyifeng.com/blog/2016/04/cors.html)
+[跨域资源共享 CORS 详解 - 阮一峰](http://www.ruanyifeng.com/blog/2016/04/cors.html)
 
-#### 满足以下两种条件就是**简单请求**：
+CORS请求(跨域请求)分为两类：简单请求 和 复杂请求
+
+#### 跨域请求时，满足以下两种条件就是**简单请求**：
 1、请求方法是这三种方法之一（HEAD，GET，POST）
 
 2、HTTP的请求头信息不超出这几种字段（Accept，Accept-Language，Content-Language，Last-Event-ID，Content-Type），其中Content-Type字段只能是这几种方式之一（application/x-www-form-urlencoded，multipart/form-data，text/plain）
 
-#### 不满上面两种条件就是**复杂请求**:
-例如，自定义了请求头字段（如：请求头里增加了Token字段），就会触发复杂请求
+#### 跨域请求时，不满足上面两种条件就是**复杂请求**:
+例如，api接口地址不是同源地址，是跨域地址，并且还自定义了请求头字段（如：在请求头里增加了Token字段），则当前要发送的请求，就属于跨域-复杂请求
 
-如果触发了**复杂请求**。则会在正式请求之前，先向服务端发送一个预检请求(向服务端发送一个请求方式是OPTIONS的 请求权限信息的请求)，来向服务端要服务端的请求权限信息。拿到服务端的请求权限信息后，客户端会将这个与正式请求的请求头，请求方式，请求域名进行检验。如果满足条件，则发送正式请求，如不满足 会触发跨域，不会进行正式请求
+如果 某个请求 属于**跨域-复杂请求**，则浏览器内部会在正式请求之前，先向服务端发送一个预检请求（OPTIONS请求），来向服务端要服务端的响应条件信息（请求服务端接口时，需要具备哪些条件）。拿到服务端的响应条件信息后，浏览器会将其与正式请求的请求头，请求方式等信息进行比较。如果满足条件，则发送请求，如不满足，则不发送请求
 
-#### Node.js处理复杂请求（解决跨域）
+注意：如果api接口地址是同源地址，不是跨域地址，则不管请求头信息，请求方式有多奇怪，则都会直接发送请求。因为这是同源请求，不是跨域请求，所以不会有(cors跨域资源共享)相关的操作
+
+#### node.js处理跨域复杂请求
 ```javascript
 const http = require('http')
 const fs = require('fs')
@@ -28,7 +32,7 @@ function app(request, response) {
     response.setHeader("Access-Control-Allow-Methods", "PUT,POST,GET,DELETE,OPTIONS");
     response.setHeader("Access-control-max-age", "1000");
 
-    //处理CORS复杂请求的预检请求
+    //处理 跨域-复杂请求 的预检请求
     if (request.method === 'OPTIONS') {
         response.writeHead(200, {
             'Content-Type': 'text/plain',

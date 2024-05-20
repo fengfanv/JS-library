@@ -132,9 +132,9 @@ process.on('exit', function () {
 
 	- .txt 正常解析保存，txt内容有中文也会正常保存
 
-	- .word 正常保存，但是打开时说无法正常读取文件，需要修复，修复后可正常打开
+	- .doc 正常解析保存
 
-	- //object型数据会在浏览器上formdata解析成[object object]所以obj在传输前要转换成字符串
+	- //object类型数据会变成[object object]，所以obj在传输前需要先将其转换成字符串
 
 	- //如果普通数据中有中文，则会在接收数据时解析成乱码（已解决）
 
