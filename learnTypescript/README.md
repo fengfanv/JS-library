@@ -29,97 +29,151 @@ ts-node xxxx.ts
 ```
 ### 数据类型
 ```
-1、any 任意类型
-声明为 any 的变量可以赋予任意类型的值。
+1、number 数字类型
+双精度64位浮点值。它可以用来表示整数和小数。
+let a1:number = 0b1010; //二进制
+let a2:number = 0o744;  //八进制
+let a3:number = 6;      //十进制
+let a4:number = 0xf00d; //十六进制
 
-2、number 数字类型
-双精度 64 位浮点值。它可以用来表示整数和小数。
-let a1:number = 0b1010; // 二进制
-let a2:number = 0o744;  // 八进制
-let a3:number = 6;      // 十进制
-let a4:number = 0xf00d; // 十六进制
-
-3、bigint 大整数类型
+2、bigint 大整数类型
 包含所有的‘大’‘整’数
 let x:bigint = 123n;
 let y:bigint = 0xffffn;
-let z:bigint = 3.14;//报错，bigint类型赋值为整数和小数，会报错。
-let k:bigint = 123;//报错，bigint类型赋值为整数和小数，会报错。
+let z:bigint = 3.14;   //报错，bigint类型赋值为整数和小数，会报错。
+let k:bigint = 123;    //报错，bigint类型赋值为整数和小数，会报错。
 
-4、symbol 类型
-let x:symbol = Symbol();//Symbol()函数的返回值就是 symbol 类型
-
-5、object 类型
-object 类型可以声明(对象、数组、函数)
+3、object 对象类型（注意这里是全小写）
+object类型可以声明(对象、数组、函数)
 let x:object = {foo:123};
 let y:object = [1,2,3];
 let z:object = (n:number) => n + 1;
 
-6、null
-和js里要表达的意思一样
-null是一个只有一个值null的特殊类型。
-表示一个空对象引用。
-用 typeof 检测 null 返回是 object。
-let x:null = null;//表示变量x为空（即此处没有值）
-
-7、undefined
-undefined是一个只有一个值undefined的特殊类型。
-表示未定义（即还未给出定义，以后可能会有定义）
-let x:undefined = undefined;
-
-8、string 字符串类型
-使用单引号（'）或双引号（"）来表示字符串类型。反引号（`）来定义多行文本字符串。
+4、string 字符串类型
+使用单引号（'）或双引号（"）来表示字符串类型。
+反引号（`）来定义多行文本字符串。
 let name:string = "Kang";
 
-9、boolean 布尔类型
-表示逻辑值：true 和 false。
+5、boolean 布尔类型
+表示逻辑值 true 和 false。
 let flag:boolean = true;
 
-10、数组类型
-let arr:number[] = [1, 2]; // 声明数组方式1，在元素类型后面加上[]
-let arr:Array<number> = [1, 2]; // 声明数组方式2，使用数组泛型
+6、数组
+let arr:number[] = [1, 2];      //声明数组方式1，在元素类型后面加上[]
+let arr:Array<number> = [1, 2]; //声明数组方式2，使用数组泛型
 
 let arr:Array<number|string> = [1,1,1,'a'];//数组arr的成员类型是number|string
 
 let arr:string[] = new Array('1','2','3');
 let arr:any[] = [1, false, 'fine'];
 
-let arr:(number|string)[] = [1,1,1,'a'];//数组arr的成员类型是number|string
+let arr:(number|string)[] = [1,1,1,'a'];   //数组arr的成员类型是number|string
 
-let arr:number[][] = [[1,2,3],[4,5,6]];//变量arr的类型是number[][]，表示它是一个二维数组，最底层的数组成员类型是number
+let arr:number[][] = [[1,2,3],[4,5,6]];    //变量arr的类型是number[][]，表示它是一个二维数组，最底层的数组成员类型是number
 
-11、元组
-元组类型用来表示已知元素数量和类型的数组，各元素的类型不必相同，对应位置的类型需要相同。
+7、元组
+元组类型用来表示 已知元素数量和类型 的数组，各元素的类型不必相同，对应位置的类型需要相同。
 let x:[string, number];
-x = ['kang', 1];    // 运行正常
-x = [1, 'kang'];    // 报错
-console.log(x[0]);  // 输出 kang
+x = ['kang', 1];    //运行正常
+x = [1, 'kang'];    //报错
+console.log(x[0]);  //输出：kang
 
-12、enum 枚举
+8、enum 枚举
 枚举类型用于定义数值集合。
 
 如，人分为男孩和女孩，人(男孩，女孩)
-enum Ren{boy,girl}	//声明一个枚举类型，名称没有大小写限制
+enum Ren{boy,girl}	  //声明一个枚举类型，名称没有大小写限制
 console.log(Ren.girl) //打印：1，对应girl在Ren里的下标
 
-enum Ren{boy='男孩',girl='女孩'}    //声明一个枚举类型
-console.log(Ren.girl) //打印：女孩，对应girl下的参数
+enum Ren{boy='男孩',girl='女孩'}  //声明一个枚举类型
+console.log(Ren.girl)            //打印：女孩，对应girl下的参数
 
-13、void
+9、symbol 类型
+let x:symbol = Symbol();    //Symbol()函数的返回值就是symbol类型
+
+10、undefined 和 null
+在ts里undefined和null与在js里要表示的意思一样
+undefined和null都比较特殊，它们既是值，又是类型
+null表示一个空对象引用
+undefined表示还没有赋值
+ts允许任何类型变量赋值为这两个值（注意，当ts编译时设置strictNullChecks:true，则undefined和null就不能赋值给(除any和unknown以外)的其他类型变量）
+
+11、void
 用于标识方法返回值的类型，表示该方法没有返回值。
 function hello():void {
     alert("Hello Kang");
 }
 
-14、never
-never 其它类型。
+12、any 和 unknown
+声明为 any 的变量可以赋予任意类型的值。
+any类型有一个很大的问题，它会“污染”其他变量。它可以赋值给任何其他类型的变量（因为没有类型检查），导致其他变量出错。
+如：
+let x: any = "hello";
+let y: number;
+y = x;
+y * 123;
+在编译完成后运行时报错了。这个错误，本来应该在编写或编译阶段就应该被ts检查出错误，但没有检查出错误，因为(x赋值给了y。变量x的any导致变量y的类型检查功能关闭，所以才导致y没能及时提示出错误)(变量x的any 污染了 变量y)
 
-12、联合类型
-var val:string|number 
+unknown是加强版的any，所有类型的值都可以分配给声明为unknown类型的变量。
+unknown解决了any类型“污染”其他类型变量的问题，unknown类型的变量，不能赋值给(除any和unknown以外的)其他类型变量。
+如：
+let v: unknown = 123;
+let v1: boolean = v;   //报错
+
+unknown对比any，unknown还是严格版的any，在实际使用unknown时会有一些限制。
+如：
+let a: unknown = 1;
+a + 1;      //会报错
+if (typeof a === "number") {
+  a + 10;   //不报错
+}
+使用unknown类型的变量，需要经过“类型缩小”(缩小unknown变量的类型范围)，如上面if(typeof a === "number"){...}就属于“类型缩小”操作，即将一个不确定的类型缩小为更明确的类型。
+
+
+13、联合类型
+指多个类型组成的一个新类型，使用符号|表示。
+联合类型A|B表示，任何一个类型只要属于A或B，就属于联合类型A|B。
+var val:string|number   //变量val就是联合类型string|number，既它的值可以是字符串，也可以是数值。
 val = 12 
-console.log("数字为 "+ val) 
+console.log("数字为",val) 
 val = "kang" 
-console.log("字符串为 " + val)
+console.log("字符串为",val)
+
+14、交叉类型
+指多个类型组成的一个新类型，使用符号&表示。
+交叉类型的主要用途是表示对象的合成。
+let obj: { foo: string } & { bar: number };
+obj = {
+  foo: "hello",
+  bar: 123,
+};
+上面示例中，变量obj同时具有属性foo和属性bar
+
+交叉类型常常用来为对象类型添加新属性。
+type a = { foo: string }
+type b = a & { bar: number }
+let data: b = {
+    foo: "hello",
+    bar: 123,
+};
+上面示例中，类型b是一个交叉类型，用来在a的基础上增加属性bar
+
+15、type
+type用来定义一个类型的别名。别名可以让类型的名字变得更有意义，也能增加代码的可读性，还可以使复杂类型用起来更方便，便于以后修改变量的类型。
+type Age = number;
+let age: Age = 55;
+
+16、never 空类型
+never类型的含义是“不可能有这样的值”
+不可以给never类型的变量赋值，否则会报错，因为never表示为“空”，即不包含任何值。
+let x: number & string; 等于 let x: never;
+上面示例中，变量x同时是数值和字符串，这当然是不可能的，所以ts会认为x的类型是never。
+
+17、值类型
+ts规定，单个值也是一种类型，称为“值类型”。
+let x:"hello";
+x = "hello";//正确
+x = "world";//报错
 
 注意：元组与数组区别
 1、固定长度：元组的长度是固定的，一旦定义了一个元组类型，你就不能再添加或删除元素。

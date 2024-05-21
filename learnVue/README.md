@@ -1493,8 +1493,10 @@ export default {
         set_count_1({ state, commit, dispatch, rootState }, value) {
           //调用当前模块里的其它dispatch，调用时不用写 app/set_value_async，写 set_value_async 就可以
           dispatch('set_value_async',18)
-          //调用其它模块里的dispatch，调用时需要写全 xxx/set_value
-          dispatch('xxx/set_value',18,{root:true})
+          //调用其它模块里的dispatch，调用时需要写全 xxx/set_value_async
+          dispatch('xxx/set_value_async',18,{root:true})
+          //调用其它模块里的commit，调用时需要写全 xxx/set_value
+          commit('xxx/set_value',18,{root:true})
         }
     },
     getters: {
