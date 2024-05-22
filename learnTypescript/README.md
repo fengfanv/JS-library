@@ -410,13 +410,14 @@ class A {
     name: string
     readonly age: number
     private money: number
+    protected car: string
     constructor(name: string, age: number, money: number) {
         this.name = name;
         this.age = age;
         this.money = money;
     }
-    say(text: string):string {
-        let str:string = `我是${this.name}。我今年${this.age}。我有${this.money}元。`;
+    say(text: string): string {
+        let str: string = `我是${this.name}。我今年${this.age}。我有${this.money}元。`;
         console.log(str);
         return str;
     }
@@ -427,15 +428,68 @@ class A {
 // }
 
 // class B extends A {
+//     protected name:string //报错。类“B”错误扩展基类“A”。属性“name”在类型“B”中受保护，但在类型“A”中为公共属性。
+// }
+
+// class B extends A {
+//     private name:string //报错。类“B”错误扩展基类“A”。属性“name”在类型“B”中是私有属性，但在类型“A”中不是。
+// }
+
+// //未报错
+// class B extends A {
+//     readonly name:string
+// }
+
+
+
+// class B extends A {
 //     money:number //报错。类“B”错误扩展基类“A”。属性“money”在类型“A”中是私有属性，但在类型“B”中不是。
 // }
+
+// class B extends A {
+//     private money:number //报错。类“B”错误扩展基类“A”。类型具有私有属性“money”的单独声明。
+// }
+
+
+
+// class B extends A {
+//     car:number //报错。类型“B”中的属性“car”不可分配给基类型“A”中的同一属性。不能将类型“number”分配给类型“string”。
+// }
+
+// //未报错
+// class B extends A {
+//     car:string
+// }
+
+// //未报错
+// class B extends A {
+//     public car:string
+// }
+
+// //未报错
+// class B extends A {
+//     protected car:string
+// }
+
+// //未报错
+// class B extends A {
+//     protected readonly car:string
+// }
+
+// class B extends A {
+//     private car:string //报错。类“B”错误扩展基类“A”。属性“car”在类型“B”中是私有属性，但在类型“A”中不是。
+// }
+
+
+
 
 // class B extends A {
 //     say:string //报错。类型“B”中的属性“say”不可分配给基类型“A”中的同一属性。不能将类型“string”分配给类型“(text: string) => void”。
 // }
 
 // class B extends A {
-//     say(name:string,age:number):string{ //报错。类型“B”中的属性“say”不可分配给基类型“A”中的同一属性。不能将类型“(name: string, age: number) => string”分配给类型“(text: string) => string”。
+//     //报错。类型“B”中的属性“say”不可分配给基类型“A”中的同一属性。不能将类型“(name: string, age: number) => string”分配给类型“(text: string) => string”。
+//     say(name:string,age:number):string{
 //         return '字符串'
 //     }
 // }
@@ -469,7 +523,7 @@ class A {
 ```
 ### instanceof运算符
 ```ts
-instanceof运算符用于判断对象是否是指定的类型
+instanceof（instance of）运算符用于判断对象是否是指定的类型
 
 class Person{ } 
 var obj = new Person() 

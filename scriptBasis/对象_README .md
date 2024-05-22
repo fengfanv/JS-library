@@ -269,6 +269,45 @@ function newObject(){
 	return obj
 }
 ```
+## bind call apply 改变函数‘运行时’的this上下文
+```javascript
+// 1、bind(this,参数,...)
+// bind()方法会创建一个新函数，这个新函数和原函数有相同的函数体，但是this上下文已经被改变为bind()方法的第一个参数。
+// bind()方法返回的新函数不会立即执行。
+
+function greet() {
+  console.log(this.greeting);
+}
+
+const obj = { greeting: 'Hello' };
+
+const boundGreet = greet.bind(obj);
+boundGreet(); //Hello
+
+
+// 2、call(this,参数,...)
+// call()方法会立即调用函数，并且指定函数内部的this上下文。
+
+function greet(name) {
+  console.log(this.greeting, name);
+}
+
+const obj = { greeting: 'Hello' };
+
+greet.call(obj, 'World'); //Hello World
+
+
+// 3、apply(this,[参数,...])
+// apply()方法和call()类似，都会立即调用函数，并指定函数内部的this上下文。
+
+function greet(name1, name2) {
+  console.log(this.greeting, name1, name2);
+}
+
+const obj = { greeting: 'Hello' };
+
+greet.apply(obj, ['World', 'JavaScript']); //Hello World JavaScript
+```
 ## 对象使用技巧
 ```javascript
 //1、对象链式调用
@@ -297,8 +336,4 @@ var person = {
 project.call(person);
 //开始链式调用
 person.smoke().drink().perm()
-
-
-
-
 ```
