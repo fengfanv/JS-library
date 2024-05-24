@@ -120,7 +120,7 @@ ES6 规定，其初始化值是在代码执行阶段（即直到它们的"定义
 
 ```javascript
 {
-  //注意，如果直接在浏览器控制台运行如下代码，那请在代码外 套上 { } ，否则报错将打印 Uncaught ReferenceError: foo is not defined 打印foo未定义，是因为，浏览器控制台环境已经预编译结束(已经初始化完毕)，已经进入到代码执行阶段。在代码执行阶段，在控制台输入(let foo = 2;)代码将直接运行，没有预编译。而如果你在代码外 套上 { } 后，{ } 这个块级 会因为let的缘故，会先进行预编译，然后再执行。
+  //注意，如果直接在浏览器控制台运行如下代码，那请在代码外 套上 { } ，否则报错将打印 Uncaught ReferenceError: foo is not defined 。打印foo未定义，是因为，浏览器控制台环境已经预编译结束(已经初始化完毕)，已经进入到代码执行阶段。在代码执行阶段，在控制台输入(let foo = 2;)代码将直接运行，没有预编译。而如果你在代码外 套上 { } 后，{ } 这个块级 会因为let的缘故，会先进行预编译，然后再执行。
   console.log(bar); // undefined
   console.log(foo); // Uncaught ReferenceError: Cannot access 'foo' before initialization  这里let变量已创建，但还未初始化值。所以这里let还处于“暂存死区”期间，所以才会报错 初始化前无法访问foo
   var bar = 1;
@@ -166,7 +166,7 @@ const obj = {
 }
 obj.value = 2 // 引用数据类型的数据的本体，保存在 堆内存里。这里改变的是 堆内存 中的数据，所以没有报错。
 console.log(obj) // { value: 2 }
-obj = {} // TypeError: Assignment to constant variable //栈内存里保存着引用数据类型在堆内存中的引用地址。这里保存在栈内存中的引用地址发生改变，所以报错。
+obj = {} // TypeError: Assignment to constant variable //栈内存里保存着引用数据类型数据在堆内存中的引用地址。这里保存在栈内存中的引用地址发生改变，所以报错。
 ```
 
 ### 块级作用域：
