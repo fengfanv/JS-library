@@ -138,7 +138,7 @@ console.log(father.sex);//男
 
 
 //继承第四种，圣杯模式，由第三种演变来的，优化了第三种不能随便改原型的问题
-function inherit(Target,Origin){
+function inherit(Origin,Target){
 	function F(){};
 	F.prototype = Origin.prototype;
 	Target.prototype = new F();
@@ -150,7 +150,7 @@ function Father(){};
 
 function Son(){};
 
-inherit(Son,Father);
+inherit(Father,Son);
 var father = new Father();
 var son = new Son();
 
@@ -159,13 +159,16 @@ console.log(father.lastName);//Deng
 console.log(son.lastName);//Deng
 
 //改原型
+Father.prototype.sex = "女";
 Son.prototype.sex = "男";
 
-console.log(father.sex);//undefined
-console.log(son.sex);//男
 //改变Son原型后，Father的原型不会收到影响，解决了第三种的问题
+console.log(father.sex);//女
+console.log(son.sex);//男
 
-
+//如下是思考代码，不用理会
+console.log(son.__proto__.sex);//男
+console.log(son.__proto__.__proto__.sex);//女
 ```
 ## 对象枚举（遍历对象属性）
 ```javascript
@@ -201,9 +204,6 @@ for(var key in obj){
 		console.log('key:',key,'value:',obj[key]);
 	}
 }
-
-
-
 ```
 ## this
 ```javascript
@@ -231,7 +231,7 @@ console.log(this);
 
 //4、obj1.fun(); 这时fun()内的this指向obj1。
 //或理解为，函数fun被对象obj1 “点调用”，则函数fun内的this就指向点调用这个函数的那个人。
-//或理解为，谁调用函数fun，则函数fun里的this就是谁。
+//或理解为，谁(点)调用函数fun，则函数fun里的this就是谁。
 //除了call/apply/bind强制改this指向 和 对象点调用函数，其余任何情况，函数内this默认指向window。
 <script>
 
@@ -247,8 +247,6 @@ obj.a(); //abc     //打印abc 是因为a方法在运行前的预编译阶段将
 aFun();  //global
 
 </script>
-
-
 ```
 ## new构造函数时，发生了啥
 ```javascript
@@ -272,7 +270,7 @@ function newObject(){
 ## bind call apply 改变函数‘运行时’的this上下文
 ```javascript
 // 1、bind(this,参数,...)
-// bind()方法会创建一个新函数，这个新函数和原函数有相同的函数体，但是this上下文已经被改变为bind()方法的第一个参数。
+// bind()方法会创建(返回)一个新函数，这个新函数和原函数有相同的函数体，但是this上下文已经被改变为bind()方法的第一个参数。
 // bind()方法返回的新函数不会立即执行。
 
 function greet() {
@@ -286,7 +284,7 @@ boundGreet(); //Hello
 
 
 // 2、call(this,参数,...)
-// call()方法会立即调用函数，并且指定函数内部的this上下文。
+// call()方法会立即调用函数，并且指定 本次执行时函数内部的this上下文。
 
 function greet(name) {
   console.log(this.greeting, name);
@@ -298,7 +296,7 @@ greet.call(obj, 'World'); //Hello World
 
 
 // 3、apply(this,[参数,...])
-// apply()方法和call()类似，都会立即调用函数，并指定函数内部的this上下文。
+// apply()方法和call()类似，都会立即调用函数，并指定 本次执行时函数内部的this上下文。
 
 function greet(name1, name2) {
   console.log(this.greeting, name1, name2);
