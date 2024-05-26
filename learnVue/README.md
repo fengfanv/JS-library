@@ -2476,7 +2476,7 @@ export default defineComponent({
 
 如：Vue.prototype.$axios = axios 其实就是单纯的在 Vue 原型上增加了一个 $axios 属性(或方法)。因为被添加在原型上，所以属于一个全局属性(或方法)。
 
-而通过全局 Vue.use() 方法来注册插件，Vue.use 会自动阻止多次注册相同插件(在使用时，会判断了该插件是不是已经注册过，防止重复注册)，它需要在你调用 new Vue() 启动应用之前完成，Vue.use() 方法至少传入一个参数，该参数类型必须是 Object 或 Function，如果是 Object 那么这个 Object 需要定义一个 install 方法，如果是 Function 那么这个函数就被当做 install 方法。在 Vue.use() 执行时 install 会默认执行，当 install 执行时，其第一个参数是 Vue，第二个参数是其他参数(options)(是调用 Vue.use() 时传入的自定义参数)。也就是说，使用它之后，调用的是该方法的 install 方法。
+而通过全局 Vue.use() 方法来注册插件，Vue.use 会自动阻止多次注册相同插件(在使用时，Vue.use会判断 该插件是不是已经注册过，防止重复注册)。它需要在你调用 new Vue() 启动应用之前完成，Vue.use() 方法至少传入一个参数，该参数类型必须是 Object 或 Function，如果是 Object 那么这个 Object 需要定义一个 install 方法，如果是 Function 那么这个函数就被当做 install 方法。在 Vue.use() 执行时 install 会默认执行，当 install 执行时，其第一个参数是 Vue，第二个参数是其他参数(options)(是调用 Vue.use() 时传入的自定义参数)。也就是说，使用它之后，调用的是该方法的 install 方法。
 
 ```js
 import Vue from "vue"
@@ -2518,6 +2518,41 @@ const = options = {
 // myPlugin 的类型可以是 object 或 Function
 // options 的类型是一个可选的对象
 Vue.use(myPlugin, options)
+```
+```js
+// Vue.use 源码
+export function initUse (Vue: GlobalAPI) {
+	// 首先先判断插件plugin是否是对象或者函数：
+	Vue.use = function (plugin: Function | Object) {
+		const installedPlugins = (this._installedPlugins || (this._installedPlugins = []))
+		// 判断vue是否已经注册过这个插件,如果已经注册过，跳出方法
+		if (installedPlugins.indexOf(plugin) > -1) {
+			return this
+		}
+		
+		// 取vue.use参数,toArray() 方法代码在下一个代码块
+		const args = toArray(arguments, 1)
+		args.unshift(this)
+		// 判断插件是否有install方法，如果有就执行install()方法。没有就直接把plugin当Install执行。
+		if (typeof plugin.install === 'function') {
+			plugin.install.apply(plugin, args)
+		} else if (typeof plugin === 'function') {
+			plugin.apply(null, args)
+		}
+		installedPlugins.push(plugin)
+		return this
+	}
+}
+
+function toArray (list: any, start?: number): Array<any> {
+	start = start || 0
+	let i = list.length - start
+	const ret: Array<any> = new Array(i)
+	while (i--) {
+		ret[i] = list[i + start]
+	}
+	return ret
+}
 ```
 ## Vue.extend
 

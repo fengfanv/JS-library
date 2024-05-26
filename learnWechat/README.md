@@ -105,6 +105,10 @@ wx.setNavigationBarColor({
   frontColor: "#ffffff", //文字颜色只能是黑（#000000）或白（#ffffff）
   backgroundColor: "#ff0000",
 });
+
+wx.setNavigationBarTitle({
+  title: "新标题"
+})
 ```
 #### 设置导航栏背景色及文字颜色2
 ```javascript
@@ -309,7 +313,16 @@ wx.getStorage({
   }
 })
 
-//清楚本地缓存
+//如：移除指定的缓存
+//这是异步方法，同步方法见文档
+wx.removeStorage({
+  key: 'key',
+  success (res) {
+    console.log(res)
+  }
+})
+
+//清楚本地所有缓存
 //这是异步方法，同步方法见文档
 wx.clearStorage()
 ```
