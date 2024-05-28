@@ -1598,7 +1598,9 @@ export default router
 
 声明响应式状态 ref() / reactive()
 ```
-声明响应式状态，声明式渲染，通过扩展标准 HTML 的语法，我们可以根据 JavaScript 的状态来描述 HTML 应该是什么样子的。当状态改变时，HTML 会自动更新。能在改变时触发更新的状态被称作是响应式的。我们可以使用 ref() / reactive() 来声明响应式状态。
+声明响应式状态，声明式渲染，通过扩展标准 HTML 的语法，我们可以根据 JavaScript 的状态来描述 HTML 应该是什么样子的。当状态改变时 HTML 会自动更新。能在改变时触发更新的状态被称作是响应式的。我们可以使用 ref() / reactive() 来声明响应式状态。
+
+如果setup导出的变量未经过ref()或reactive()加工，则导出的变量可以被渲染，但当变量值发生改变时，页面不会跟着变化。
 
 ---
 
@@ -1609,6 +1611,7 @@ reactive用于包装对象和数组等复杂类型的数据。它不能包装（
 在模板template中使用ref声明的值，不需要通过 .value 属性。
 
 当ref的值是一个对象时，ref会在内部调用reactive，但使用时仍需要通过 .value 属性来访问或修改。
+当reactive的值是一个基本类型数据时，会[Vue warn]，并且返回的状态，不是响应式状态。
 ```
 组合式API &lt;script setup&gt;
 ```html

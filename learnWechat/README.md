@@ -163,7 +163,7 @@ page {
 #### 使用 button 按钮（组件 -> 表单组件）
 [button文档](https://developers.weixin.qq.com/miniprogram/dev/component/button.html)
 ```html
-<button open-type="getUserInfo" bindgetuserinfo="getUserInfoCallback">微信登录</button>
+<button open-type="getUserInfo" bindgetuserinfo="getUserInfoCallback">获取用户信息</button>
 ```
 #### 使用 input 按钮（组件 -> 表单组件）
 [input文档](https://developers.weixin.qq.com/miniprogram/dev/component/input.html)
@@ -384,7 +384,7 @@ wx.chooseImage({
 #### 跳转页面/路由（API -> 路由 -> wx.navigateTo）
 [wx.navigateTo文档](https://developers.weixin.qq.com/miniprogram/dev/api/route/wx.navigateTo.html)
 
-#### 页面之间使用事件监听 来 相互传输数据
+#### 页面之间使用“事件通信通道” 来 相互传输数据
 
 a页面
 ```javascript
@@ -419,18 +419,18 @@ Page({
   }
 })
 ```
-#### 使用 app.js 内 globaldata（全局变量）
+#### 使用 app.js 内 globalData（全局变量）
+
+[小程序globalData](https://developers.weixin.qq.com/miniprogram/dev/reference/api/getApp.html)
 ```javascript
 //app.js
 App({
-	onLaunch: function () {
-		
-		//...
-		
-		this.globalData = {
-			name:"Ian"
-		}
-	}
+    onLaunch: function () {
+        //...
+    },
+    globalData: {
+        name: "Ian"
+    }
 })
 ```
 
