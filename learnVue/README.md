@@ -260,7 +260,7 @@ module.exports = {
 
     //解决跨域问题
     devServer: {
-        open: true,
+        open: true, //devServer启动后是否自动打开浏览器
         proxy: {
             '/api': {                           //匹配的路径
                 target: "http://xxx.com",       //服务端api接口地址
@@ -2076,6 +2076,17 @@ defineExpose({
 </script>
 ```
 vue hooks 功能
+
+hooks类似vue2里mixin，可以用来代替vue2里mixin，vue3里仍存在mixin，但推荐用hooks来代替mixin
+
+hooks对比mixin：
+
+1、hooks支持vue3组合式api语法。
+
+2、hooks允许开发者将组件的逻辑拆分成更小的可复用的函数。使代码更加模块化，逻辑更清晰。
+
+3、页面里可以引入多个mixin，并直接隐式调用了mixin里的变量/方法，这让我们有时候会混乱 这些变量/方法 分别是哪个mixin里的。而hooks是指名道姓的引入属性/方法，代码语义化更好。
+
 ```ts
 // src/hooks/nowTime.ts
 
@@ -2471,12 +2482,17 @@ export default defineComponent({
 
 [Vue.use()的作用及原理](https://juejin.cn/post/7138216381283205128)
 
-在 Vue 中引入(使用)第三方库时，通常我们会采用 import 的形式引入进来，但是有的库在引入进来之后做了 Vue.use() 操作，而有的库引入进来之后进行了 Vue.prototype.$something = something 操作，那么它们之间有什么区别呢？
+Vue.use()用于安装Vue插件。可以用来扩展Vue功能或添加全局属性/方法。
 
-如：Vue.prototype.$axios = axios 其实就是单纯的在 Vue 原型上增加了一个 $axios 属性(或方法)。因为被添加在原型上，所以属于一个全局属性(或方法)。
+Vue.use()和Vue.prototype.$something=something两者都可以用来添加全局属性/方法。
 
-而通过全局 Vue.use() 方法来注册插件，Vue.use 会自动阻止多次注册相同插件(在使用时，Vue.use会判断 该插件是不是已经注册过，防止重复注册)。它需要在你调用 new Vue() 启动应用之前完成，Vue.use() 方法至少传入一个参数，该参数类型必须是 Object 或 Function，如果是 Object 那么这个 Object 需要定义一个 install 方法，如果是 Function 那么这个函数就被当做 install 方法。在 Vue.use() 执行时 install 会默认执行，当 install 执行时，其第一个参数是 Vue，第二个参数是其他参数(options)(是调用 Vue.use() 时传入的自定义参数)。也就是说，使用它之后，调用的是该方法的 install 方法。
+Vue.prototype.$axios=axios就是单纯的在Vue原型上增加一个$axios属性/方法。因为被添加在原型上，所以这是一个全局属性/方法。
 
+通过Vue.use()来注册全局属性/方法，Vue.use会自动阻止多次注册相同属性/方法(在使用时，Vue.use会判断 该插件是不是已经注册过，防止重复注册)。
+
+Vue.use()方法至少传入一个参数，该参数类型必须是 Object 或 Function，如果是 Object 那么这个 Object 需要定义一个 install 方法，如果是 Function 那么这个函数就被当做 install 方法。
+
+在Vue.use()执行时 install 会默认执行，当 install 执行时，其第一个参数是 Vue，第二个参数是其他参数(options)(是调用 Vue.use() 时传入的自定义参数)。也就是说，使用它之后，调用的是该方法的 install 方法。
 ```js
 import Vue from "vue"
 

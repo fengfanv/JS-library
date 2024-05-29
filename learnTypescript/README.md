@@ -260,26 +260,66 @@ var wangleilei = new renlei('王雷雷', 18);
 console.log(wangleilei);
 wangleilei.say();
 ```
-### 类的访问控制修饰符(public，protected，private)
+### 类的访问控制修饰符(public，private，protected)
 ```javascript
-class ren{
-    public sex:string//公共属性sex，可以在任何地方被访问。
-    protected name:string//受保护的属性name，只能在 类ren自己 或 类ren的子类 中使用
-    private age:number//私有属性age，只能在类ren中使用
-    public readonly tall:number=180//公共的，只读的，tall属性
-    public constructor(sex:string,name:string,age:number){
-        this.sex=sex
-        this.name=name
-        this.age=age
-    }
-    public sayHello(){//公共方法，在哪里都可以访问
-        console.log('你好！我叫'+this.name+',今年'+this.age+'岁');
-    }
-    protected sayLove(){//受保护的方法，只能在 类ren自己 或 类ren的子类 中使用
-        console.log('loves you!');
+//public修饰符表示这是公开成员，类内部，类外部(类的实例对象)，及子类 可以自由访问
+//public是默认修饰符，如果不写修饰符，则默认属性或方法是public修饰符
+class MyClass {
+    public myPublicProperty: string = "I'm public!";
+}
+
+let obj = new MyClass();
+console.log(obj.myPublicProperty); //输出 "I'm public!"
+
+
+
+
+//private修饰符表示这是私有成员，只能在当前类的内部使用，类的实例和子类都不能使用该成员
+class MyClass {
+    private myPrivateProperty: string = "I'm private!";
+
+    public showPrivateProperty() {
+        console.log(this.myPrivateProperty); //可以在类内部访问  
     }
 }
-let wangleilei:ren = new ren('男','王雷雷',28);
+
+let obj = new MyClass();
+console.log(obj.myPrivateProperty); //错误：myPrivateProperty 是私有的
+
+
+
+
+//protected修饰符表示这是受保护成员，只能在类的内部使用该成员，类的实例无法使用该成员，但是子类内部可以使用
+class MyClass {
+    protected myProtectedProperty: string = "I'm protected!";
+}
+
+class MySubClass extends MyClass {
+    public showProtectedProperty() {
+        console.log(this.myProtectedProperty); //可以在子类中访问  
+    }
+}
+
+let obj = new MyClass();
+console.log(obj.myProtectedProperty); //错误：myProtectedProperty 是受保护的  
+
+let subObj = new MySubClass();
+subObj.showProtectedProperty(); //可以在子类中访问受保护的属性
+
+
+
+
+
+class Ren {
+    name: string
+    age: number
+    public readonly tall: number = 180//公共的 只读的 tall属性
+    constructor(name: string, age: number) {
+        this.name = name
+        this.age = age
+    }
+}
+let wangleilei: Ren = new Ren('王雷雷', 28);
 ```
 ### 类的static关键字
 ```ts
@@ -303,8 +343,8 @@ class Ren {
     }
 
     say(){
-        console.log(Ren.num)//实例方法通过类名，获取类的静态属性
-        Ren.disp()//实例方法通过类名，调用类的静态方法
+        console.log(Ren.num)//通过类名，获取类的静态属性
+        Ren.disp()//通过类名，调用类的静态方法
     }
 }
 
@@ -324,6 +364,7 @@ class God extends Ren {
         console.log('God.disp.num',God.num)//15
     }
 }
+
 console.log('God.num',God.num)//12
 God.num = 15
 console.log('Ren.num',Ren.num)//12
@@ -365,13 +406,13 @@ son.zhuanqian();//打印：我会赚钱
 ```
 ### 类继承属性和方法的重写
 ```javascript
-子类可以继承父类的属性和方法，并且子类可以重写（或称为覆盖）父类的非私有属性和方法。
+子类可以继承父类的属性和方法，并且子类可以重写(覆盖)父类的非私有属性和方法。
 
-如果父类中的属性或方法被声明为private，则它们不能在子类中被访问或重写。如果它们被声明为protected，则它们可以在子类中被访问，但不能在子类之外被访问。如果它们被声明为public或没有明确的访问修饰符（默认为public），则它们可以在任何地方被访问。
+父类中的属性和方法如果被声明为private，则它们不能在子类中被访问或重写。
 
 在子类中，可以使用super关键字来访问父类的属性和方法。
 
-子类可以重写（实际上是提供自己的实现）父类的构造函数。但是，在子类的构造函数中，通常需要使用super()来调用父类的构造函数，以确保父类的初始化代码得到执行。
+子类可以重写(实际上是提供自己的实现)父类的构造函数。在子类的构造函数中，通常需要使用super()来调用父类的构造函数，以确保父类的初始化代码得到执行。
 
 class me{
     public name:string
