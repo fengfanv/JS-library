@@ -1,5 +1,7 @@
 <template>
-    <div id="container"></div>
+    <div id="container">
+        <button @click="moveCube()">移动立方体</button>
+    </div>
 </template>
 
 <script setup>
@@ -15,7 +17,7 @@ const scene = new THREE.Scene()
 //scene.background = new THREE.Color(0x666666) //将“场景”的背景色，从“黑色”设置成“灰色”
 //scene.background = new THREE.Color(0xffffff) //将“场景”的背景色，从“黑色”设置成“白色”
 //为“场景”设置背景图片（setPath('/') 设置 图片 的根路径）（图片顺序，pos-x, neg-x, pos-y, neg-y, pos-z, neg-z）
-scene.background = new THREE.CubeTextureLoader().setPath('/').load(['qiang_zhi.png','qiang_zhi.png','tian_kong.png','di_mian.png','qiang_zhi.png','qiang_zhi.png'])
+scene.background = new THREE.CubeTextureLoader().setPath('/').load(['qiang_zhi.png', 'qiang_zhi.png', 'tian_kong.png', 'di_mian.png', 'qiang_zhi.png', 'qiang_zhi.png'])
 
 
 //为“场景(三维空间)”添加一个“雾”效果
@@ -35,9 +37,22 @@ const cube = new THREE.Mesh(liFangTi, material)
 //通过立方体的网格，重新设置 立方体 在 “场景” 中的位置
 cube.position.set(0, 1, 0) //x,y,z   立方体的位置，是以立方体的中心点为基准，而不是以立方体的左上角。如果我们以左上角为基准 则立方体的位置是（x(0-立方体边长/2)，y(0-立方体边长/2)，z(0-立方体边长/2)）
 scene.add(cube) //将“立方体”添加到“场景”里
+//移动立方体
+const moveCube = () => {
+
+    //移动立方体到(x1,y3,z0)
+    cube.position.set(1, 3, 0)
+
+    let { x, y, z } = cube.position
+
+    //让相机，始终，对着，立方体（让立方体始终保持在，相机所看到的画面的正中间）（以相机当前位置为基准，然后调整相机角度，看 向 场景内某个坐标点）（相机位置不变，调整相机角度，让相机俯看，仰看，左看，右看）
+    //camera.lookAt(x, y, z)
+    controls.target = new THREE.Vector3(x, y, z) //如果使用了“相机轨道控制器”，则使用这句话，来改变相机角度。如果没有使用，则使用上面那句话，来改变相机角度(camera.lookAt)
+}
 
 
 //创建相机(通过相机，观察(看)上边三维空间里的某个物体)
+//PerspectiveCamera透视相机
 const camera = new THREE.PerspectiveCamera()
 //默认情况下    相机在场景中的位置是（x0,y0,z0）    立方体中心点位置也是（x0,y0,z0）   这样就导致 相机 被包裹在 立方体中 ，导致相机看不到立方体，所以这里为了能够观察到 场景里的立方体，这里调整了 相机位置
 //改变相机位置
@@ -65,7 +80,6 @@ onMounted(() => {
 renderer.setSize(window.innerWidth, window.innerHeight)
 
 
-
 //创建轨道控制器，通过“轨道控制器”控制相机围绕目标进行轨道运动
 //添加“轨道控制器”后，鼠标在页面上进行移动滑动操作，能让相机 围绕目标，根据鼠标操作，来动态切换相机视角
 const controls = new OrbitControls(camera, renderer.domElement)
@@ -82,7 +96,6 @@ controls.autoRotateSpeed = 1 //设置 围绕目标自动旋转的速度有多快
 controls.addEventListener('change', () => {
     //console.log('轨道控制器，改变了，相机视角')
 })
-
 
 
 
