@@ -2571,7 +2571,7 @@ function toArray (list: any, start?: number): Array<any> {
 ```
 ## Vue.extend
 
-Vue.extend 是 Vue.js 中用于创建组件构造器的方法。通过 Vue.extend 可以定义一个 Vue 组件的构造函数，然后可以使用该构造函数创建新的 Vue 组件实例。
+Vue.extend 是 Vue 中用于创建组件构造器的方法。vue组件构造函数生成器。通过 Vue.extend 可以定义一个 Vue 组件的构造函数，然后可以使用该构造函数创建一个 Vue 组件实例。
 
 Vue.extend 方法的参数是一个包含组件选项的对象，用于定义新的 Vue 组件的行为和特性。（组件选项的对象与我们在定义普通 Vue 组件时使用的选项相同，例如 data、methods、computed、components、watch、等等）
 
@@ -2582,7 +2582,7 @@ var MyComponent = Vue.extend({
 });
 
 //用法1
-//使用该(组件构造器/组件构造函数)创建一个新的 Vue 实例
+//使用该(组件构造器/组件构造函数)创建一个 Vue 组件实例
 var vm = new MyComponent();
 //将新创建的实例挂载到 DOM 中
 vm.$mount('#abc');
