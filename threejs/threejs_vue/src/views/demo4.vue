@@ -17,7 +17,9 @@ const scene = new THREE.Scene()
 //scene.background = new THREE.Color(0x666666) //将“场景”的背景色，从“黑色”设置成“灰色”
 //scene.background = new THREE.Color(0xffffff) //将“场景”的背景色，从“黑色”设置成“白色”
 //为“场景”设置背景图片（setPath('/') 设置 图片 的根路径）（图片顺序，pos-x, neg-x, pos-y, neg-y, pos-z, neg-z）
-scene.background = new THREE.CubeTextureLoader().setPath('/').load(['threejs_img/px.png', 'threejs_img/nx.png', 'threejs_img/py.png', 'threejs_img/ny.png', 'threejs_img/pz.png', 'threejs_img/nz.png'])
+//CubeTextureLoader(立体纹理)
+const cubeTexture = new THREE.CubeTextureLoader().setPath('/').load(['threejs_img/px.png', 'threejs_img/nx.png', 'threejs_img/py.png', 'threejs_img/ny.png', 'threejs_img/pz.png', 'threejs_img/nz.png'])
+scene.background = cubeTexture
 
 
 //为“场景(三维空间)”添加一个“雾”效果
@@ -28,12 +30,20 @@ scene.fog = new THREE.Fog(0xff0000, 10, 15)
 
 
 
-//创建一个立方体
-const liFangTi = new THREE.BoxGeometry()
-//为立方体创建一个材质(为立方体创建一个皮肤)
-const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 }) //0x00ff00    0x开头代表16进制    00ff00 = rgb(0,255,0) = 绿色
+// //创建一个立方体
+// const wuTi = new THREE.BoxGeometry()
+
+//创建一个球体
+const wuTi = new THREE.SphereGeometry(1) //传的这个 1 是圆的半径
+
+//为立方体创建一个材质(外观)(为立方体创建一个皮肤)
+const material = new THREE.MeshBasicMaterial({
+    // color: 0x00ff00 //立方体颜色（0x开头代表16进制）00ff00 == rgb(0,255,0) == 绿色
+    // map: new THREE.TextureLoader().load('threejs_img/pi_fu.png') //将立方体的皮肤，换成，贴图(图片纹理)
+    envMap: cubeTexture //环境纹理贴图(立体纹理)(通过在物体上贴图，模拟，物体根据当前环境，镜面反射效果)
+})
 //创建网格（想把“立方体”放进“场景”里，需要通过“网格”来操作）（可以通过“网格”，控制“立方体”在“场景”中的相对位置）
-const cube = new THREE.Mesh(liFangTi, material)
+const cube = new THREE.Mesh(wuTi, material)
 //通过立方体的网格，重新设置 立方体 在 “场景” 中的位置
 cube.position.set(0, 1, 0) //x,y,z   立方体的位置，是以立方体的中心点为基准，而不是以立方体的左上角。如果我们以左上角为基准 则立方体的位置是（x(0-立方体边长/2)，y(0-立方体边长/2)，z(0-立方体边长/2)）
 scene.add(cube) //将“立方体”添加到“场景”里

@@ -18,7 +18,7 @@ const scene = new THREE.Scene()
 //scene.background = new THREE.Color(0x666666) //将“场景”的背景色，从“黑色”设置成“灰色”
 //scene.background = new THREE.Color(0xffffff) //将“场景”的背景色，从“黑色”设置成“白色”
 //为“场景”设置背景图片（setPath('/') 设置 图片 的根路径）（图片顺序，pos-x, neg-x, pos-y, neg-y, pos-z, neg-z）
-scene.background = new THREE.CubeTextureLoader().setPath('/').load(['qiang_zhi.png', 'qiang_zhi.png', 'tian_kong.png', 'di_mian.png', 'qiang_zhi.png', 'qiang_zhi.png'])
+scene.background = new THREE.CubeTextureLoader().setPath('/').load(['threejs_img/px.png', 'threejs_img/nx.png', 'threejs_img/py.png', 'threejs_img/ny.png', 'threejs_img/pz.png', 'threejs_img/nz.png'])
 
 
 //为“场景(三维空间)”添加一个“雾”效果
