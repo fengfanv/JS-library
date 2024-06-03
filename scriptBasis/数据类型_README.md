@@ -49,6 +49,8 @@ Object.prototype.toString.call("字符串") //"[object String]"
 
 Object.prototype.toString.call(123) //"[object Number]"
 
+Object.prototype.toString.call(NaN) //"[object Number]"
+
 Object.prototype.toString.call(true) //"[object Boolean]"
 
 Object.prototype.toString.call(undefined) //"[object Undefined]"
