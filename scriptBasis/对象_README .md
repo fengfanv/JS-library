@@ -248,6 +248,43 @@ aFun();  //global
 
 </script>
 ```
+## 箭头函数
+```js
+箭头函数与普通函数区别：
+
+1、箭头函数没有属于自己的this，在箭头函数内使用的this，其this是捕获自其所在上下文的this（箭头函数内使用的this，是箭头函数所处环境的this。或是箭头函数继承了当前所处环境的this）。
+const obj = {
+    value: 1,
+
+    increment: function () {
+        setTimeout(function () {
+            console.log(this.value) //undefined，因为这里的this指向window
+        }, 1000)
+    },
+    incrementArrow: function () {
+        setTimeout(() => {
+            //箭头函数，this捕获自incrementArrow方法，因此它指向obj
+            console.log(this.value) //1  
+        }, 1000)
+    }
+}
+obj.increment()
+obj.incrementArrow()
+
+2、箭头函数不能通过call(),apply(),bind()来改变this指向
+
+3、箭头函数不能用作构造函数，因为箭头函数没有prototype属性。尝试使用new关键字和箭头函数 会 报错。
+
+4、箭头函数没有arguments对象，但如果你需要参数数组，可以使用剩余参数。
+//普通函数
+function func() {
+    console.log(arguments);
+}
+//箭头函数
+const arrowFunc = (...args) => {
+    console.log(args)
+}
+```
 ## new构造函数时，发生了啥
 ```javascript
 function Person(){
