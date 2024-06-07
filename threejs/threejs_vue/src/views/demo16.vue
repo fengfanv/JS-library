@@ -7,6 +7,9 @@ import { onMounted } from 'vue'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js' //引入轨道控制器
 
+import { FontLoader } from 'three/addons/loaders/FontLoader.js' //引入json字体加载器
+import { TextGeometry } from 'three/addons/geometries/TextGeometry.js' //文本缓冲几何体。需要单独引入
+
 
 
 
@@ -18,7 +21,64 @@ scene.background = new THREE.Color(0x666666) //将“场景”的背景色，从
 
 
 
+//参考文档
+//https://threejs.org/docs/#examples/zh/loaders/FontLoader
+//https://threejs.org/docs/#examples/zh/geometries/TextGeometry
+//https://juejin.cn/post/7104817223444725774
 
+//普通字体文件(转)json字体文件
+//https://gero3.github.io/facetype.js/
+
+
+
+
+//json字体文件路径
+const fontPath = new URL('../assets/Alimama_DaoLiTi_Regular.json', import.meta.url).href
+
+
+
+
+//创建json字体加载器
+const loader = new FontLoader()
+//加载json字体
+loader.load(fontPath, function (font) {
+    // console.log(font)
+
+    //创建文字几何体
+    const textGeometry = new TextGeometry('王哥你好啊', {
+        font: font,
+        size: 1, //文字大小
+        depth: 0.5, //文本厚度
+        // curveSegments: 12, //(文本)曲线上“点”的数量
+        // bevelEnabled: true, //是否开启斜角
+        // bevelThickness: 20, //文本上斜角的深度
+        // bevelSize: 8, //斜角与原始文本轮廓之间的延伸距离
+        // bevelSegments: 3 //斜角的分段数
+    })
+    //创建文字的材质(皮肤)
+    const material = new THREE.MeshBasicMaterial({
+        wireframe: false,
+        color: 0x550000
+    })
+    //通过网格，将“文字几何体”和“材质”拼接在一起，然后添加到场景中
+    const text = new THREE.Mesh(textGeometry, material)
+    scene.add(text)
+
+
+    //默认添加到场景里的“文字”位置是不居中的，调用如下代码，让文字居中
+    //方式1：
+    // textGeometry.center()
+    //方式2：
+    textGeometry.computeBoundingBox() //使用computeBoundingBox获取“文字几何体”的尺寸
+    if (textGeometry.boundingBox) {
+        textGeometry.translate(
+            -textGeometry.boundingBox.max.x * 0.5, // Subtract bevel size
+            -textGeometry.boundingBox.max.y * 0.5, // Subtract bevel size
+            -textGeometry.boundingBox.max.z * 0.5, // Subtract bevel thickness
+        )
+    }
+    
+})
 
 
 
