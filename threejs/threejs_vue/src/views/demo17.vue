@@ -9,48 +9,55 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js' //引入�
 
 
 
+
+let width = window.innerWidth
+let height = window.innerHeight
+let depth = 1400
+
+
+
+
 //创建场景(创建一个三维空间，创建一个三维世界)
 const scene = new THREE.Scene()
-//修改“场景”的背景色（默认，黑色）
-scene.background = new THREE.Color(0x666666) //将“场景”的背景色，从“黑色”设置成“灰色”
+//添加雾效果
+scene.fog = new THREE.Fog(0x000000, 0, 10000)
 
 
 
-//加载vue里的图片
-const image_logo = new URL('../assets/logo.png', import.meta.url).href
 
-
-
-//创建一个“点”
-const geometry = new THREE.BufferGeometry()
-const vertices = [0, 0, 0] //设置“点”在场景中位置
-geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3))
-//创建“点材质”。给“点”这种特殊物体添加皮肤，需要使用特殊的“点材质”
-const material = new THREE.PointsMaterial({
-    size: 5, //“点”大小
-    map: new THREE.TextureLoader().load(image_logo), //给“点”添加一个图片纹理材质(图片皮肤)
-    color: 0xffffff, //“点”材质的颜色
-    transparent: true //材质是否透明
+//创建一个立方体
+const liFangTi = new THREE.BoxGeometry(width, height, depth)
+//创建一个材质(外观)(为立方体创建一个皮肤)
+let liFangTi_image = new URL('../assets/sky.png', import.meta.url).href
+const material = new THREE.MeshBasicMaterial({
+    map: new THREE.TextureLoader().load(liFangTi_image),
+    side: THREE.BackSide, //THREE.FrontSide前面渲染 THREE.BackSide背面渲染 THREE.DoubleSide双面渲染
 })
-const point = new THREE.Points(geometry, material)
-scene.add(point)
+//利用网格，将 几何体 和 材质 拼接在一起，然后添加到场景中
+const cube = new THREE.Mesh(liFangTi, material)
+scene.add(cube) //将“物体”添加到“场景”里
+
+
 
 
 
 
 //创建相机(通过相机，观察(看)上边三维空间里的某个物体)
 //PerspectiveCamera透视相机
-const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight)
-//默认情况下    相机在场景中的位置是（x0,y0,z0）    立方体中心点位置也是（x0,y0,z0）   这样就导致 相机 被包裹在 立方体中 ，导致相机看不到立方体，所以这里为了能够观察到 场景里的立方体，这里调整了 相机位置
-//改变相机位置
-camera.position.z = 10 //这里为啥调整z轴位置，请看图片“three里xyz轴.png”
-camera.position.y = 3 //为了 能看出 立方体 是立体的，这里稍微抬高了一下相机的位置
+let fov = 30 //相机垂直视角角度
+let aspect = width / height //相机视锥体的长宽比，通常是使用 画布的宽/画布的高
+const camera = new THREE.PerspectiveCamera(fov, aspect)
+//计算 相机与立方体 二者之间的最佳距离
+//三角函数 tanθ=对边/邻边    邻边=对边/tanθ    对边=tanθ*邻边    对边=height/2    邻边=z=?    tan30°=Math.tan(30*Math.PI/180)
+let bestDistance = (height / 2) / Math.tan(fov * Math.PI / 180)
+camera.position.z = bestDistance //这里为啥调整z轴位置，请看图片“three里xyz轴.png”
+
 
 
 
 
 //创建一个“xyz坐标轴参考辅助线”（默认情况下，红线代表X轴，绿线代表Y轴，蓝线代表Z轴）
-const axesHelper = new THREE.AxesHelper(5)
+const axesHelper = new THREE.AxesHelper(100)
 scene.add(axesHelper) //将“xyz坐标轴参考辅助线”添加到“场景”里
 
 
@@ -62,7 +69,9 @@ onMounted(() => {
     document.getElementById('container').appendChild(renderer.domElement) //将渲染器添加到html页面上
 })
 //设置渲染器窗口大小(设置canvas大小)
-renderer.setSize(window.innerWidth, window.innerHeight)
+renderer.setSize(width, height)
+//设置渲染器的像素比。避免绘图模糊
+renderer.setPixelRatio(window.devicePixelRatio)
 
 
 

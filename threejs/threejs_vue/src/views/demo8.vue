@@ -50,7 +50,7 @@ scene.add(group)
 
 //创建相机(通过相机，观察(看)上边三维空间里的某个物体)
 //PerspectiveCamera透视相机
-const camera = new THREE.PerspectiveCamera()
+const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight)
 //默认情况下    相机在场景中的位置是（x0,y0,z0）    立方体中心点位置也是（x0,y0,z0）   这样就导致 相机 被包裹在 立方体中 ，导致相机看不到立方体，所以这里为了能够观察到 场景里的立方体，这里调整了 相机位置
 //改变相机位置
 camera.position.z = 10 //这里为啥调整z轴位置，请看图片“three里xyz轴.png”
@@ -102,4 +102,17 @@ function animation() {
     renderer.render(scene, camera)
 }
 animation()
+
+
+
+
+
+//监听窗口变化，更新渲染画面
+window.addEventListener("resize", function () {
+    camera.aspect = window.innerWidth / window.innerHeight //重新设置相机视锥体的长宽比，默认值是1
+    camera.updateProjectionMatrix() //更新相机投影矩阵，相机参数被改变后必须被调用
+
+    renderer.setSize(window.innerWidth, window.innerHeight) //设置渲染器窗口大小(设置canvas大小)
+    renderer.setPixelRatio(window.devicePixelRatio) //设置渲染器的像素比。避免绘图模糊
+})
 </script>
