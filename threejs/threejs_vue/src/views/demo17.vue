@@ -29,13 +29,59 @@ scene.fog = new THREE.Fog(0x000000, 0, 10000)
 const liFangTi = new THREE.BoxGeometry(width, height, depth)
 //创建一个材质(外观)(为立方体创建一个皮肤)
 let liFangTi_image = new URL('../assets/sky.png', import.meta.url).href
-const material = new THREE.MeshBasicMaterial({
+const liFangTi_material = new THREE.MeshBasicMaterial({
     map: new THREE.TextureLoader().load(liFangTi_image),
     side: THREE.BackSide, //THREE.FrontSide前面渲染 THREE.BackSide背面渲染 THREE.DoubleSide双面渲染
 })
 //利用网格，将 几何体 和 材质 拼接在一起，然后添加到场景中
-const cube = new THREE.Mesh(liFangTi, material)
-scene.add(cube) //将“物体”添加到“场景”里
+const liFangTi_cube = new THREE.Mesh(liFangTi, liFangTi_material)
+scene.add(liFangTi_cube) //将“物体”添加到“场景”里
+
+
+
+
+
+
+//创建一个球体
+let radius = 50 //半径
+let widthSegments = 64 //几个经线（竖线是经线，连接南北极的是经线）
+let heightSegments = 32 //几个纬线（横线是纬线）横纬竖经
+const qiuTi = new THREE.SphereGeometry(radius, widthSegments, heightSegments)
+//为 几何体 创建一个材质(外观)(为 几何体 创建一个皮肤)
+let qiuTi_image = new URL('../assets/earth_bg.png', import.meta.url).href
+//注意，这里球体的皮肤，是高光反射材质。所以，需要灯光，才能看见球体的皮肤
+const qiuTi_material = new THREE.MeshPhongMaterial({
+    map: new THREE.TextureLoader().load(qiuTi_image), //为球体，添加一个，图片皮肤
+    shininess: 400
+})
+//利用网格，将 几何体 和 材质 拼接在一起
+const qiuTi_cube = new THREE.Mesh(qiuTi, qiuTi_material)
+
+
+
+
+
+//为球体，创建灯光
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.4) //环境光 0xffffff是光的颜色 0.4是光的强度
+const pointLight = new THREE.PointLight(0xffffff, 10000000) //点光源
+pointLight.position.set(1000, 0, 0) //修改 点光源 位置
+
+
+
+
+
+
+//创建一个分组，将球体和灯光整合在一起
+const group = new THREE.Group()
+group.add(qiuTi_cube)
+group.add(ambientLight)
+group.add(pointLight)
+scene.add(group) //将“分组”添加到“场景”里
+//根据 立方体大小 动态设置组的位置
+let group_x = -(width / 2) * (40 / 100)
+let group_y = (height / 2) * (40 / 100)
+let group_z = -(depth / 2) * (50 / 100)
+group.position.set(group_x, group_y, group_z) //修改 分组 在 场景 中的位置
 
 
 
@@ -46,18 +92,22 @@ scene.add(cube) //将“物体”添加到“场景”里
 //PerspectiveCamera透视相机
 let fov = 30 //相机垂直视角角度
 let aspect = width / height //相机视锥体的长宽比，通常是使用 画布的宽/画布的高
-const camera = new THREE.PerspectiveCamera(fov, aspect)
-//计算 相机与立方体 二者之间的最佳距离
-//三角函数 tanθ=对边/邻边    邻边=对边/tanθ    对边=tanθ*邻边    对边=height/2    邻边=z=?    tan30°=Math.tan(30*Math.PI/180)
-let bestDistance = (height / 2) / Math.tan(fov * Math.PI / 180)
-camera.position.z = bestDistance //这里为啥调整z轴位置，请看图片“three里xyz轴.png”
+let near = 1 //相机可视范围最小值
+let far = 30000 //相机可视范围最大值(相机最远能看多远)
+const camera = new THREE.PerspectiveCamera(fov, aspect, near, far)
+camera.lookAt(0, 0, 0) //让相机看向某个"点"
+//计算 相机与立方体(立方体中心(0,0,0)) 二者之间的最佳距离
+//三角函数 tanθ=对边/邻边    邻边=对边/tanθ    对边=tanθ*邻边    对边=height/2    邻边=z=?    tan15°=Math.tan(15*Math.PI/180)
+let bestDistance = (height / 2) / Math.tan((fov / 2) * Math.PI / 180)
+camera.position.z = bestDistance - (depth / 2) //这里 减(depth/2) 是因为，所计算的位置 是根据立方体中心(0,0,0)计算的（脑海中的三角函数图形的"对边"是(0,0,0)的y轴那条线）。所以为了获得最佳效果，这里 减了(depth/2)
+
 
 
 
 
 
 //创建一个“xyz坐标轴参考辅助线”（默认情况下，红线代表X轴，绿线代表Y轴，蓝线代表Z轴）
-const axesHelper = new THREE.AxesHelper(100)
+const axesHelper = new THREE.AxesHelper(100) //100是size大小
 scene.add(axesHelper) //将“xyz坐标轴参考辅助线”添加到“场景”里
 
 
@@ -97,6 +147,11 @@ function animation() {
     requestAnimationFrame(animation)
 
     controls.update() //当鼠标在页面上移动、滑动操作的时候，实时调用“轨道控制器”的“更新”方法，来刷新(更新)相机视角
+
+
+    qiuTi_cube.rotateY(0.01) //让球体自转。等效qiuTi_cube.rotation.y += 0.01
+
+
 
     //将相机所观察到的 画面，画到canvas上
     renderer.render(scene, camera)
