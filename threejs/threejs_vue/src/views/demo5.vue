@@ -27,7 +27,7 @@ scene.background = new THREE.Color(0x666666) //将“场景”的背景色，从
 
 // //---方式1---
 // const vertices = new Float32Array([
-//     -1.0, -1.0, 1.0, //在场景中某一个点的x，y，z坐标位置
+//     -1.0, -1.0, 1.0, //设置 几何体 形状的坐标位置。(x，y，z)
 //     1.0, -1.0, 1.0,
 //     1.0, 1.0, 1.0,
 //     //一般情况下threejs里的任何形状或物体，都是由若干个三角形组成的。如这里的平面几何体，就是由两个三角形组成的
@@ -36,20 +36,20 @@ scene.background = new THREE.Color(0x666666) //将“场景”的背景色，从
 //     -1.0, -1.0, 1.0
 // ])
 // const wuTi = new THREE.BufferGeometry()
-// wuTi.setAttribute('position', new THREE.BufferAttribute(vertices, 3))//这里这个 3 的意思是，每三个值，为一组，代表一个点的坐标(xyz)
+// wuTi.setAttribute('position', new THREE.BufferAttribute(vertices, 3))//这里这个 3 的意思是，每三个值，为一组，来代表几何体形状的一个(顶)点坐标(xyz)
 
 //---方式2（索引的方式）---
 const vertices = new Float32Array([
-    -1.0, -1.0, 1.0, //在场景中某一个点的x，y，z坐标位置    index=0
-    1.0, -1.0, 1.0, //                                   index=1
-    1.0, 1.0, 1.0, //                                    index=2
+    -1.0, -1.0, 1.0, //设置 几何体 形状的坐标位置。(x，y，z)    index=0
+    1.0, -1.0, 1.0, //                                       index=1
+    1.0, 1.0, 1.0, //                                        index=2
 
     //1.0, 1.0, 1.0,
-    -1.0, 1.0, 1.0, //                                   index=3
+    -1.0, 1.0, 1.0, //                                       index=3
     //-1.0, -1.0, 1.0
 ])
 const wuTi = new THREE.BufferGeometry()
-wuTi.setAttribute('position', new THREE.BufferAttribute(vertices, 3))//这里这个 3 的意思是，每三个值，为一组，代表一个点的坐标(xyz)
+wuTi.setAttribute('position', new THREE.BufferAttribute(vertices, 3))//这里这个 3 的意思是，每三个值，为一组，来代表几何体形状的一个(顶)点坐标(xyz)
 wuTi.index = new THREE.BufferAttribute(new Uint16Array([0, 1, 2,/*---*/2, 3, 0]), 1)
 
 
@@ -62,6 +62,7 @@ const material = new THREE.MeshBasicMaterial({
 //创建网格（想把“立方体”放进“场景”里，需要通过“网格”来操作）（可以通过“网格”，控制“立方体”在“场景”中的相对位置）
 //利用网格，将 几何体 和 材质 拼接在一起，然后添加到场景中
 const cube = new THREE.Mesh(wuTi, material)
+cube.position.set(1,1,1) //设置 自定义几何体 在场景中的位置
 scene.add(cube) //将“物体”添加到“场景”里
 
 

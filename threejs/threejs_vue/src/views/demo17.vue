@@ -70,7 +70,6 @@ pointLight.position.set(1000, 0, 0) //修改 点光源 位置
 
 
 
-
 //创建一个分组，将球体和灯光整合在一起
 const group = new THREE.Group()
 group.add(qiuTi_cube)
@@ -82,6 +81,64 @@ let group_x = -(width / 2) * (40 / 100)
 let group_y = (height / 2) * (40 / 100)
 let group_z = -(depth / 2) * (50 / 100)
 group.position.set(group_x, group_y, group_z) //修改 分组 在 场景 中的位置
+
+
+
+
+
+
+
+//创建星星
+let star_image_1 = new URL('../assets/starflake1.png', import.meta.url).href
+let star_image_2 = new URL('../assets/starflake2.png', import.meta.url).href
+let size1 = 50
+let size2 = 20
+let color1 = [0.6, 1, 0.75]
+let color2 = [0, 0, 1]
+function createStar(image, size, color, x, y, z) {
+    //创建一个“点”
+    const geometry = new THREE.BufferGeometry()
+    const vertices = [0, 0, 0] //定义 几何体 形状的坐标数据(这里这个坐标数据，是专门用来定义几何体形状的。当“物体”被添加到“场景”里后，会初始化“物体”在“场景”中位置为(0,0,0)，所以如果要修改“物体”在“场景”中的位置，请调用point.position.set(1, 2, 1)方法。不要在这里定义“物体”在“场景”中的位置)
+    geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3))
+    //创建“点材质”。给“点”这种特殊物体添加皮肤，需要使用特殊的“点材质”
+    const material = new THREE.PointsMaterial({
+        size: size, //“点”大小
+        map: new THREE.TextureLoader().load(image), //给“点”添加一个图片纹理材质(图片皮肤)
+        transparent: true, //材质是否透明
+    })
+    material.color.setHSL(color[0], color[1], color[2]) //setHSL(色相[0-1],饱和度[0-1],亮度[0-1]) 
+    const point = new THREE.Points(geometry, material)
+    point.position.set(x, y, z) //设置 点物体 在场景中的位置
+    return point
+}
+//生成随机数
+function createRandom(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min
+}
+
+let stars = [] //存放星星的数组
+//创建1500个星星
+for (let i = 0; i < 1500; i++) {
+    //生成星星在场景中的位置
+    let x = createRandom(-(width / 2), (width / 2))
+    let y = createRandom(-(height / 2), (height / 2))
+    let z = createRandom(-(depth / 2), (depth / 2))
+    let image = null
+    let size = null
+    let color = null
+    if (i % 2) {
+        image = star_image_1
+        size = size1
+        color = color1
+    } else {
+        image = star_image_2
+        size = size2
+        color = color2
+    }
+    //创建星星
+    stars.push(createStar(image, size, color, x, y, z))
+    scene.add(stars[i]) //将“星星”添加到“场景”里
+}
 
 
 
@@ -100,7 +157,6 @@ camera.lookAt(0, 0, 0) //让相机看向某个"点"
 //三角函数 tanθ=对边/邻边    邻边=对边/tanθ    对边=tanθ*邻边    对边=height/2    邻边=z=?    tan15°=Math.tan(15*Math.PI/180)
 let bestDistance = (height / 2) / Math.tan((fov / 2) * Math.PI / 180)
 camera.position.z = bestDistance - (depth / 2) //这里 减(depth/2) 是因为，所计算的位置 是根据立方体中心(0,0,0)计算的（脑海中的三角函数图形的"对边"是(0,0,0)的y轴那条线）。所以为了获得最佳效果，这里 减了(depth/2)
-
 
 
 
@@ -150,6 +206,16 @@ function animation() {
 
 
     qiuTi_cube.rotateY(0.01) //让球体自转。等效qiuTi_cube.rotation.y += 0.01
+
+
+    //移动小星星
+    for (let i = 0; i < stars.length; i++) {
+        if (stars[i].position.z > (depth / 2)) {
+            stars[i].position.setZ(-(depth / 2))
+        } else {
+            stars[i].position.z += 3
+        }
+    }
 
 
 
