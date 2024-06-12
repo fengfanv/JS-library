@@ -23,7 +23,7 @@ const image_logo = new URL('../assets/logo.png', import.meta.url).href
 
 //创建一个“点”
 const geometry = new THREE.BufferGeometry()
-const vertices = [0, 0, 0] //定义 几何体 形状的坐标数据(这里这个坐标数据，是专门用来定义几何体形状的。当“物体”被添加到“场景”里后，会初始化“物体”在“场景”中位置为(0,0,0)，所以如果要修改“物体”在“场景”中的位置，请调用point.position.set(1, 2, 1)方法。不要在这里定义“物体”在“场景”中的位置)
+const vertices = [0, 0, 0] //定义 几何体 形状的坐标数据(这里这个坐标数据，是专门用来定义几何体形状的)（注意，不要在这里设置物体在场景中的位置）（当“物体”被添加到“场景”里后，会初始化“物体”在“场景”中位置(position)为(0,0,0)，所以如果要修改“物体”在“场景”中的位置，请使用point.position.set(1, 2, 1)方法）
 geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3))
 //创建“点材质”。给“点”这种特殊物体添加皮肤，需要使用特殊的“点材质”
 const material = new THREE.PointsMaterial({

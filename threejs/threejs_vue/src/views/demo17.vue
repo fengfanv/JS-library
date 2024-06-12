@@ -44,8 +44,8 @@ scene.add(liFangTi_cube) //将“物体”添加到“场景”里
 
 //创建一个球体
 let radius = 50 //半径
-let widthSegments = 64 //几个经线（竖线是经线，连接南北极的是经线）
-let heightSegments = 32 //几个纬线（横线是纬线）横纬竖经
+let widthSegments = 64 //球体有几个经线（竖线是经线，连接南北极的是经线）
+let heightSegments = 32 //球体有几个纬线（横线是纬线）横纬竖经
 const qiuTi = new THREE.SphereGeometry(radius, widthSegments, heightSegments)
 //为 几何体 创建一个材质(外观)(为 几何体 创建一个皮肤)
 let qiuTi_image = new URL('../assets/earth_bg.png', import.meta.url).href
@@ -76,12 +76,11 @@ group.add(qiuTi_cube)
 group.add(ambientLight)
 group.add(pointLight)
 scene.add(group) //将“分组”添加到“场景”里
-//根据 立方体大小 动态设置组的位置
+//根据 “上边立方体的大小” 动态设置组的位置
 let group_x = -(width / 2) * (40 / 100)
 let group_y = (height / 2) * (40 / 100)
 let group_z = -(depth / 2) * (50 / 100)
 group.position.set(group_x, group_y, group_z) //修改 分组 在 场景 中的位置
-
 
 
 
@@ -98,7 +97,7 @@ let color2 = [0, 0, 1]
 function createStar(image, size, color, x, y, z) {
     //创建一个“点”
     const geometry = new THREE.BufferGeometry()
-    const vertices = [0, 0, 0] //定义 几何体 形状的坐标数据(这里这个坐标数据，是专门用来定义几何体形状的。当“物体”被添加到“场景”里后，会初始化“物体”在“场景”中位置为(0,0,0)，所以如果要修改“物体”在“场景”中的位置，请调用point.position.set(1, 2, 1)方法。不要在这里定义“物体”在“场景”中的位置)
+    const vertices = [0, 0, 0] //定义 几何体 形状的坐标数据(这里这个坐标数据，是专门用来定义几何体形状的)（注意，不要在这里设置物体在场景中的位置）（当“物体”被添加到“场景”里后，会初始化“物体”在“场景”中位置(position)为(0,0,0)，所以如果要修改“物体”在“场景”中的位置，请使用point.position.set(1, 2, 1)方法）
     geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3))
     //创建“点材质”。给“点”这种特殊物体添加皮肤，需要使用特殊的“点材质”
     const material = new THREE.PointsMaterial({
@@ -141,6 +140,41 @@ for (let i = 0; i < 1500; i++) {
 }
 
 
+
+
+
+//创建星云
+//创建一个平面几何体
+const pingMian = new THREE.PlaneGeometry(400, 200)
+//为 平面几何体 创建一个材质(外观)(为 平面几何体 创建一个皮肤)
+let pingMian_image = new URL('../assets/cloud.png', import.meta.url).href
+const material = new THREE.MeshBasicMaterial({
+    map: new THREE.TextureLoader().load(pingMian_image),
+    transparent: true
+})
+//利用网格，将 几何体 和 材质 拼接在一起，然后添加到场景中
+const xingYun = new THREE.Mesh(pingMian, material)
+xingYun.position.set(0, 0, 0) //设置 几何体 在场景中的位置
+scene.add(xingYun) //将“物体”添加到“场景”里
+
+
+
+
+//让星云曲线运动
+let route = new THREE.CatmullRomCurve3([
+    new THREE.Vector3(0, 0, -depth / 2),
+    new THREE.Vector3(-width / 2 / 2, height / 2 / 2, -depth / 2 / 2),
+    new THREE.Vector3(0, height / 2 / 2, -depth / 2 / 2 / 2),
+    new THREE.Vector3(width / 2 / 2, height / 2 / 2, -depth / 2 / 2 / 2 / 2),
+    new THREE.Vector3(0, 0, depth / 2)
+])
+let currentProcess = 0 //当前走到哪里了 0至1
+//将 星云运动路径 画出来
+const points = route.getPoints(50) //注意这里是getPoints    结尾有s
+const curve_geometry = new THREE.BufferGeometry().setFromPoints(points)
+const curve_material = new THREE.LineBasicMaterial({ color: 0xff0000 })
+const curve = new THREE.Line(curve_geometry, curve_material)
+scene.add(curve) //将“曲线”添加到“场景”里
 
 
 
@@ -198,29 +232,91 @@ renderer.render(scene, camera)
 
 
 
+//requestAnimationFrame每秒执行120次（运行120次需要1秒钟时间）
+//星星颜色发生变化，从蓝到黄，(值范围：0到1)，需要5秒
+let chunk_value = 1 / (120 * 5)
+let direction = 'add' //add/reduce
+
+
+
+
+
+//计算fps
+let lastTime = 0;
+let frameCount = 0;
+let secondPassed = 0;
+
 //实时绘制，相机所看到的画面
 function animation() {
-    requestAnimationFrame(animation)
+
+    //计算fps
+    const now = performance.now();
+    frameCount++;
+    if (now - lastTime >= 1000) { //如果已经过去1秒
+        const fps = frameCount / (now - lastTime) * 1000; //计算每秒的帧数
+        console.log(`FPS: ${fps.toFixed(2)}`);
+        frameCount = 0;
+        secondPassed++;
+
+        lastTime = now;
+    }
+
+
 
     controls.update() //当鼠标在页面上移动、滑动操作的时候，实时调用“轨道控制器”的“更新”方法，来刷新(更新)相机视角
+
 
 
     qiuTi_cube.rotateY(0.01) //让球体自转。等效qiuTi_cube.rotation.y += 0.01
 
 
-    //移动小星星
+
     for (let i = 0; i < stars.length; i++) {
+
+        //移动小星星
         if (stars[i].position.z > (depth / 2)) {
             stars[i].position.setZ(-(depth / 2))
         } else {
             stars[i].position.z += 3
         }
+
+        //让星星颜色发生变化
+        let itemRGB = stars[i].material.color
+        if (direction == 'add') {
+            stars[i].material.color.setRGB(itemRGB.r, itemRGB.g, itemRGB.b + chunk_value)
+            if (itemRGB.b >= 1) {
+                direction = 'reduce'
+            }
+        } else {
+            stars[i].material.color.setRGB(itemRGB.r, itemRGB.g, itemRGB.b - chunk_value)
+            if (itemRGB.b <= 0) {
+                direction = 'add'
+            }
+        }
+    }
+
+
+    //让星云曲线运动
+    if (currentProcess <= 1) {
+        currentProcess += 0.001
+        const point = route.getPoint(currentProcess) //注意这里是getPoint    结尾没有s
+        if (point) {
+            xingYun.position.set(point.x, point.y, point.z)
+        }
+    } else {
+        currentProcess = 0
     }
 
 
 
+    
     //将相机所观察到的 画面，画到canvas上
     renderer.render(scene, camera)
+
+
+
+
+    requestAnimationFrame(animation)
 }
 animation()
 
