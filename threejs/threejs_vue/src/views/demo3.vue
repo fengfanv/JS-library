@@ -8,7 +8,7 @@
 import { onMounted } from 'vue'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js' //引入轨道控制器
-import dat from 'dat.gui'
+import dat from 'dat.gui' //npm install dat.gui
 
 
 
