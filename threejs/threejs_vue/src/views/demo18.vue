@@ -127,35 +127,35 @@ const scene = new THREE.Scene()
 
 
 
-// import { FontLoader } from 'three/addons/loaders/FontLoader.js' //引入json字体加载器
-// import { TextGeometry } from 'three/addons/geometries/TextGeometry.js' //文本缓冲几何体。需要单独引入
-// const fontPath = new URL('../assets/Alimama_DaoLiTi_Regular.json', import.meta.url).href //json字体文件路径
-// //加载json字体
-// new FontLoader().load(fontPath, (font) => {
+import { FontLoader } from 'three/addons/loaders/FontLoader.js' //引入json字体加载器
+import { TextGeometry } from 'three/addons/geometries/TextGeometry.js' //文本缓冲几何体。需要单独引入
+const fontPath = new URL('../assets/Alimama_DaoLiTi_Regular.json', import.meta.url).href //json字体文件路径
+//加载json字体
+new FontLoader().load(fontPath, (font) => {
 
-//     let textArr = '绿水青山就是金山银山'.split('') || []
-//     for (let i = 0; i < textArr.length; i++) {
+    let textArr = '绿水青山就是金山银山'.split('') || []
+    for (let i = 0; i < textArr.length; i++) {
 
-//         const r = 3
-//         const rad = ((360 * Math.PI / 180) / textArr.length) * i //弧度 （角度转弧度）
-//         const x = Math.cos(rad) * r //cosθ=邻/斜    邻=cosθ*斜    斜=邻/cosθ    斜=r    cosθ=Math.cos(rad)     邻=x=？
-//         const y = Math.sin(rad) * r //sinθ=对/斜    对=sinθ*斜    斜=对/sinθ    斜=r    sinθ=Math.sin(rad)     对=y=？
+        const r = 3
+        const rad = ((360 * Math.PI / 180) / textArr.length) * i //弧度 （角度转弧度）
+        const x = Math.cos(rad) * r //cosθ=邻/斜    邻=cosθ*斜    斜=邻/cosθ    斜=r    cosθ=Math.cos(rad)     邻=x=？
+        const y = Math.sin(rad) * r //sinθ=对/斜    对=sinθ*斜    斜=对/sinθ    斜=r    sinθ=Math.sin(rad)     对=y=？
 
-//         const textGeometry = new TextGeometry(textArr[i], {
-//             font: font,
-//             size: 0.8,
-//             depth: 0.5
-//         })
-//         textGeometry.center() //让文字居中
-//         const text = new THREE.Mesh(textGeometry)
+        const textGeometry = new TextGeometry(textArr[i], {
+            font: font,
+            size: 0.8,
+            depth: 0.5
+        })
+        textGeometry.center() //让文字居中
+        const text = new THREE.Mesh(textGeometry)
 
-//         text.position.set(x, y, 0)
-//         text.rotation.z = rad - (90 * Math.PI / 180)
+        text.position.set(x, y, 0)
+        text.rotation.z = rad - (90 * Math.PI / 180)
 
-//         scene.add(text) //将文字添加到场景里
-//     }
+        scene.add(text) //将文字添加到场景里
+    }
 
-// })
+})
 
 
 

@@ -11,8 +11,10 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js' //引入�
 
 
 
+
 let width = window.innerWidth
 let height = window.innerHeight
+
 
 
 
@@ -39,14 +41,8 @@ const dq_material = new THREE.MeshBasicMaterial({
     map: new THREE.TextureLoader().load(dq_image),
 })
 const dq = new THREE.Mesh(dq_geometry, dq_material)
-dq.rotation.y = 149.5 * (Math.PI / 180)
 scene.add(dq)
-
-
-
-
-
-
+dq.rotation.y = 150.5 * (Math.PI / 180) //让地球自己旋转一下，来对应贴图上的经纬度
 
 
 
@@ -55,16 +51,14 @@ scene.add(dq)
 
 
 /**
-*经纬度 转 3D空间坐标
-*lon:经度
-*lat:纬度
-*radius:球体半径
+* 经纬度转3D空间坐标
+* lon 经度
+* lat 纬度
+* radius 球体半径
 */
 //注意，这个方法仅供在threejs里使用
-//经纬度转3D空间坐标。涉及xyz坐标轴方向(视角)问题。由于坐标轴方向(视角)不一样，地球的经纬度 和 threejs里球体的经纬度 并不对应。
-//threejs里，z轴是前后，x是左右，y是上下，
-//其它软件里，z是上下
-//注意2，如果不听劝阻，将此方法用于其它软件里，则会出现 “纬度变 经度不变 的问题(经纬度 与 对应的xyz轴混淆 问题)”
+//经纬度转3D空间坐标。涉及xyz坐标轴方向(视角)问题。threejs里，z轴是前后，x是左右，y是上下。其它软件里，z是上下，x是左右，y是前后。
+//其它软件里，请自行搜索，相关“经纬度转3D空间坐标”方法
 function lglt2xyz(lon, lat, radius) {
 
     //https://juejin.cn/post/6977125921048231972 民间
@@ -83,68 +77,141 @@ function lglt2xyz(lon, lat, radius) {
 }
 
 
-// //北京经纬度
-// let lon = 116.39724214611238  //经度
-// let lat = 39.908267064866955  //纬度
+
+
+
+
+
+//北京经纬度
+let lon = 116.55407278276036  //经度
+let lat = 39.89250177349417  //纬度
 
 // //乌鲁木齐
-// let lon = 87.4061103  //经度
-// let lat = 43.4695655  //纬度
+// let lon = 87.6231971294296  //经度
+// let lat = 43.83155867874312  //纬度
 
-//纽约
-let lon = -73.754968  //经度
-let lat = 42.6511674  //纬度
+// //纽约
+// let lon = -73.87991253324408  //经度
+// let lat = 40.85487031970448  //纬度
 
+// //悉尼
+// let lon = 151.205774  //经度
+// let lat = -33.885642  //纬度
 
+//将经纬度转成3D空间坐标
 const { x, y, z } = lglt2xyz(lon, lat, radius)
 
-//小球
-const xq_geometry = new THREE.SphereGeometry(0.1)
-const xq_material = new THREE.MeshBasicMaterial({
-    color: 0x000000
-})
-const xq = new THREE.Mesh(xq_geometry, xq_material)
-xq.position.set(x, y, z)
+
+
+
+
+//创建一个小球
+const xq_size = 2 //小球大小
+const xq = new THREE.Mesh(
+    new THREE.SphereGeometry(xq_size),
+    new THREE.MeshBasicMaterial({
+        color: 0x000000
+    })
+)
 scene.add(xq)
+xq.position.set(x, y, z) //设置小球位置
 
 
 
 
 
+//创建一个柱子
+const zhuzi = new THREE.Mesh(
+    new THREE.BoxGeometry(0.5, 0.5, 200),
+    new THREE.MeshBasicMaterial({ color: 0xFF0000 })
+)
+const zhuziGroup = new THREE.Group()
+zhuziGroup.add(zhuzi)
+scene.add(zhuziGroup)
+
+//让柱子指向3D空间坐标（让柱子指向小球）
+//让柱子上下摆动（纬度变化）（横纬竖经，lat纬度，lon经度）
+//参考图片“柱子_上下摆动.png”
+function rotationLat() {
+
+    //三角函数 sinθ=对/斜    对=sinθ*斜    斜=对/sinθ
+
+    //对边=y    斜边=radius
+
+    let sinθ = y / radius
+
+    let rad = Math.asin(sinθ) //反三角函数     Math.asin(sinθ)此方法需传入sin值，然后此方法返回(弧度值)
+
+    let deg = rad * (180 / Math.PI) //弧度转角度
 
 
-// //创建一个柱子
-// const zhuzi = new THREE.Mesh(
-//     new THREE.BoxGeometry(0.5, 0.5, 200),
-//     new THREE.MeshBasicMaterial({ color: 0xFF0000 })
-// )
-// const zhuziGroup = new THREE.Group()
-// zhuziGroup.add(zhuzi)
-// scene.add(zhuziGroup)
+    zhuzi.rotation.x = -rad
+}
+rotationLat()
 
 
+//让柱子左右摆动（经度变化）（横纬竖经，lat纬度，lon经度）
+//参考图片“柱子_左右摆动_1.png”
+//参考图片“柱子_左右摆动_2.png”
+function rotationLon() {
 
-// //三角函数 cosθ=邻/斜    邻=cosθ*斜    斜=邻/cosθ
+    //判断坐标在第几象限
+    function getQuadrant(x, y) {
+        if (x > 0 && y > 0) {
+            return 1
+        } else if (x < 0 && y > 0) {
+            return 2
+        } else if (x < 0 && y < 0) {
+            return 3
+        } else {
+            return 4
+        }
+    }
 
-// //斜边=radius   邻边=a^2+b^2=c^2
+    //根据坐标象限来获取度数
+    function getDeg(x, y) {
 
-// let value = Math.abs(Math.sqrt((x * x) + (z * z)))
+        //三角函数 sinθ=对/斜    对=sinθ*斜    斜=对/sinθ
 
-// let cosθ = value / radius
+        var quadrant = getQuadrant(x, y)
 
-// let rad = Math.acos(cosθ) //反三角函数     Math.acos(cosθ)此方法需传入cos值，然后此方法返回(弧度值)
+        var opposite //对边
+        if (quadrant == 1) {
+            opposite = y
+        } else if (quadrant == 2) {
+            opposite = y
+        } else if (quadrant == 3) {
+            opposite = x
+        } else {
+            opposite = y
+        }
 
-// let deg = rad * (180 / Math.PI) //弧度转角度
+        var oblique = Math.abs(Math.sqrt((x * x) + (y * y))) //斜边     a^2+b^2=c^2
 
-// console.log(value, radius, cosθ, rad, deg)
+        var sinθ = opposite / oblique
 
-// zhuzi.rotation.x = rad
+        var rad = Math.asin(sinθ)
 
-// // zhuziGroup.rotation.y = -124 * (Math.PI / 180) //角度转弧度
+        var deg = rad * (180 / Math.PI)
+
+        deg = Math.abs(deg)
+
+        if (quadrant == 1) {
+            return deg
+        } else if (quadrant == 2) {
+            return 180 - deg
+        } else if (quadrant == 3) {
+            return 270 - deg
+        } else {
+            return 360 - deg
+        }
+    }
 
 
-
-
+    var deg = getDeg(x, z)
+    zhuziGroup.rotation.y = (90 + (-deg)) * (Math.PI / 180) //这里为啥要操作“组”旋转，详细请看“demo10.vue”
+}
+rotationLon()
 
 
 
