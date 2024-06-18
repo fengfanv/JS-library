@@ -28,51 +28,34 @@ scene.background = new THREE.Color(0x666666) //将“场景”的背景色，从
 
 
 
-//创建一个“环境光”
-const light = new THREE.AmbientLight(0xffffff, 2) //0xffffff是光的颜色   2是光的强度
-scene.add(light)
+//生成一条曲线路径
+let curve = new THREE.CatmullRomCurve3([
+    new THREE.Vector3(0, 0, 0),
+    new THREE.Vector3(10, 0, 0),
+    new THREE.Vector3(10, 0, 10),
+    new THREE.Vector3(10, 10, 10),
+    new THREE.Vector3(5, 10, 5),
+    new THREE.Vector3(0, 0, 10)
+])
 
+//基于上面的曲线路径，创建一个管状几何体
+let tubeGeometry = new THREE.TubeGeometry(curve, 80, 0.1)
 
+//加载一个图片作为纹理
+let image = new URL('../assets/route_line.png', import.meta.url).href
+let texture = new THREE.TextureLoader().load(image)
 
+texture.wrapS = texture.wrapT = THREE.RepeatWrapping //设置纹理的环绕方式为重复
 
-
-
-//创建一个地球
-let radius = 50 //半径
-let widthSegments = 960 //球体有几个经线（竖线是经线，连接南北极的是经线）
-let heightSegments = 960 //球体有几个纬线（横线是纬线）横纬竖经
-const dq_geometry = new THREE.SphereGeometry(radius, widthSegments, heightSegments)
-let dq_image = new URL('../assets/world.topoea-4.jpg', import.meta.url).href //地球背景贴图
-let zh_image = new URL('../assets/srtm_ramp.ea-3.jpg', import.meta.url).href //地形(置换贴图/位移贴图)
-const dq_material = new THREE.MeshStandardMaterial({
-    map: new THREE.TextureLoader().load(dq_image),
-
-    displacementMap: new THREE.TextureLoader().load(zh_image),
-    displacementScale: 3,//位移贴图对网格的影响程度(黑色是无位移，白色是最大位移)
-    displacementBias: 0,//位移贴图在网格顶点上的偏移量
-})
-const dq = new THREE.Mesh(dq_geometry, dq_material)
-scene.add(dq)
-
-
-
-
-
-
-//创建云层
-let cloud_radius = 53 //半径
-let cloud_widthSegments = 64 //球体有几个经线（竖线是经线，连接南北极的是经线）
-let cloud_heightSegments = 32 //球体有几个纬线（横线是纬线）横纬竖经
-const cloud_geometry = new THREE.SphereGeometry(cloud_radius, cloud_widthSegments, cloud_heightSegments)
-let cloud_image = new URL('../assets/clouds_ea-1.png', import.meta.url).href //云层贴图
-const cloud_material = new THREE.MeshStandardMaterial({
-    map: new THREE.TextureLoader().load(cloud_image),
-
-    transparent: true,
+let material = new THREE.MeshBasicMaterial({
+    map: texture,
     side: THREE.DoubleSide,
+    transparent: true
 })
-const cloud = new THREE.Mesh(cloud_geometry, cloud_material)
-scene.add(cloud)
+
+let mesh = new THREE.Mesh(tubeGeometry, material)
+scene.add(mesh)
+
 
 
 
@@ -87,8 +70,8 @@ let near = 1 //相机可视范围最小值
 let far = 30000 //相机可视范围最大值(相机最远能看多远)
 const camera = new THREE.PerspectiveCamera(fov, aspect, near, far)
 //改变相机位置
-camera.position.z = 200 //这里为啥调整z轴位置，请看图片“three里xyz轴.png”
-camera.position.y = 30 //为了 能看出 立方体 是立体的，这里稍微抬高了一下相机的位置
+camera.position.z = 50 //这里为啥调整z轴位置，请看图片“three里xyz轴.png”
+camera.position.y = 10 //为了 能看出 立方体 是立体的，这里稍微抬高了一下相机的位置
 
 
 
@@ -146,10 +129,11 @@ function animation() {
 
 
 
-    cloud.rotation.y += 0.001 //让云层动起来
+
+    texture.offset.x -= 0.01 //让“道路流光动画”动起来
 
 
-    
+
     requestAnimationFrame(animation)
 }
 animation()

@@ -187,7 +187,7 @@ let near = 1 //相机可视范围最小值
 let far = 30000 //相机可视范围最大值(相机最远能看多远)
 const camera = new THREE.PerspectiveCamera(fov, aspect, near, far)
 camera.lookAt(0, 0, 0) //让相机看向某个"点"
-//计算 相机与立方体(立方体中心(0,0,0)) 二者之间的最佳距离
+//计算 相机与立方体(立方体中心(0,0,0)) 二者之间的最佳距离（参考图片：camera1.png、camera2.png、camera3.png）
 //三角函数 tanθ=对边/邻边    邻边=对边/tanθ    对边=tanθ*邻边    对边=height/2    邻边=z=?    tan15°=Math.tan(15*Math.PI/180)
 let bestDistance = (height / 2) / Math.tan((fov / 2) * Math.PI / 180)
 camera.position.z = bestDistance - (depth / 2) //这里 减(depth/2) 是因为，所计算的位置 是根据立方体中心(0,0,0)计算的（脑海中的三角函数图形的"对边"是(0,0,0)的y轴那条线）。所以为了获得最佳效果，这里 减了(depth/2)
