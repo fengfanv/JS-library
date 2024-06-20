@@ -1,7 +1,7 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
 
 const routes = [
-  { path: '/', redirect: '/demo25' },
+  { path: '/', redirect: '/demo26' },
   {
     path: '/demo1',
     name: 'demo1',
@@ -126,6 +126,11 @@ const routes = [
     path: '/demo25',
     name: 'demo25',
     component: () => import('../views/demo25.vue')
+  },
+  {
+    path: '/demo26',
+    name: 'demo26',
+    component: () => import('../views/demo26.vue')
   }
 ]
 
