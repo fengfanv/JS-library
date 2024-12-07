@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>人脸检测demo</title>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+        }
+
+        #box {
+            position: relative;
+        }
+
+        #canvas {
+            position: absolute;
+            left: 0;
+            top: 0;
+            z-index: 999;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="box">
+        <img src="./face_database/face_test.png" id="face_test_img">
+        <img src="./face_database/哈利·波特/1.png" id="face_test_img_1">
+        <img src="./face_database/哈利·波特/2.png" id="face_test_img_2">
+    </div>
+
+    <script src="./js/face-api.js"></script>
+    <script>
+        //加载模型
+        // ssdMobilenetv1   Google开源AI算法除库包含分类和线性回归
+        // tinyFaceDetector 比Google的mobilenet更轻量级，速度更快一点
+        // tinyYolov2   识别身体轮廓的算法
+        // mtcnn    多任务CNN算法
+        // faceLandmark68Net    识别脸部特征用于mobilenet算法
+        // faceLandmark68TinyNet    识别脸部特征用于tiny算法
+        // faceRecognitionNet   识别人脸
+        // faceExpressionNet    识别表情,开心，沮丧
+        // ageGenderNet 识别性别和年龄
+        Promise.all([
+            faceapi.nets.ssdMobilenetv1.loadFromUri('./weights'),
+            // faceapi.nets.tinyFaceDetector.loadFromUri('./weights'),
+            // faceapi.nets.tinyYolov2.loadFromUri('./weights'),
+            // faceapi.nets.mtcnn.loadFromUri('./weights'),
+            faceapi.nets.faceLandmark68Net.loadFromUri('./weights'),
+            // faceapi.nets.faceLandmark68TinyNet.loadFromUri('./weights'),
+            faceapi.nets.faceRecognitionNet.loadFromUri('./weights'),
+            // faceapi.nets.faceExpressionNet.loadFromUri('./weights'),
+            // faceapi.nets.ageGenderNet.loadFromUri('./weights'),
+        ]).then(async () => {
+            console.log('模型加载完毕！')
+
+            //从图片内获取人脸图片和特征
+            function getFaceImg(imgDom) {
+                return new Promise(async (resolve, reject) => {
+                    const results = await faceapi.detectAllFaces(imgDom, new faceapi.SsdMobilenetv1Options()).withFaceLandmarks()
+                        .withFaceDescriptors() //获取图片内所有人脸(位置，特征)
+
+                    const list = [];
+                    for (let i = 0; i < results.length; i++) {
+                        let fd = results[i];
+                        // console.log(fd)
+                        const box = fd.detection.box //人脸位置
+                        let imgData = await faceapi.extractFaces(imgDom, [new faceapi.Rect(box.x, box.y, box.width, box.height)])
+                        imgData = imgData[0].toDataURL('image/jpeg', 1)
+                        // console.log(imgData)
+                        list.push({
+                            img: imgData,
+                            descriptor: fd.descriptor
+                        })
+                    }
+                    resolve(list)
+                })
+            }
+
+            let list = []
+            getFaceImg(document.getElementById('face_test_img')).then((res) => {
+                list = list.concat(res)
+                return getFaceImg(document.getElementById('face_test_img_1'))
+            }).then((res) => {
+                list = list.concat(res)
+                return getFaceImg(document.getElementById('face_test_img_2'))
+            }).then((res) => {
+                list = list.concat(res)
+
+                console.log(list)
+
+                let compareList = [];
+                for (let i = 0; i < list.length - 1; i++) {
+                    for (let j = i + 1; j < list.length; j++) {
+                        compareList.push({ a: list[i], b: list[j], c: '', d: [i, j].join() })
+                    }
+                }
+
+                for (let i = 0; i < compareList.length; i++) {
+                    const threshold = 0.6;
+                    const distance = faceapi.euclideanDistance(compareList[i].a.descriptor, compareList[i].b.descriptor); //计算两张人脸特征点的欧几里得距离
+                    compareList[i].c = distance > threshold ? `${distance.toFixed(2)} (不匹配)` : `${distance.toFixed(2)} (匹配)`; //根据阈值判断是否匹配
+                }
+
+                console.log(compareList)
+
+                for (let i = 0; i < compareList.length; i++) {
+
+                    let f_div = document.createElement('div');
+                    f_div.setAttribute('style', 'margin-bottom:20px;');
+
+                    let a_img = document.createElement('img');
+                    a_img.setAttribute('style', 'width:100px;');
+                    a_img.src = compareList[i].a.img;
+
+                    let b_img = document.createElement('img');
+                    b_img.setAttribute('style', 'width:100px;');
+                    b_img.src = compareList[i].b.img;
+
+                    let c = document.createElement('p');
+                    c.setAttribute('style', 'width:100%;');
+                    c.innerText = compareList[i].c + ' ' + compareList[i].d;
+
+                    f_div.appendChild(a_img)
+                    f_div.appendChild(b_img)
+                    f_div.appendChild(c)
+
+                    document.body.appendChild(f_div)
+                }
+
+
+
+
+            })
+
+        }).catch((err) => {
+            console.error(err)
+        })
+
+        //https://www.cnblogs.com/neozhu/p/11771148.html
+        //https://github.com/justadudewhohacks/face-api.js
+    </script>
+</body>
+
+</html>

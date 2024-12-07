@@ -1,0 +1,23 @@
+[
+  {
+    "label": "哈利·波特",
+    "image": [
+      "/face_database/哈利·波特/1.png",
+      "/face_database/哈利·波特/2.png"
+    ]
+  },
+  {
+    "label": "赫敏·格兰杰",
+    "image": [
+      "/face_database/赫敏·格兰杰/1.png",
+      "/face_database/赫敏·格兰杰/2.png"
+    ]
+  },
+  {
+    "label": "罗恩·韦斯莱",
+    "image": [
+      "/face_database/罗恩·韦斯莱/1.png",
+      "/face_database/罗恩·韦斯莱/2.png"
+    ]
+  }
+]

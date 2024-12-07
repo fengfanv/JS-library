@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>人脸检测demo</title>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+        }
+
+        #box {
+            position: relative;
+        }
+
+        #canvas {
+            position: absolute;
+            left: 0;
+            top: 0;
+            z-index: 999;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="box">
+        <img src="./face_database/face_test.png" id="face_test_img">
+        <canvas id="canvas"></canvas>
+    </div>
+
+    <script src="./js/face-api.js"></script>
+    <script src="./js/tf.min.js"></script>
+    <script>
+        //加载模型
+        // ssdMobilenetv1   Google开源AI算法除库包含分类和线性回归
+        // tinyFaceDetector 比Google的mobilenet更轻量级，速度更快一点
+        // tinyYolov2   识别身体轮廓的算法
+        // mtcnn    多任务CNN算法
+        // faceLandmark68Net    识别脸部特征用于mobilenet算法
+        // faceLandmark68TinyNet    识别脸部特征用于tiny算法
+        // faceRecognitionNet   识别人脸
+        // faceExpressionNet    识别表情,开心，沮丧
+        // ageGenderNet 识别性别和年龄
+
+        async function loadModel(manifest_url) {
+            //读取JSON文件
+            const response = await fetch(manifest_url);
+            const manifest = await response.json();
+
+            //处理二进制文件地址
+            let _url = manifest_url.slice(0, manifest_url.lastIndexOf('/'))
+            let weight_url_arr = manifest[0].paths.map((name) => {
+                return `${_url}/${name}`;
+            });
+            manifest[0].paths = weight_url_arr;
+
+            //使用tf加载模型数据(返回一个模型weightMap数据)
+            return await tf.io.loadWeights(manifest)
+        }
+
+
+
+        // loadModel('./weights/ssd_mobilenetv1_model-weights_manifest.json').then(async (weightMap) => {
+        //     console.log(weightMap)
+
+        //     if (confirm("将模型数据保存成weightMap.json？")) {
+        //         //创建一个对象来存储可序列化的数据
+        //         let weightMapForJSON = {};
+
+        //         //遍历每个张量
+        //         for (let key in weightMap) {
+        //             if (weightMap.hasOwnProperty(key)) {
+        //                 let tensor = weightMap[key];
+
+        //                 //获取张量的元数据（dtype、shape等）
+        //                 let tensorData = {
+        //                     dtype: tensor.dtype,
+        //                     shape: tensor.shape,
+        //                     data: Array.from(tensor.dataSync()) //转换数据为数组
+        //                 };
+
+        //                 //将数据存储到新对象中
+        //                 weightMapForJSON[key] = tensorData;
+        //             }
+        //         }
+
+        //         //将weightMapForJSON对象转化为JSON字符串
+        //         let jsonString = JSON.stringify(weightMapForJSON);
+        //         console.log(weightMapForJSON)
+
+        //         //保存JSON字符串到文件
+        //         const blob = new Blob([jsonString], { type: 'application/json' });
+        //         const link = document.createElement('a');
+        //         link.href = URL.createObjectURL(blob);
+        //         link.download = 'weightMap.json';
+        //         link.click();
+        //     }
+
+        //     //通过WeightMap方式加载模型参数
+        //     return await faceapi.nets.ssdMobilenetv1.loadFromWeightMap(weightMap)
+        // })
+
+        // //-----------------------------
+
+        //根据刚刚保存的weightMap.json来加载模型
+        fetch('./weightMap/weightMap.json').then(async (res) => {
+            let json_data = await res.json();
+            // console.log(json_data)
+
+            for (let key in json_data) {
+                if (json_data.hasOwnProperty(key)) {
+                    let item = json_data[key];
+                    //将数据转成tensorflow数据
+                    json_data[key] = tf.tensor(item.data, item.shape, item.dtype)
+                }
+            }
+
+            //通过WeightMap方式加载模型参数
+            return await faceapi.nets.ssdMobilenetv1.loadFromWeightMap(json_data)
+        })
+
+            .then(async () => {
+                console.log('模型加载完毕！')
+
+                let imgDom = document.getElementById('face_test_img'); //待检测的图片
+                let canvasDom = document.getElementById('canvas'); //用于展示检测结果
+                canvasDom.width = imgDom.width;
+                canvasDom.height = imgDom.height;
+
+                //------------------------------------------------------------
+                //------------------------------------------------------------
+                //------------------------------------------------------------
+                //------------------------------------------------------------
+
+                console.time('耗时')
+                //(检测图片内所有人脸)（获取图片内 人脸位置）
+                const results = await faceapi
+                    // .detectAllFaces(imgDom, new faceapi.TinyFaceDetectorOptions())
+                    .detectAllFaces(imgDom, new faceapi.SsdMobilenetv1Options())
+
+                //在canvas上显示人脸检测框
+                const displaySize = { width: imgDom.width, height: imgDom.height }
+                const resizedDetections = faceapi.resizeResults(results, displaySize)
+
+                resizedDetections.forEach((fd, i) => {
+                    //显示人脸框
+                    const box = fd.box
+                    const drawBox = new faceapi.draw.DrawBox(box, { label: i + 1 })
+                    drawBox.draw(canvasDom)
+                })
+                console.timeEnd('耗时')
+
+            }).catch((err) => {
+                console.error(err)
+            })
+
+        //https://www.cnblogs.com/neozhu/p/11771148.html
+        //https://github.com/justadudewhohacks/face-api.js
+        //https://www.tensorflow.org/js?hl=zh-cn
+        //https://www.jsdelivr.com/package/npm/@tensorflow/tfjs
+    </script>
+</body>
+
+</html>

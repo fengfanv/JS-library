@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>人脸匹配demo</title>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+        }
+
+        #box {
+            position: relative;
+        }
+
+        #canvas {
+            position: absolute;
+            left: 0;
+            top: 0;
+            z-index: 999;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="box">
+        <video src="./face_database/face_test.mp4" id="face_test_video" controls></video>
+        <canvas id="canvas"></canvas>
+    </div>
+
+    <script src="./js/face-api.js"></script>
+    <script>
+        //加载模型
+        // ssdMobilenetv1   Google开源AI算法除库包含分类和线性回归
+        // tinyFaceDetector 比Google的mobilenet更轻量级，速度更快一点
+        // tinyYolov2   识别身体轮廓的算法
+        // mtcnn    多任务CNN算法
+        // faceLandmark68Net    识别脸部特征用于mobilenet算法
+        // faceLandmark68TinyNet    识别脸部特征用于tiny算法
+        // faceRecognitionNet   识别人脸
+        // faceExpressionNet    识别表情,开心，沮丧
+        // ageGenderNet 识别性别和年龄
+        Promise.all([
+            faceapi.nets.ssdMobilenetv1.loadFromUri('./weights'),
+            faceapi.nets.tinyFaceDetector.loadFromUri('./weights'),
+            faceapi.nets.tinyYolov2.loadFromUri('./weights'),
+            faceapi.nets.mtcnn.loadFromUri('./weights'),
+            faceapi.nets.faceLandmark68Net.loadFromUri('./weights'),
+            faceapi.nets.faceLandmark68TinyNet.loadFromUri('./weights'),
+            faceapi.nets.faceRecognitionNet.loadFromUri('./weights'),
+            faceapi.nets.faceExpressionNet.loadFromUri('./weights'),
+            faceapi.nets.ageGenderNet.loadFromUri('./weights'),
+        ]).then(async () => {
+            console.log('模型加载完毕！')
+
+            //加载人脸数据库
+            let face_database = await fetch('./face_database/index.json')
+            face_database = await face_database.json()
+            // console.log(face_database)
+            const labeledDescriptors = []
+            for (let i = 0; i < face_database.length; i++) {
+                let peopleItem = face_database[i];
+                for (let j = 0; j < peopleItem.image.length; j++) {
+                    peopleItem.image[j] = await faceapi.fetchImage(location.origin + peopleItem.image[j]) //加载图片
+                    const result = await faceapi.detectSingleFace(peopleItem.image[j]).withFaceLandmarks().withFaceDescriptor() //计算人脸特征描述符(检测单个人脸)
+                    // console.log(result)
+                    // const results = await faceapi.detectAllFaces(peopleItem.image[j]).withFaceLandmarks().withFaceDescriptors() //计算人脸特征描述符(检测所有(多个)人脸)
+                    // console.log(results)
+                    peopleItem.image[j] = result.descriptor
+                }
+                //人脸特征标签数据。人脸特征数据，和，(人名/标签)，进行关联
+                labeledDescriptors.push(new faceapi.LabeledFaceDescriptors(
+                    peopleItem.label,
+                    peopleItem.image
+                ))
+            }
+            // console.log(labeledDescriptors)
+            console.log('人脸数据库初始化完毕！')
+
+            //------------------------------------------------------------
+            //------------------------------------------------------------
+            //------------------------------------------------------------
+            //------------------------------------------------------------
+
+            let videoDom = document.getElementById('face_test_video'); //待检测的视频
+            let canvasDom = document.getElementById('canvas'); //用于展示检测结果
+            let canvasDom_ctx = canvasDom.getContext('2d');
+
+            //------------------------------------------------------------
+            //------------------------------------------------------------
+            //------------------------------------------------------------
+            //------------------------------------------------------------
+
+            //根据，人脸标签数据，创建一个，面部匹配器
+            const faceMatcher = new faceapi.FaceMatcher(labeledDescriptors);
+
+            //------------------------------------------------------------
+
+            let isCheck = false
+            const getVideoFrameCanvas = document.createElement('canvas');
+            const getVideoFrameCanvas_ctx = getVideoFrameCanvas.getContext('2d');
+
+            function videoPlay() {
+                canvasDom.width = videoDom.videoWidth;
+                canvasDom.height = videoDom.videoHeight;
+                getVideoFrameCanvas.width = videoDom.videoWidth;
+                getVideoFrameCanvas.height = videoDom.videoHeight;
+                isCheck = true
+                getVideoFrame()
+            }
+            function videoStop() {
+                isCheck = false
+            }
+            videoDom.onplay = videoPlay;
+            videoDom.onended = videoStop;
+            videoDom.onpause = videoStop;
+
+            async function getVideoFrame() {
+                getVideoFrameCanvas_ctx.drawImage(videoDom, 0, 0, videoDom.videoWidth, videoDom.videoHeight);
+
+                let base64Data = getVideoFrameCanvas.toDataURL('image/jpeg', 1); //图片格式为image/jpeg或image/webp时，可以设置图片质量(从0到1)
+
+                let imgDom = document.createElement('img')
+                imgDom.src = base64Data
+
+                const results = await faceapi
+                    .detectAllFaces(imgDom)
+                    .withFaceLandmarks()
+                    .withFaceDescriptors()
+
+                const resizedDetections = faceapi.resizeResults(results, { width: videoDom.videoWidth, height: videoDom.videoHeight })
+
+                canvasDom_ctx.clearRect(0, 0, canvasDom.width, canvasDom.height); //清空画布
+
+                //开始人脸匹配
+                results.forEach((fd, i) => {
+                    const bestMatch = faceMatcher.findBestMatch(fd.descriptor) //人脸匹配
+                    console.log(bestMatch) //打印人脸匹配结果
+
+                    //显示人脸框
+                    const box = resizedDetections[i].detection.box
+                    const drawBox = new faceapi.draw.DrawBox(box, { label: bestMatch.toString() })
+                    drawBox.draw(canvasDom)
+                })
+
+                if (isCheck) {
+                    getVideoFrame()
+                }
+            }
+            
+        }).catch((err) => {
+            console.error(err)
+        })
+
+        //https://www.cnblogs.com/neozhu/p/11771148.html
+        //https://github.com/justadudewhohacks/face-api.js
+    </script>
+</body>
+
+</html>

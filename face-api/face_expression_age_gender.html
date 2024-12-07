@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>人脸检测demo</title>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+        }
+
+        #box {
+            position: relative;
+        }
+
+        #canvas {
+            position: absolute;
+            left: 0;
+            top: 0;
+            z-index: 999;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="box">
+        <img src="./face_database/face_test.png" id="face_test_img">
+        <canvas id="canvas"></canvas>
+    </div>
+
+    <script src="./js/face-api.js"></script>
+    <script>
+        //加载模型
+        // ssdMobilenetv1   Google开源AI算法除库包含分类和线性回归
+        // tinyFaceDetector 比Google的mobilenet更轻量级，速度更快一点
+        // tinyYolov2   识别身体轮廓的算法
+        // mtcnn    多任务CNN算法
+        // faceLandmark68Net    识别脸部特征用于mobilenet算法
+        // faceLandmark68TinyNet    识别脸部特征用于tiny算法
+        // faceRecognitionNet   识别人脸
+        // faceExpressionNet    识别表情,开心，沮丧
+        // ageGenderNet 识别性别和年龄
+        Promise.all([
+            faceapi.nets.ssdMobilenetv1.loadFromUri('./weights'),
+            faceapi.nets.tinyFaceDetector.loadFromUri('./weights'),
+            // faceapi.nets.tinyYolov2.loadFromUri('./weights'),
+            // faceapi.nets.mtcnn.loadFromUri('./weights'),
+            faceapi.nets.faceLandmark68Net.loadFromUri('./weights'),
+            faceapi.nets.faceLandmark68TinyNet.loadFromUri('./weights'),
+            faceapi.nets.faceRecognitionNet.loadFromUri('./weights'),
+            faceapi.nets.faceExpressionNet.loadFromUri('./weights'),
+            faceapi.nets.ageGenderNet.loadFromUri('./weights'),
+        ]).then(async () => {
+            console.log('模型加载完毕！')
+
+            let imgDom = document.getElementById('face_test_img'); //待检测的图片
+            let canvasDom = document.getElementById('canvas'); //用于展示检测结果
+            canvasDom.width = imgDom.width;
+            canvasDom.height = imgDom.height;
+
+            //------------------------------------------------------------
+            //------------------------------------------------------------
+            //------------------------------------------------------------
+            //------------------------------------------------------------
+
+            console.time('耗时')
+            //(检测图片内所有人脸)（获取图片内 人脸位置）
+            const results = await faceapi
+                // .detectAllFaces(imgDom, new faceapi.TinyFaceDetectorOptions())
+                .detectAllFaces(imgDom, new faceapi.SsdMobilenetv1Options()).withFaceLandmarks().withFaceExpressions().withAgeAndGender().withFaceDescriptors()
+
+            //在canvas上显示人脸检测框
+            const displaySize = { width: imgDom.width, height: imgDom.height }
+            const resizedDetections = faceapi.resizeResults(results, displaySize)
+
+            // console.log(results)
+
+            resizedDetections.forEach((fd, i) => {
+                //显示人脸框
+                const box = fd.detection.box
+                const drawBox = new faceapi.draw.DrawBox(box, { label: `表情：${fd.expressions.asSortedArray()[0].expression}；年龄：${fd.age.toFixed(0)}；性别：${fd.gender}` })
+                drawBox.draw(canvasDom)
+            })
+            console.timeEnd('耗时')
+
+        }).catch((err) => {
+            console.error(err)
+        })
+
+        //https://www.cnblogs.com/neozhu/p/11771148.html
+        //https://github.com/justadudewhohacks/face-api.js
+    </script>
+</body>
+
+</html>
