@@ -7,14 +7,13 @@
     <title>Document</title>
 
     <style>
-        body{
-            background: black;
-        }
-
-
         * {
             margin: 0;
             padding: 0;
+        }
+
+        body {
+            background: black;
         }
 
         #videoTitle {
@@ -34,17 +33,14 @@
 <body>
     <h5 id="videoTitle">标题</h5>
     <!--旧版本，仅支持手机-->
-    
-    <!--
+    <!--     
     <video id="video" controls="controls" width="100%">
         <source id="video" src="" type="application/x-mpegURL">
-    </video>
-  
--->
+    </video> -->
 
-    
+
     <video id="video" controls="controls" width="100%" class="video-js vjs-big-play-centered"></video>
-    
+
 
     <script src="./jquery.js"></script>
 
@@ -73,28 +69,25 @@
             setTimeout(() => {
                 let title_text = index + '、' + title;
                 $('#videoTitle').html(title_text);
-                document.title = title_text;
-                //旧版本，仅支持手机
-                
-                //$('#video').attr('src', url);
-            
-                
-                var player = videojs('video');
-                var mediaType = 'application/x-mpegURL';
+                //document.title = title_text;
 
-                if(/.{0,}mp4$/.test(url)){
+                //旧版本，仅支持手机
+                //$('#video').attr('src', url);
+
+
+                let player = videojs('video');
+                let mediaType = 'application/x-mpegURL';
+
+                if (/.{0,}mp4$/.test(url)) {
                     mediaType = '';
-                    location.href=url;
+                    location.href = url;
                 }
                 player.src({
                     src: url,
                     type: mediaType
                 });
-                
-            }, 10)
 
-
-
+            })
         }
     </script>
 </body>
