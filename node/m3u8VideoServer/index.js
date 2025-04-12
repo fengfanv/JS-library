@@ -71,7 +71,7 @@ http.createServer(function (request, response) {
             }
         } else {
             let filetype = pathname.split('.')[1];
-            let MIME = undefined;
+            let MIME = null;
             if (filetype == 'html' || filetype == 'htm') {
                 MIME = 'text/html;'
             } else if (filetype == 'css') {
@@ -114,14 +114,16 @@ function getFileDir(objPath, callback) { //获取文件目录
         }
         fs.readdirSync(objPath).forEach(function (file) {
             var pathname = path.join(objPath, file);
-            if (fs.statSync(pathname).isDirectory()) {
+            const stats = fs.statSync(pathname);
+            if (stats.isDirectory()) {
                 //console.log('是文件夹');
             } else {
                 if (file.slice(file.length - 4) != '.zip') {
-                    arr.push({ "name": file, "path": file });
+                    arr.push({ "name": file, "path": file, createTime: stats.birthtime.getTime() });
                 }
             }
         });
+        arr = arr.sort((a, b) => a.createTime - b.createTime);
         callback && callback(arr);
     })
 }
@@ -180,7 +182,7 @@ function API_parseZip(req, response) {
     let data = querystring.parse(req.url.split('?')[1]);
     let objPath = path.join(__dirname, 'zip', data.path);
     let objSource = path.join(__dirname, 'zipSource', data.path);
-    let toDir = path.join(__dirname, ['public', 'cacheFile'].join(path.sep)); //解压到哪里
+    let toDir = path.join(__dirname, ['public', 'cacheFiles'].join(path.sep)); //解压到哪里
     parseZipFile(objPath, toDir, function (res) {
         response.end(JSON.stringify({
             "status": true,
