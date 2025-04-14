@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <button onclick="handleStart()">Start</button>
+    <button onclick="handleStop()">Stop</button>
+    <script>
+        var es = null;
+
+        //开始
+        function handleStart() {
+            es = new EventSource('http://localhost:3000/events');
+
+            es.onmessage = (e) => {
+                console.log('收到消息:', e.data);
+                document.body.innerHTML += `<p>${e.data}</p>`;
+            };
+
+            es.onerror = (err) => {
+                console.error('连接错误:', err);
+                handleStop(); //连接错误后，手动停止，防止自动重新连接
+            };
+        }
+
+        //停止
+        function handleStop() {
+            es.close();
+            es = null;
+        }
+
+        //Server-Sent Events 教程（阮一峰）
+        //https://www.ruanyifeng.com/blog/2017/05/server-sent_events.html
+    </script>
+</body>
+
+</html>
