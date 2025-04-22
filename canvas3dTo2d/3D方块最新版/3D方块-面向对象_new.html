@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D方块-面向对象</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            width: 100%;
+            height: 100vh;
+            background-color: antiquewhite;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        canvas {
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="canvas"></canvas>
+    <script>
+        class Painter {
+            canvasWidth = 500;
+            canvasHeight = 500;
+            canvas;
+            ctx;
+            canvasCenterX;
+            canvasCenterY;
+
+            //---------
+            //投影幕布（3D空间坐标，3D空间坐标y轴和canvas的y轴是相反的）
+            curtainPosition = { z: -300 };
+
+            //---------
+            //立方体（3D空间坐标，3D空间坐标y轴和canvas的y轴是相反的）
+            cubeCenterPosition = { x: 0, y: 0, z: 0 }; //这里立方体中心点位置 是3D空间的中心点
+            //立方体3D空间点
+            cube = [
+                { x: -50, y: 50, z: 50 }, //前面，左上角，点
+                { x: -50, y: -50, z: 50 }, //前面，左下角，点
+                { x: 50, y: -50, z: 50 }, //前面，右下角，点
+                { x: 50, y: 50, z: 50 }, //前面，右上角，点
+
+                { x: -50, y: 50, z: -50 }, //后面，左上角，点
+                { x: -50, y: -50, z: -50 }, //后面，左下角，点
+                { x: 50, y: -50, z: -50 }, //后面，右下角，点
+                { x: 50, y: 50, z: -50 }, //后面，右上角，点
+            ];
+            cubeLineGroup = [[0, 1], [0, 3], [0, 4], [1, 2], [1, 5], [2, 3], [2, 6], [3, 7], [4, 5], [5, 6], [6, 7], [7, 4]]; //一个立方体有12条线，4+4+4=12
+
+            //---------
+            //手电筒（3D空间坐标，3D空间坐标y轴和canvas的y轴是相反的）
+            flashlightPosition = { x: 0, y: 0, z: 300 };
+
+            //---------
+            //在3D空间内，在手电筒所在位置，用手电筒照射3D空间中的点，这时点的影子会落在幕布上，求影子在幕布上的位置（该方法返回的2D幕布坐标的y轴也是与canvas的y轴相反的）
+            //透视投影，近大远小（物体离眼睛近大，物体离眼睛远小）
+            //算法核心
+            _3DTo2D({ x, y, z }) {
+                let { x: flashlightX, y: flashlightY, z: flashlightZ } = this.flashlightPosition;
+                let { z: curtainZ } = this.curtainPosition;
+                let shadowX = 0;
+                let shadowY = 0;
+
+                //算“点”投影到xy平面(幕布)上后，点的影子在幕布y轴上的位置（三角形相似原理）
+                //shadowY/y=(flashlightZ-curtainZ)/(flashlightZ-z)
+                shadowY = (flashlightZ - curtainZ) / (flashlightZ - z) * y;
+
+                //算“点”投影到xy平面(幕布)上后，点的影子在幕布x轴上的位置（三角形相似原理）
+                //shadowX/x=(flashlightZ-curtainZ)/(flashlightZ-z)
+                shadowX = (flashlightZ - curtainZ) / (flashlightZ - z) * x;
+
+                return {
+                    x: shadowX,
+                    y: shadowY
+                };
+            }
+
+            //---------
+            //幕布坐标转canvas坐标（幕布坐标，3D空间坐标，幕布坐标和3D空间坐标的y轴是与canvas的y轴相反的）
+            _toCanvas2D({ x, y }) {
+                return {
+                    x: x,
+                    y: -y
+                };
+            }
+
+            //---------
+            //在canvas画布中心显示影像（入参是canvas坐标，返回也是canvas坐标）
+            _inCenter({ x, y }) {
+                return {
+                    x: this.canvasCenterX + x,
+                    y: this.canvasCenterY + y
+                };
+            }
+
+            //---------
+            //画线（入参是canvas坐标）
+            _drawLine({ x: startX, y: startY }, { x: endX, y: endY }) {
+                this.ctx.beginPath();
+                this.ctx.moveTo(startX, startY);
+                this.ctx.lineTo(endX, endY);
+                this.ctx.closePath();
+                this.ctx.stroke();
+            }
+
+            //---------
+            //标文字（入参是canvas坐标）
+            _drawText({ x: startX, y: startY }, text) {
+                this.ctx.font = "12px Arial";
+                this.ctx.fillText(text, startX, startY);
+            }
+
+            //---------
+            //画点（入参是canvas坐标）
+            _drawPoint({ x: startX, y: startY }) {
+                let r = 5;
+                let sAngle = 0;
+                let eAngle = Math.PI * 2;
+                this.ctx.beginPath();
+                this.ctx.arc(startX, startY, r, sAngle, eAngle);
+                this.ctx.fillStyle = 'black';
+                this.ctx.fill();
+                this.ctx.closePath();
+            }
+
+            //---------
+            //清空画布
+            _clearCanvas() {
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            }
+
+            constructor(canvasId) {
+                this.canvas = document.getElementById(canvasId);
+                this.canvas.width = this.canvasWidth;
+                this.canvas.height = this.canvasWidth;
+                this.canvasCenterX = this.canvas.width / 2;
+                this.canvasCenterY = this.canvas.height / 2;
+                this.ctx = this.canvas.getContext('2d');
+                //---------
+                //创建圆
+                function _createCircle() {
+                    this.cube = [];
+                    this.cubeLineGroup = []; //清空立方体3D空间点及连线信息，为创建圆做准备
+                    //----------------------
+                    let cubeCenterPosition = this.cubeCenterPosition; //基于立方体中心点，创建圆
+                    let r = 50;
+                    let pointNumber = 10; //圆一圈有多少个点
+                    let arr = [];
+                    for (let i = 0; i < pointNumber; i++) {
+                        const rad = ((360 * Math.PI / 180) / pointNumber) * i //弧度 （角度转弧度）
+                        const x = Math.cos(rad) * r //cosθ=邻/斜    邻=cosθ*斜      斜=邻/cosθ      斜=r    cosθ=Math.cos(rad)      邻=x=？
+                        const y = Math.sin(rad) * r //sinθ=对/斜    对=sinθ*斜      斜=对/sinθ      斜=r    sinθ=Math.sin(rad)      对=y=？
+                        arr.push({
+                            x: x,
+                            y: y,
+                            z: 0
+                        })
+                    }
+                    let copy = JSON.parse(JSON.stringify(arr));
+                    arr = [];
+                    let angleList = [0, 45, 90, 135]
+                    for (let i = 0; i < angleList.length; i++) {
+                        let angleItem = copy.map((item) => rotateY_old(item, angleList[i]));
+                        arr.push(...angleItem)
+                    }
+                    this.cube = arr;
+                }
+                _createCircle.call(this)
+            }
+        }
+
+        const painter = new Painter('canvas');
+        const cube = JSON.parse(JSON.stringify(painter.cube));
+
+        //-------------------------------------------------
+        //-------------------------------------------------
+        //-------------------------------------------------
+        //旋转（3D空间坐标，3D空间坐标y轴和canvas的y轴是相反的）
+        let angle = 0;
+        let angle_add = 0.5;
+        //根据圆心点(旋转点)，获取坐标距离圆心点的半径
+        function getRadius({ x, y }, centerPosition) {
+            let { x: centerX, y: centerY } = centerPosition ?? { x: 0, y: 0 };
+            return Math.sqrt(((x - centerX) * (x - centerX)) + ((y - centerY) * (y - centerY)));
+        }
+        //根据圆心点(旋转点)，获取坐标在第几象限
+        /*
+            二 | 一
+            三 | 四
+        */
+        /*
+            三 | 四
+            二 | 一
+        */
+        function getQuadrant({ x, y }, centerPosition) {
+            let { x: centerX, y: centerY } = centerPosition ?? { x: 0, y: 0 };
+
+            //处理坐标轴和原点
+            if (x == centerX && y == centerY) {
+                //原点
+                return '0';
+            }
+            if (x == centerX) {
+                //y轴上
+                if (y > centerY) {
+                    return 'y+';
+                } else {
+                    return 'y-';
+                }
+            }
+            if (y == centerY) {
+                //x轴上
+                if (x > centerX) {
+                    return 'x+';
+                } else {
+                    return 'x-';
+                }
+            }
+
+            //判断象限
+            if (x > centerX && y > centerY) {
+                //第一象限
+                return '1';
+            }
+            if (x < centerX && y > centerY) {
+                //第二象限
+                return '2';
+            }
+            if (x < centerX && y < centerY) {
+                //第三象限
+                return '3';
+            }
+            if (x > centerX && y < centerY) {
+                //第四象限
+                return '4';
+            }
+        }
+        //坐标转角度数（sin版）（sin版和tan版功能一样，只不过就是，计算方式不一样而已）
+        function coordinateToAngle_sin({ x, y }, centerPosition) {
+            let { x: centerX, y: centerY } = centerPosition ?? { x: 0, y: 0 };
+
+            let r = getRadius(arguments[0], arguments[1]); //半径 Or 斜边
+            let quadrant = getQuadrant(arguments[0], arguments[1]);
+
+            //----------
+            //特殊角
+            if (quadrant == '0') {
+                return 0; //原点
+            } else if (quadrant == 'y+') {
+                return 90; //90度
+            } else if (quadrant == 'y-') {
+                return 270; //270度
+            } else if (quadrant == 'x+') {
+                return 0; //0度
+            } else if (quadrant == 'x-') {
+                return 180; //180度
+            }
+
+            //----------
+            //象限角（普通角）
+            let oppositeSide = 0; //对边
+            if (quadrant == '1') {
+                oppositeSide = y - centerY;
+            } else if (quadrant == '2') {
+                oppositeSide = centerX - x;
+            } else if (quadrant == '3') {
+                oppositeSide = centerY - y;
+            } else if (quadrant == '4') {
+                oppositeSide = x - centerX;
+            }
+
+            let sin = oppositeSide / r; //sin=对比斜
+            let rad = Math.asin(sin); //反正弦函数
+            let angle = Math.abs(rad * (180 / Math.PI)); //（rad*(180/Math.PI)=弧度转角度）
+
+            if (quadrant == 1) {
+                return angle;
+            } else if (quadrant == 2) {
+                return 180 - angle;
+            } else if (quadrant == 3) {
+                return 270 - angle;
+            } else {
+                return 360 - angle;
+            }
+        }
+
+        //坐标转角度数（tan版）（sin版和tan版功能一样，只不过就是，计算方式不一样而已）
+        function coordinateToAngle_tan({ x, y }, centerPosition) {
+            let { x: centerX, y: centerY } = centerPosition ?? { x: 0, y: 0 };
+
+            let quadrant = getQuadrant(arguments[0], arguments[1]);
+
+            //----------
+            //特殊角
+            if (quadrant == '0') {
+                return 0; //原点
+            } else if (quadrant == 'y+') {
+                return 90; //90度
+            } else if (quadrant == 'y-') {
+                return 270; //270度
+            } else if (quadrant == 'x+') {
+                return 0; //0度
+            } else if (quadrant == 'x-') {
+                return 180; //180度
+            }
+
+            //----------
+            //象限角（普通角）
+            let tan = (y - centerY) / (x - centerX); //tanθ=对边/邻边    tanθ=y/x    x=(x-centerX)    y=(y-centerY)
+            let rad = Math.atan(tan); //atan反正切
+            let angle = Math.abs(rad * (180 / Math.PI)); //（rad*(180/Math.PI)=弧度转角度）
+
+            if (quadrant == 1) {
+                return angle;
+            } else if (quadrant == 2) {
+                return 180 - angle;
+            } else if (quadrant == 3) {
+                return 270 - angle;
+            } else {
+                return 360 - angle;
+            }
+        }
+
+        //转动Y轴（入参是3D空间坐标，返回也是3D空间坐标）
+        //自己写的，旧版，支持自定义旋转中心点
+        function rotateY_old({ x, y, z }, angle, centerPosition) {
+            let { x: centerX, y: centerY, z: centerZ } = centerPosition ?? { x: 0, y: 0, z: 0 };
+            let newX = 0;
+            let newZ = 0;
+
+            //坐标初始角度
+            let initAngle = coordinateToAngle_tan({ x: x, y: z }, { x: centerX, y: centerZ });
+            angle = initAngle + angle;
+
+            //圆心位置(centerX,centerZ)，半径radius，角度angle(0-360)，求某角度下半径顶点的(newX,newZ)坐标位置
+            //极坐标转笛卡尔坐标
+            //newX = centerX + radius * cos(度数)
+            //newZ = centerZ + radius * sin(度数)
+            let radius = getRadius({ x: x, y: z }, { x: centerX, y: centerZ }); //求“点”距离旋转中心点的半径
+            const rad = angle * (Math.PI / 180); //弧度 （angle*(Math.PI/180)=角度转弧度）
+            newX = centerX + radius * Math.cos(rad);
+            newZ = centerZ + radius * Math.sin(rad);
+            newX = roundWithTwo(newX);
+            newZ = roundWithTwo(newZ); //计算结果需要进行4舍5入保留两位小数，要不计算结果会有e-15(微小非零值)的问题出现，canvas识别不了那个e-15(微小非零值)
+
+            return {
+                x: newX,
+                y: y, //y轴转动，y不变
+                z: newZ
+            };
+        }
+
+        //转动Y轴（入参是3D空间坐标，返回也是3D空间坐标）
+        //自己写的，新版，支持自定义旋转中心点（rotateY_old，rotateY，rotateY_ai，这三个方法功能是一样的，没有区别，就是计算过程不一样而已）
+        function rotateY({ x, y, z }, angle, centerPosition) {
+            let { x: centerX, y: centerY, z: centerZ } = centerPosition ?? { x: 0, y: 0, z: 0 };
+
+            //旋转前，需要先将物体坐标系平移到旋转中心点，旋转后 再平移回去（这样做的目的是，方便旋转计算）
+            //平移坐标系到旋转中心（相当于将选中点(x,z)的坐标系变换到以centerPosition(旋转点)为原点的新坐标系中；默认(x,z)是绝对坐标；(dx,dz)是相对坐标，相对于centerPosition的坐标；换句话说dx=x-centerX和dz=z-centerZ后，得到一个新坐标系，(dx,dz)这个位置就是新坐标系中的位置。新坐标系中心点是(0,0)，而这个新坐标系中心点(0,0)在旧坐标系中是(centerX,centerZ) ）
+            const dx = x - centerX;
+            const dz = z - centerZ;
+
+            let newX = 0;
+            let newZ = 0;
+
+            //坐标初始角度
+            let initAngle = coordinateToAngle_tan({ x: dx, y: dz }, { x: 0, y: 0 });
+            angle = initAngle + angle;
+
+            //圆心位置(centerX,centerZ)，半径radius，角度angle(0-360)，求某角度下半径顶点的(newX,newZ)坐标位置
+            //极坐标转笛卡尔坐标
+            //newX = radius * cos(度数)
+            //newZ = radius * sin(度数)
+            let radius = getRadius({ x: dx, y: dz }, { x: 0, y: 0 }); //求“点”距离旋转中心点的半径
+            const rad = angle * (Math.PI / 180); //弧度 （angle*(Math.PI/180)=角度转弧度）
+            newX = radius * Math.cos(rad); //cosθ=邻/斜    邻=cosθ*斜    斜=邻/cosθ    斜=r    cosθ=Math.cos(rad)     邻=x=newX=？
+            newZ = radius * Math.sin(rad); //sinθ=对/斜    对=sinθ*斜    斜=对/sinθ    斜=r    sinθ=Math.sin(rad)     对=y=newZ=？
+            newX = roundWithTwo(newX);
+            newZ = roundWithTwo(newZ); //计算结果需要进行4舍5入保留两位小数，要不计算结果会有e-15(微小非零值)的问题出现，canvas识别不了那个e-15(微小非零值)
+
+            return {
+                x: newX + centerX, //旋转后，再将坐标系平移回去
+                y: y, //y轴转动，y不变
+                z: newZ + centerZ //旋转后，再将坐标系平移回去
+            };
+        }
+
+        //文心一言或deepseek写的，支持自定义旋转中心点
+        function rotateY_ai({ x, y, z }, angle, centerPosition) {
+            let { x: centerX, y: centerY, z: centerZ } = centerPosition ?? { x: 0, y: 0, z: 0 };
+
+            // 平移坐标系到旋转中心
+            const dx = x - centerX;
+            const dz = z - centerZ;
+
+            // 绕 Y 轴旋转（弧度）
+            const rad = angle * (Math.PI / 180);
+            const cos = Math.cos(rad);
+            const sin = Math.sin(rad);
+
+            // 应用旋转矩阵
+            const newDx = dx * cos - dz * sin;
+            const newDz = dx * sin + dz * cos;
+
+            // 平移回原坐标系
+            return {
+                x: centerX + newDx,
+                y: y, // Y 轴不变
+                z: centerZ + newDz
+            };
+        }
+
+        //4舍5入保留两位小数
+        function roundWithTwo(num) {
+            num = Number(num)
+            return Math.round(num * 100) / 100
+        }
+
+        //-------------------------------------------------
+        //-------------------------------------------------
+        //-------------------------------------------------
+
+        //渲染
+        function animate() {
+            let index = requestAnimationFrame(animate);
+
+            painter._clearCanvas();
+
+            //立方体Y轴转动
+            angle += angle_add;
+            if (angle >= 360) {
+                angle = 0;
+            }
+            let cube3D = cube.map((item) => rotateY_old(item, angle, { x: 0, y: 0, z: 0 })); //立方体Y轴转动
+            //let cube3D = cube.map((item) => rotateY_old(item, angle, { x: -50, y: 0, z: 50 })); //立方体Y轴转动
+            //let cube3D = cube.map((item) => rotateY_old(item, angle, { x: 50, y: 0, z: 50 })); //立方体Y轴转动
+            //let cube3D = cube.map((item) => rotateY_old(item, angle, { x: -50, y: 0, z: -50 })); //立方体Y轴转动
+            //let cube3D = cube.map((item) => rotateY_old(item, angle, { x: 50, y: 0, z: -50 })); //立方体Y轴转动
+
+            let cube2D = cube3D.map((item) => painter._3DTo2D(item)); //将3D空间坐标转成2D幕布坐标（计算幕布上投影点坐标）
+
+            canvas2D = cube2D.map((item) => painter._toCanvas2D(item)); //将坐标转换成canvas坐标
+
+            canvas2D = canvas2D.map((item) => painter._inCenter(item)); //让图像在canvas中心显示
+
+            //绘制线条，以显示立方体轮廓
+            painter.cubeLineGroup.forEach(([startIndex, endIndex]) => {
+                painter._drawLine(canvas2D[startIndex], canvas2D[endIndex]);
+            });
+
+            //绘制文字
+            canvas2D.forEach((item, index) => {
+                painter._drawText(item, index);
+            });
+
+            //绘制点
+            canvas2D.forEach((item, index) => {
+                painter._drawPoint(item);
+            });
+
+            // cancelAnimationFrame(index);
+        }
+
+        animate();
+
+    </script>
+
+
+</body>
+
+</html>
