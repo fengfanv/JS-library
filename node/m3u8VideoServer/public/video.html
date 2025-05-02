@@ -82,14 +82,14 @@
                 //旧版本，仅支持手机
                 //$('#video').attr('src', url);
 
-
                 let player = videojs('video', {
                     html5: {
                         vhs: {
                             overrideNative: true //强制使用VHS处理HLS；Video.js 7+ 已内置VHS，无需额外引用videojs-contrib-hls.js
-                        }
+                        },
+                        nativeControlsForTouch: true
                     },
-                    playbackRates: [0.5, 1, 1.5, 2, 3],
+                    playbackRates: [0.8, 1, 1.25, 1.5, 2, 3],
                 });
                 let mediaType = 'application/x-mpegURL';
 

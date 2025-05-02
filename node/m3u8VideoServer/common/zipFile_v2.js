@@ -115,6 +115,7 @@ function parseFormData(formdataBuff, storageFilePath) {
         // postData.copy(boundaryStringBuff, 0, 0, 40);
         //找边界字符串，方式2
         let boundaryStringLen = postData.indexOf(Buffer.from('\r\n'));
+        boundaryStringLen = boundaryStringLen || 0;
         var boundaryStringBuff = Buffer.alloc(boundaryStringLen);
         postData.copy(boundaryStringBuff, 0, 0, boundaryStringLen);
 
@@ -188,8 +189,8 @@ function parseFormData(formdataBuff, storageFilePath) {
             //然后再清除formdata每条数据 尾部的(\r\n)
             // var valueData = Buffer.alloc(item.length - (40+2) - 2);//(40+2)是首部边界字符串和\r\n的长度。2是尾部\r\n的长度。//console.log(Buffer.from(`\r\n`).length)//2
             // item.copy(valueData, 0, (40+2), item.length - 2);//提取去除了(首部边界字符串及\r\n)和(尾部\r\n)后的数据。
-            var valueData = Buffer.alloc(item.length - (boundaryStringLen+2) - 2);//这里把(40+2)改成(boundaryStringLen+2)，是因为边界字符串因为之前randomStr16的bug，可能会导致边界字符串长度大于40，所以才改成这样。
-            item.copy(valueData, 0, (boundaryStringLen+2), item.length - 2);
+            var valueData = Buffer.alloc(item.length - (boundaryStringLen + 2) - 2);//这里把(40+2)改成(boundaryStringLen+2)，是因为边界字符串因为之前randomStr16的bug，可能会导致边界字符串长度大于40，所以才改成这样。
+            item.copy(valueData, 0, (boundaryStringLen + 2), item.length - 2);
 
             //每条数据的(首部边界字符串及\r\n)和(尾部\r\n)去除后
             //将每条数据的 数据状态信息(数据名称、数据类型等) 和 数据值本体 分离开来

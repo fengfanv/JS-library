@@ -75,11 +75,10 @@
         <source id="video" src="" type="application/x-mpegURL">
     </video>-->
 
-    <ul id="list"></ul>
-    <hr>
-    <hr>
-    <hr>
-    <ul id="zipList"></ul>
+    <div style="display: flex;flex-direction: row;">
+        <ul id="list"></ul>
+        <ul id="zipList"></ul>
+    </div>
 
     <script src="./jquery.js"></script>
     <script>
@@ -91,6 +90,8 @@
                 console.log(res)
                 if (res.data) {
                     let len = res.data.length;
+
+                    res.data = res.data.reverse();
                     for (let i = 0; i < len; i++) {
 
                         let name = res.data[i].name.replace(/_.+$/, '');
@@ -160,7 +161,9 @@
                 "url": `/api/parsezip?path=${path}`,
                 success: function (res) {
                     console.log(res)
-                    alert('解压完毕')
+                    // alert('解压完毕')
+                    location.reload()
+
                 },
                 error: function () {
                     alert('请求接口失败！');
