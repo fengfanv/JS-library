@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <svg width="200" height="200" viewBox="-100 -100 200 200">
+        <circle cx="0" cy="20" r="70" fill="#D1495B" />
+
+        <circle cx="0" cy="-75" r="12" fill="none" stroke="#F79257" stroke-width="2" />
+
+        <rect x="-17.5" y="-65" width="35" height="20" fill="#F79257" />
+    </svg>
+    <p>
+        Christmas bauble
+        The SVG tag contains the image elements and defines the frame of our image. It has a width and a height property
+        defining how much space the image takes up in the document. There's also a viewBox property that defines a
+        coordinate system. Every image element is positioned based on this coordinate system. The first two values in
+        viewBox define the top-left coordinate in the image and the last two define the size. The size, in this case,
+        matches the one defined at the width and the height, but that's not necessary. If they don't match the image
+        scales up or scales down. With this setting, the 0,0 coordinate ends up at the middle of the image.
+
+        Let’s start with a simple Christmas bauble. Here we only use simple shapes, a rectangle, and two circles. We
+        position and style these elements with attributes. For the circle, we define the center position and for the
+        rectangle, we define the top left corner. These positions are always related to the coordinate system defined by
+        the viewBox.
+
+        We also have presentational attributes that style our shapes. Unlike in HTML, we do not use background-color to
+        set a color for a shape but we use the fill attribute. And to set a border for a shape we use stroke and
+        stroke-width. Note how we use the circle element both to draw a ring and a ball with different attributes.
+    </p>
+    <p>
+        圣诞小玩意
+        SVG标签包含图像元素并定义了图像的帧。它有一个width和height属性，定义了图像在文档中占用的空间大小。还有一个定义坐标系的viewBox属性。每个图像元素都基于这个坐标系定位。viewBox中的前两个值定义了图像中的左上角坐标，后两个值则定义了大小。在这种情况下，大小与宽度和高度上定义的大小相匹配，但这不是必需的。如果它们不匹配，图像会放大或缩小。使用此设置，0,0坐标最终位于图像的中间。
+
+        让我们从一个简单的圣诞小饰品开始。这里我们只使用简单的形状，一个矩形和两个圆形。我们用属性来定位和设计这些元素。对于圆形，我们定义中心位置，对于矩形，我们定义左上角。这些位置始终与viewBox定义的坐标系相关。
+
+        我们还具有塑造形状风格的表现属性。与HTML不同，我们不使用背景色为形状设置颜色，而是使用fill属性。为了给形状设置边框，我们使用笔划和笔划宽度。请注意，我们如何使用circle元素来绘制具有不同属性的环和球。
+    </p>
+    <p>
+        SVG的viewBox属性，主要用于定义该SVG内的定位坐标系。主要用于给该SVG内的其它元素，提供一个内部位置坐标系。处理之外其还有，缩放，放大功能。
+        viewBox定义了SVG内部的坐标系原点，为内部元素提供一个定位基准。
+    </p>
+</body>
+
+</html>

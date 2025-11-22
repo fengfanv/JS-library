@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <p>
+        Data-driven diagram
+        SVGs also work well with frontend libraries. Here I’m using React to generate a data-driven diagram. Here I’m
+        both generating a list of rectangles to create a column diagram based on some data and I also generate a series
+        of coordinates for a polyline.
+
+        For simple use cases, you can code your own diagram like this. But if you need more complex diagrams then check
+        out the D3 library. The D3 library uses SVG under to hood to create all sorts of diagrams.
+    </p>
+    <p>
+        数据驱动图
+        SVG也可以很好地与前端库配合使用。在这里，我使用React生成一个数据驱动的图表。在这里，我既生成了一个矩形列表，以基于一些数据创建柱状图，也为折线生成了一系列坐标。
+
+        对于简单的用例，您可以像这样编写自己的图表。但是，如果您需要更复杂的图表，请查看D3库。D3库使用SVG底层创建各种图表。
+    </p>
+
+    <script>
+        function Diagram() {
+  const dataPoints = [3, 4, 7, 5, 3, 6];
+  const sineWave = Array.from({ length: 115 })
+    .map((item, index) => `${index - 55},${Math.sin(index / 20) * 20 + 10}`)
+    .join(" ");
+
+//   return (
+//     <svg width=“200" height="200" viewBox="-100 -100 200 200">
+//       {dataPoints.map((dataPoint, index) => (
+//         <rect
+//           key={index}
+//           x={index * 20 - 55}
+//           y={50 - dataPoint * 10}
+//           width="15"
+//           height={dataPoint * 10}
+//           fill="#CD803D"
+//         />
+//       ))}
+
+//       <polyline points={sineWave} fill="none" stroke="black" stroke-width="5" />
+//     </svg>
+//   );
+}
+    </script>
+</body>
+
+</html>

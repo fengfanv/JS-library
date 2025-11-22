@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .gift .box {
+            fill: #d1495b;
+            stroke: black;
+            stroke-width: 2px;
+        }
+
+        .gift .stripe {
+            fill: white;
+            stroke: black;
+            stroke-width: 2px;
+        }
+
+        .gift .ribbon {
+            stroke: #b73a3b;
+            stroke-width: 4px;
+            fill: none;
+        }
+    </style>
+</head>
+
+<body>
+    <svg class="gift" width="200" height="200" viewBox="-100 -100 200 200">
+        <circle cx="0" cy="-50" r="10" fill="#a9172a" />
+        <rect class="box" x="-60" y="-40" width="120" height="100" />
+        <rect class="box" x="-70" y="-47" width="140" height="20" />
+        <rect class="stripe" x="-20" y="-40" width="40" height="100" />
+        <rect class="stripe" x="-25" y="-47" width="50" height="20" />
+
+        <path class="ribbon" d="
+      M 0 -50
+      L 30 -50
+      C 50 -50 50 -70 30 -65
+      L 0 -50" />
+
+        <path class="ribbon" d="
+      M 0 -50
+      L -30 -50
+      C -50 -50 -50 -70 -30 -65
+      L 0 -50" />
+    </svg>
+    <svg class="gift" width="200" height="200" viewBox="-100 -100 200 200">
+        <path class="ribbon" d="
+      M 0 0
+      C -45 40 30 50 0 80
+      " />
+    </svg>
+    <p>C [弯曲处1坐标x,y] [弯曲处2坐标x,y] [终点坐标x,y]</p>
+    <p>
+        Cubic Bézier
+        While the quadratic bezier is great when we want to bend a line, often it’s not flexible enough. With cubic
+        Bezier, we not only one have one control point but two. The first control point sets the initial direction of
+        the curve and the second one defines from which direction should the curve arrive to its endpoint. If these
+        directions match the directions of the line before and the line after the curve, then we have a smooth
+        transitioning between the path segments.
+
+        In this example the ribbon of the gift box uses a cubic Bezier that smoothly continues the previous straight
+        line then turns back to the direction of the upcoming line.
+    </p>
+    <p>
+        立方贝塞尔
+        当我们想弯曲一条线时，二次贝塞尔曲线很好，但通常它不够灵活。使用三次贝塞尔曲线，我们不仅有一个控制点，还有两个控制点。第一个控制点设置曲线的初始方向，第二个控制点定义曲线从哪个方向到达终点。如果这些方向与曲线之前和之后的线的方向匹配，那么我们就可以在路径段之间实现平滑过渡。
+
+        在这个例子中，礼品盒的缎带使用三次贝塞尔曲线，该曲线平滑地延续了前一条直线，然后转向下一条直线的方向。
+    </p>
+</body>
+
+</html>

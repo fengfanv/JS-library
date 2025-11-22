@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .gingerbread .body {
+            fill: #cd803d;
+        }
+
+        .gingerbread .eye {
+            fill: white;
+        }
+
+        .gingerbread .mouth {
+            fill: none;
+            stroke: white;
+            stroke-width: 2px;
+        }
+
+        .gingerbread .limb {
+            stroke: #cd803d;
+            stroke-width: 35px;
+            stroke-linecap: round;
+        }
+    </style>
+</head>
+
+<body>
+    <svg class="gingerbread" width="200" height="200" viewBox="-100 -100 200 200">
+        <circle class="body" cx="0" cy="-50" r="30" />
+
+        <circle class="eye" cx="-12" cy="-55" r="3" />
+        <circle class="eye" cx="12" cy="-55" r="3" />
+        <rect class="mouth" x="-10" y="-40" width="20" height="5" rx="2" />
+
+        <line class="limb" x1="-40" y1="-10" x2="40" y2="-10" />
+        <line class="limb" x1="-25" y1="50" x2="0" y2="-15" />
+        <line class="limb" x1="25" y1="50" x2="0" y2="-15" />
+
+        <circle class="button" cx="0" cy="-10" r="5" />
+        <circle class="button" cx="0" cy="10" r="5" />
+    </svg>
+    <p>
+        Gingerbread figure
+        Since our SVG is living inside an HTML file now, we can assign CSS classes to each tag and move some attributes
+        to CSS. You can only move the presentation attributes though. Position attributes and attributes that define the
+        shape still have to stay in HTML. But colors, stroke, and font attributes can be moved to CSS.
+
+        We already saw the fill and some of the stroke properties, but here’s another one. The stroke-linecap. This can
+        make our line cap round. Note that the legs and the arms are simple lines here. To give you a comparison if we
+        remove the line cap and set a smaller stroke-width, then this is how it would looks like. But by setting a thick
+        stroke width and a round line cap we can shape legs and arms for our figure.
+
+        Also, note the rx property at the rectangle defining the mouth. This will make the edges round. You can think of
+        it as border-radius if you like.
+    </p>
+    <p>
+        姜饼图
+        由于我们的SVG现在位于HTML文件中，我们可以为每个标签分配CSS类，并将一些属性移动到CSS。但是，您只能移动演示文稿属性。位置属性和定义形状的属性仍然必须保留在HTML中。但是颜色、笔划和字体属性可以移动到CSS中。
+
+        我们已经看到了填充和一些笔划属性，但这是另一个。击球线帽。这可以使我们的生产线变圆。请注意，这里的腿和手臂是简单的线条。为了给你一个比较，如果我们去掉行帽并设置一个较小的笔划宽度，那么它就是这样的。但是通过设置粗笔划宽度和圆形线条帽，我们可以为我们的身材塑造腿和手臂。
+
+        此外，请注意定义嘴部的矩形处的rx属性。这将使边缘变圆。如果你愿意，你可以把它想象成边界半径。
+    </p>
+</body>
+
+</html>

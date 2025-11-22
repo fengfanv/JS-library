@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .sleigh {
+            offset-path: path("M-200 80 L -90 80 Q 60 80 60 -10 A 50 50 0 0 0 -60 -10 Q -60 80 90 80 L 200 80"
+                );
+            animation: roller-coaster 6000ms infinite linear;
+        }
+
+        @keyframes roller-coaster {
+            0% {
+                offset-distance: 0%;
+            }
+
+            100% {
+                offset-distance: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <svg width="400" height="200" viewBox="-200 -100 400 200" fill="none">
+        <path stroke="#E0CEB9" stroke-width="4" d=" M-200 80 L -80 80 Q 80 80 70 -10 A 70 70 0 0 0 -70 -10 Q -80 80 80
+            80 L 200 80" />
+
+        <g class="sleigh">
+            <path d="
+      M -30 -2 L 30 -2 A 10 10 0 0 0 30 -22
+      M -20 -2 L -20 -17
+      M 20 -2 L 20 -17" stroke="#AF6455" stroke-width="5" />
+            <path d="M -27 -17 L 27 -17" stroke="#7A504F" stroke-width="6" />
+        </g>
+    </svg>
+    <p>
+        Path based animation
+        Another fun use of paths is to create animation paths. This method is not SVG only. I’m using a CSS property
+        here that works for any other HTML tag. But if you check the value of this attribute, you see that we define a
+        path the same way as we do for SVGs.
+
+        To give you a fair warning though, this feature at this point is rather experimental at this point and it’s not
+        supported for Safari. There’s also an old SVG specific way for doing the same thing with animationMotion.
+        Unfortunately, that’s rather obsolete. So at this point, neither of these are fully supported, but I’m sure
+        there’s going to be a way in the future to use paths for animation.
+    </p>
+    <p>
+        基于路径的动画
+        路径的另一个有趣用途是创建动画路径。这种方法不仅仅是SVG。我在这里使用的CSS属性适用于任何其他HTML标签。但是，如果您检查此属性的值，您会看到我们定义路径的方式与SVG相同。
+
+        不过，为了给你一个公平的警告，这个功能在这一点上是相当实验性的，Safari不支持它。还有一种旧的SVG特定的方法可以在animationMotion上做同样的事情。不幸的是，这已经过时了。因此，在这一点上，这两种方法都没有得到完全支持，但我相信将来会有一种方法将路径用于动画。
+    </p>
+</body>
+
+</html>

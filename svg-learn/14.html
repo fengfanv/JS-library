@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .candy .body {
+            stroke-linecap: round;
+            fill: none;
+        }
+
+        .candy .red-mark {
+            stroke: #d1495b;
+            stroke-width: 2.5px;
+        }
+
+        .candy .green-mark {
+            stroke: #234236;
+            stroke-width: 2.5px;
+        }
+    </style>
+</head>
+
+<body>
+    <svg class="candy" width="200" height="400" viewBox="-100 -200 200 400">
+        <path d="
+      M 50 120
+      L 50 -80
+      A 50 50 0 0 0 -50 -80" stroke="#cd803d" stroke-width="45" class="body" />
+
+        <path d="
+      M 50 120
+      L 50 -80
+      A 50 50 0 0 0 -50 -80" stroke="white" stroke-width="40" class="body" />
+
+        <line class="green-mark" x1="-35" y1="-90" x2="-60" y2="-100" />
+        <line class="red-mark" x1="-15" y1="-115" x2="-25" y2="-135" />
+        <line class="green-mark" x1="20" y1="-110" x2="35" y2="-130" />
+        <line class="red-mark" x1="40" y1="-60" x2="60" y2="-80" />
+        <line class="green-mark" x1="40" y1="-10" x2="60" y2="-30" />
+        <line class="red-mark" x1="40" y1="40" x2="60" y2="20" />
+        <line class="green-mark" x1="40" y1="90" x2="60" y2="70" />
+    </svg>
+    <code style="background-color: black;color: white;font-size: 30px;">
+        &lt;path d="M x0,y0 A rx,ry x-axis-rotation large-arc-flag,sweep-flag x1,y1" /&gt;
+    </code>
+    <p>
+        M x0,y0：起始点坐标。<br>
+        A：绝对路径命令（小写 a 表示相对路径）。<br>
+        rx,ry：椭圆的 x 轴半径长度 和 y 轴半径长度。<br>
+        x-axis-rotation：椭圆相对于 x 轴的 旋转角度（单位：度）。（椭圆绕其中心旋转的角度）<br>
+        large-arc-flag：选择绘制 大弧（1） 或 小弧（0）（当两点间有两条弧时）。<br>
+        sweep-flag：选择 顺时针（1） 或 逆时针（0） 方向绘制弧。<br>
+        x1,y1：弧的 结束点坐标。<br>
+    </p>
+    <svg class="candy" width="200" height="400" viewBox="-100 -200 200 400">
+
+        <path d="
+        M 0,0
+        A 30,10 45 0 1 0,50" stroke="black" stroke-width="4" fill="red" />
+
+        <line x1="-100" y1="0" x2="100" y2="0" stroke="blue" />
+        <line x1="0" y1="-200" x2="0" y2="200" stroke="yellow" />
+
+        <g transform="translate(0 25)">
+            <g transform="rotate(45)">
+                <line x1="-100" y1="0" x2="100" y2="0" stroke="green" />
+            </g>
+        </g>
+    </svg>
+    <hr>
+    <hr>
+    <hr>
+    <h2>large-arc-flag仅决定弧的大小，sweep-flag决定弧的方向(顺时针或逆时针)</h2>
+    <h3>椭圆(x半轴长度, y半轴长度)(rx,ry)相等时(椭圆弧to圆弧)，可以更好的观察到，大/小弧的区别。<br>
+        rx,ry两个值越是近似/相等，大小弧区别越是明显。<br>
+        接近圆时（rx ≈ ry）：两条弧的角度差异接近 180°，区别明显。<br>
+        非常扁时（rx ≫ ry 或 ry ≫ rx）：两条弧的角度差异可能缩小，区别不明显。
+    </h3>
+    <div>
+        <h3>大弧（1）+顺时针（1）</h3>
+        <svg class="candy" width="200" height="400" viewBox="-100 -200 200 400">
+
+            <path d="
+        M 0,0
+        A 30,30 0 1 1 0,50" stroke="black" stroke-width="4" fill="red" />
+
+            <line x1="-100" y1="0" x2="100" y2="0" stroke="blue" />
+            <line x1="0" y1="-200" x2="0" y2="200" stroke="yellow" />
+        </svg>
+    </div>
+    <div>
+        <h3>小弧（0）+顺时针（1）</h3>
+        <svg class="candy" width="200" height="400" viewBox="-100 -200 200 400">
+
+            <path d="
+        M 0,0
+        A 30,30 0 0 1 0,50" stroke="black" stroke-width="4" fill="red" />
+
+            <line x1="-100" y1="0" x2="100" y2="0" stroke="blue" />
+            <line x1="0" y1="-200" x2="0" y2="200" stroke="yellow" />
+        </svg>
+    </div>
+    <hr>
+    <div>
+        <h3>大弧（1）+逆时针（0）</h3>
+        <svg class="candy" width="200" height="400" viewBox="-100 -200 200 400">
+
+            <path d="
+        M 0,0
+        A 30,30 0 1 0 0,50" stroke="black" stroke-width="4" fill="red" />
+
+            <line x1="-100" y1="0" x2="100" y2="0" stroke="blue" />
+            <line x1="0" y1="-200" x2="0" y2="200" stroke="yellow" />
+        </svg>
+    </div>
+    <div>
+        <h3>小弧（0）+逆时针（0）</h3>
+        <svg class="candy" width="200" height="400" viewBox="-100 -200 200 400">
+
+            <path d="
+        M 0,0
+        A 30,30 0 0 0 0,50" stroke="black" stroke-width="4" fill="red" />
+
+            <line x1="-100" y1="0" x2="100" y2="0" stroke="blue" />
+            <line x1="0" y1="-200" x2="0" y2="200" stroke="yellow" />
+        </svg>
+    </div>
+    <p>Arc
+        If you thought that cubic Beziers are the most complicated parts of SVGs then I have bad news for you. Arcs are
+        even more complicated.
+
+        The last two parameters are still the endpoint of the arc. Arcs have five extra parameters on top of that
+        though. You define a horizontal and vertical radius for an arc. If these two values are not the same then you
+        end up with an ellipse. If you draw an ellipse you can also turn it by an angle, which will be the third
+        parameter. Given the starting point coming from the previous segment, given the endpoint defined here, and the
+        radiuses there are still two possible arc centers and four possible arcs to draw. The last two parameters of an
+        arc are to pick one of these four options.</p>
+    <p>
+        弧
+        如果你认为立方贝塞尔函数是SVG中最复杂的部分，那么我有个坏消息要告诉你。圆弧甚至更复杂。
+
+        最后两个参数仍然是圆弧的端点。不过，圆弧上还有五个额外的参数。为圆弧定义水平和垂直半径。如果这两个值不相同，则最终会得到一个椭圆。如果绘制椭圆，还可以将其旋转一个角度，这将是第三个参数。给定来自前一段的起点，给定此处定义的终点，以及半径，仍然有两个可能的弧中心和四个可能的圆弧需要绘制。圆弧的最后两个参数是从这四个选项中选择一个。
+    </p>
+</body>
+
+</html>

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <svg width="200" height="200" viewBox="-100 -100 200 200">
+        <script>
+            window.addEventListener("DOMContentLoaded", () => {
+                const hoursElement = document.getElementById("hours");
+                const minutesElement = document.getElementById("minutes");
+                const hour = new Date().getHours() % 12;
+                const minute = new Date().getMinutes();
+                hoursElement.setAttribute("transform", `rotate(${(360 / 12) * hour})`);
+                minutesElement.setAttribute("transform", `rotate(${(360 / 60) * minute})`);
+            });
+        </script>
+
+        <rect x="-100" y="-100" width="200" height="200" fill="#CD803D" />
+
+        <circle r="55" stroke="#FCCE7B" stroke-width="10" fill="white" />
+        <circle r="45" stroke="#B6705F" stroke-width="6" stroke-dasharray="6 17.56194490192345" stroke-dashoffset="3"
+            fill="none" />
+
+        <g stroke="#5f4c6c" stroke-linecap="round">
+            <line id="hours" y2="-20" stroke-width="8" />
+            <line id="minutes" y2="-35" stroke-width="6" />
+        </g>
+    </svg>
+    <p>
+        Clock
+        SVG elements can be manipulated from JavaScript the same way as any other HTML tag. In this example we are using
+        a short code snipped to show the actual time on a clock. You can even have a script tag inside the SVG but of
+        course, you can have it outside of an SVG as well and refer to the elements the same way.
+
+        There’s another trick here worth mentioning. The dots here showing each hour are actually part of a circle. In
+        CSS we can set the border-style to be dashed, but CSS is not too flexible on this one. SVG though took this to
+        the next level and we can fine-tune the length of each dash segment and the space in between. That’s what we use
+        here to show the dots for each hour.
+    </p>
+    <p>
+        时钟
+        SVG元素可以像任何其他HTML标签一样从JavaScript中操作。在这个例子中，我们使用一个简短的代码来显示时钟上的实际时间。你甚至可以在SVG内部有一个script标签，但当然，你也可以在SVG外部有它，并以相同的方式引用元素。
+
+        这里还有另一个值得一提的技巧。这里显示每个小时的点实际上是一个圆圈的一部分。在CSS中，我们可以将边框样式设置为虚线，但CSS在这方面不太灵活。SVG将这一点提升到了一个新的水平，我们可以微调每个破折号段的长度以及其间的空间。这就是我们在这里用来显示每个小时的点。
+    </p>
+</body>
+
+</html>

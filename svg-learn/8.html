@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <svg width="200" height="200" viewBox="-100 -100 200 200">
+        <defs>
+            <g id="tree">
+                <polygon points="-10,0 10,0 0 -50" fill="#38755b" />
+                <line x1="0" y1="0" x2="0" y2="10" stroke="#778074" stroke-width="2" />
+            </g>
+        </defs>
+
+        <rect x="-100" y="-100" width="200" height="200" fill="#F1DBC3" />
+        <circle cx="0" cy="380" r="350" fill="#F8F4E8" />
+
+        <use href="#tree" x="-30" y="25" transform="scale(2)" />
+        <use href="#tree" x="-20" y="40" transform="scale(1.2)" />
+        <use href="#tree" x="40" y="40" />
+        <use href="#tree" x="50" y="30" transform="scale(1.5)" />
+    </svg>
+    <p>
+        Forest
+        Rotation is not the only way we can generate images from simple shapes. In this example, we define a tree shape
+        then place it to various positions in different sizes to draw a forest.
+    </p>
+    <p>
+        森林
+        旋转并不是我们从简单形状生成图像的唯一方法。在这个例子中，我们定义了一个树形，然后将其放置在不同大小的不同位置以绘制森林。
+    </p>
+</body>
+
+</html>

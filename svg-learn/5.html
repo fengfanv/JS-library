@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <svg width="200" height="200" viewBox="-100 -100 200 200">
+        <defs>
+            <clipPath id="ball">
+                <circle cx="0" cy="20" r="70" />
+            </clipPath>
+        </defs>
+
+        <circle cx="0" cy="20" r="70" fill="#D1495B" />
+
+        <polyline clip-path="url(#ball)" points="-120 40 -80 0 -40 40 0 0 40 40 80 0 120 40" fill="none"
+            stroke="#9C2D2A" stroke-width="20" />
+
+        <circle cx="0" cy="-75" r="12" fill="none" stroke="#F79257" stroke-width="2" />
+        <rect x="-17.5" y="-65" width="35" height="20" fill="#F79257" />
+    </svg>
+    <p>
+        Christmas bauble with clip-path
+        This bauble has a motif on its side defined as a polyline. Polylines normally wouldn't care about the edge of
+        the ball. Part of the line would overhang or stop too soon. We use clip-path here to make sure that the motif
+        fits perfectly with the ball.
+
+        We define the motif to be bigger than the ball then we cut the overhanging parts with a clip-path. The clip-path
+        is defined in the definitions section. The defs section is like a hidden compartment of our image. Things here
+        don't show up as part of our image, but we can refer to them and use them later.
+    </p>
+    <p>
+        带有剪辑路径的圣诞小饰品
+        这个小玩意的侧面有一个被定义为折线的图案。折线通常不会在意球的边缘。部分线路会悬垂或过早停止。我们在这里使用剪辑路径来确保主题与球完美契合。
+
+        我们将主题定义为比球大，然后用剪切路径切割悬垂部分。剪辑路径在定义部分中定义。defs部分就像我们图像中的一个隐藏隔间。这里的东西不会作为我们形象的一部分出现，但我们可以参考它们并在以后使用它们。
+    </p>
+</body>
+
+</html>

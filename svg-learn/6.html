@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <svg width="200" height="200" viewBox="-100 -100 200 200">
+        <g transform="translate(0 5)">
+            <g>
+                <polygon points="0,0 36,-50 0,-100" fill="#EDD8B7" />
+                <polygon points="0,0 -36,-50 0,-100" fill="#E5C39C" />
+            </g>
+            <g transform="rotate(72)">
+                <polygon points="0,0 36,-50 0,-100" fill="#EDD8B7" />
+                <polygon points="0,0 -36,-50 0,-100" fill="#E5C39C" />
+            </g>
+            <g transform="rotate(-72)">
+                <polygon points="0,0 36,-50 0,-100" fill="#EDD8B7" />
+                <polygon points="0,0 -36,-50 0,-100" fill="#E5C39C" />
+            </g>
+            <g transform="rotate(144)">
+                <polygon points="0,0 36,-50 0,-100" fill="#EDD8B7" />
+                <polygon points="0,0 -36,-50 0,-100" fill="#E5C39C" />
+            </g>
+            <g transform="rotate(-144)">
+                <polygon points="0,0 36,-50 0,-100" fill="#EDD8B7" />
+                <polygon points="0,0 -36,-50 0,-100" fill="#E5C39C" />
+            </g>
+        </g>
+    </svg>
+    <p>
+        Star
+        A star is a simple shape, so we could define it as a bunch of polygons and set each point individually. But then
+        we would need to know each coordinate. Instead of that, we can just define one wing, then repeat it five times
+        with a rotation to get the same shape. We use the transform attribute to set a rotation.
+
+        In this example, each wing consists of two polygons. They need to be rotated the same way, so we can group them
+        with a g tag and rotate them together. You can think of the g tag as the div tag in HTML. On its own, it does
+        not represent anything. But it can contain other elements and attributes defined on the group tag apply to its
+        children.
+    </p>
+    <p>
+        星
+        恒星是一个简单的形状，所以我们可以将其定义为一堆多边形，并分别设置每个点。但我们需要知道每个坐标。相反，我们可以定义一个翅膀，然后旋转五次以获得相同的形状。我们使用transform属性来设置旋转。
+
+        在这个例子中，每个机翼由两个多边形组成。它们需要以相同的方式旋转，所以我们可以用g标签将它们分组并一起旋转。您可以将g标签视为HTML中的div标签。就其本身而言，它并不代表任何东西。但是，它可以包含组标记上定义的其他元素和属性，这些元素和属性应用于其子对象。
+
+    </p>
+</body>
+
+</html>

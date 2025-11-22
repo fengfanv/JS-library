@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <svg width="200" height="200" viewBox="-100 -100 200 200">
+        <defs>
+            <path id="text-arc" d="M 0, 50 A 50 50 0 1 1 1,50" />
+        </defs>
+
+        <text fill="#0c5c4c" font-family="Tahoma" font-size="0.77em" font-weight="bold">
+            <textPath href="#text-arc">
+                Happy Holidays! Happy Holidays! Happy Holidays!
+            </textPath>
+        </text>
+    </svg>
+    <p>
+        Text Path
+        Drawing shapes are not the only use case for paths. We can also use them to render a text along an invisible
+        path. We can define a path in the definitions section to make sure it's invisible. Then we refer to it in the
+        textPath attribute to make a text go around a circle. Here we use arc again, but you can use any other path and
+        the text will follow it.
+    </p>
+    <p>
+        文本路径
+        绘制形状并不是路径的唯一用例。我们还可以使用它们沿着不可见的路径渲染文本。我们可以在定义部分定义一个路径，以确保它不可见。然后，我们在textPath属性中引用它，使文本绕一个圆圈。这里我们再次使用圆弧，但您可以使用任何其他路径，文本将遵循它。
+    </p>
+</body>
+
+</html>

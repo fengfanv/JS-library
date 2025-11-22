@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <svg width="200" height="200" viewBox="-100 -100 200 200">
+        <defs>
+            <radialGradient id="shine" cx="0.25" cy="0.25" r="0.35">
+                <stop offset="0%" stop-color="#e3a8b0" />
+                <stop offset="100%" stop-color="#D1495B" />
+            </radialGradient>
+        </defs>
+
+        <circle cx="0" cy="20" r="70" fill="url(#shine)" />
+        <circle cx="0" cy="-75" r="12" fill="none" stroke="#F79257" stroke-width="2" />
+        <rect x="-17.5" y="-65" width="35" height="20" fill="#F79257" />
+    </svg>
+    <p>
+        Christmas bauble with gradient
+        The filling of a shape can be defined as a gradient. Here we apply a radial gradient to our Christmas decoration
+        to have a subtle 3D effect. It has a different syntax than CSS but the capabilities are rather similar.
+        Gradients in SVG though can also be applied for strokes and pretty cool effects can be achieved that way.
+    </p>
+    <p>
+        渐变圣诞饰品
+        形状的填充可以定义为梯度。在这里，我们将径向渐变应用于圣诞节装饰，以获得微妙的3D效果。它的语法与CSS不同，但功能非常相似。SVG中的渐变也可以应用于笔划，这样可以实现非常酷的效果。
+    </p>
+</body>
+
+</html>
