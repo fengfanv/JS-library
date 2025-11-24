@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        canvas {
+            background-color: #fafafa;
+            display: block;
+            margin: 0 auto;
+            cursor: crosshair;
+            border-radius: 8px;
+        }
+
+        /* 移动端适配：无旋转 */
+        @media (max-width: 768px) {
+            canvas {
+                width: 100%;
+                height: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <canvas id="signatureCanvas" width="800" height="600"></canvas>
+        <button id="clearButton">清除签名</button>
+        <button id="exportButton">导出签名</button>
+    </div>
+    <script>
+
+
+        //模仿真笔写字特效（根据笔速，动态设置，笔迹粗细）
+        var positions = [];
+        var lineWidths = [];
+        var minWidth = 2; //笔迹粗细，最小值
+        var maxWidth = 10; //笔迹粗细，最大值
+        var minSpeed = Number.MIN_VALUE; //笔速，最小移动速度
+        var maxSpeed = 12; //笔速，最大移动速度
+
+        var lastMoveTime = undefined;
+        var lastLineWidth = minWidth;
+
+        //鼠标移动时添加新的坐标
+        function addPosition(position) {
+            positions.push(position)
+            // 处理当前线宽
+            if (positions.length > 1) {
+                // 计算移动速度
+                const mouseSpeed = _computedSpeed(
+                    positions[positions.length - 2],
+                    positions[positions.length - 1]
+                )
+                // 计算线宽
+                const lineWidth = _computedLineWidth(mouseSpeed)
+                lineWidths.push(lineWidth)
+            }
+        }
+
+        /**
+         * 计算距离
+         * @param start 起点
+         * @param end 终点
+         */
+        function getDistance(start, end) {
+            return Math.sqrt(Math.pow(start.x - end.x, 2) + Math.pow(start.y - end.y, 2))
+        }
+
+        /**
+         * 计算移动速度
+         * @param start 起点
+         * @param end 终点
+         */
+        function _computedSpeed(start, end) {
+            // 获取距离
+            const moveDistance = getDistance(start, end)
+
+            const curTime = Date.now()
+            // 获取移动间隔时间   lastMoveTime：最后鼠标移动时间
+            const moveTime = curTime - lastMoveTime
+            // 计算速度
+            const mouseSpeed = moveDistance / moveTime
+            // 更新最后移动时间
+            lastMoveTime = curTime
+            return mouseSpeed
+        }
+
+        /**
+         * 计算画笔宽度
+         * @param speed 鼠标移动速度
+         */
+        function _computedLineWidth(speed) {
+            let lineWidth = 0
+            if (speed >= maxSpeed) {
+                lineWidth = minWidth
+            } else if (speed <= minSpeed) {
+                lineWidth = maxWidth
+            } else {
+                lineWidth = maxWidth - (speed / maxSpeed) * maxWidth
+            }
+
+            lineWidth = lineWidth * (1 / 3) + lastLineWidth * (2 / 3)
+            lastLineWidth = lineWidth
+
+            return lineWidth
+        }
+
+        //-----------------------------------------------------
+        //-----------------------------------------------------
+        //-----------------------------------------------------
+
+        var canvas = undefined;
+        var ctx = undefined;
+
+        function init() {
+            canvas = document.getElementById('signatureCanvas')
+            if (canvas.nodeName.toLocaleLowerCase() != 'canvas') {
+                canvas = document.querySelector('#signatureCanvas canvas')
+            }
+            canvas.style.zIndex = 9999;
+            ctx = canvas.getContext('2d')
+
+            // 设置初始画笔参数
+            ctx.strokeStyle = '#000'
+            ctx.lineWidth = minWidth
+            ctx.lineJoin = 'round'
+            ctx.lineCap = 'round'
+
+            // 监听鼠标事件
+            canvas.addEventListener('mousedown', startDrawing)
+            canvas.addEventListener('mousemove', draw)
+            canvas.addEventListener('mouseup', stopDrawing)
+            canvas.addEventListener('mouseleave', stopDrawing) // 鼠标离开时停止绘制
+
+            // 监听触摸事件
+            canvas.addEventListener('touchstart', startDrawing)
+            canvas.addEventListener('touchmove', draw)
+            canvas.addEventListener('touchend', stopDrawing)
+            canvas.addEventListener('touchcancel', stopDrawing) // 触摸取消时停止绘制
+        }
+
+        window.onload = () => {
+            init()
+        };
+
+        var isDrawing = false
+
+        // 获取鼠标/触摸位置
+        function getPosition(e) {
+            const rect = canvas.getBoundingClientRect() // 获取canvas相对于视口的位置
+            let x, y
+
+            if (e.touches && e.touches.length) {
+                x = e.touches[0].clientX - rect.left // 使用rect.left来确保位置准确
+                y = e.touches[0].clientY - rect.top // 使用rect.top来确保位置准确
+            } else {
+                // 对于鼠标事件
+                x = e.clientX - rect.left
+                y = e.clientY - rect.top
+            }
+
+            // // 适配屏幕缩放，考虑触摸设备的缩放问题
+            // // renderjs下请注释这行代码（不注释，会导致，轨迹偏移）
+            // const scaleX = canvas.width / rect.width
+            // const scaleY = canvas.height / rect.height
+            // x = (x - window.scrollX) * scaleX
+            // y = (y - window.scrollY) * scaleY
+
+            return { x, y }
+        }
+
+        // 检查鼠标/触摸位置是否在画布内
+        function isInCanvas(e) {
+            const rect = canvas.getBoundingClientRect()
+            const x = e.clientX || e.touches[0].clientX
+            const y = e.clientY || e.touches[0].clientY
+            return x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom
+        }
+
+        // 开始绘制
+        function startDrawing(e) {
+            if (!isInCanvas(e)) return
+            isDrawing = true
+            lastMoveTime = Date.now()
+            const position = getPosition(e)
+            addPosition(position)
+
+        }
+
+        // 绘制
+        function draw(e) {
+            if (!isDrawing || !isInCanvas(e)) return
+            const position = getPosition(e)
+            addPosition(position)
+
+            ctx.beginPath()
+            ctx.moveTo(positions[positions.length - 2].x, positions[positions.length - 2].y)
+            ctx.lineTo(position.x, position.y)
+            ctx.lineWidth = Number(lineWidths.slice(-1))
+            ctx.stroke()
+        }
+
+        // 停止绘制
+        function stopDrawing() {
+            isDrawing = false
+            positions = [] // 清空上次绘制的路径
+            lineWidths = []
+            ctx.lineWidth = minWidth
+            lastLineWidth = minWidth
+        }
+
+        function clearCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height)
+            stopDrawing()
+        }
+
+        function getCanvasImageBase64() {
+            const dataURL = canvas.toDataURL('image/png', 1) // 获取签名图片的 DataURL
+            return dataURL
+        }
+
+        //-----------------------------------------------------------------
+
+        // 清除按钮
+        document.getElementById('clearButton').addEventListener('click', () => {
+            clearCanvas()
+        })
+
+        // 导出签名按钮
+        document.getElementById('exportButton').addEventListener('click', () => {
+            const dataURL = getCanvasImageBase64()
+            const link = document.createElement('a')
+            link.href = dataURL
+            link.download = 'signature.png' // 下载文件名
+            link.click() // 模拟点击链接以下载图片
+        })
+
+    </script>
+
+
+</body>
+
+</html>
