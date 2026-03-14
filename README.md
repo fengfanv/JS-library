@@ -94,6 +94,8 @@
 
 33、[js惯性滚动动画_inertialScrolling](/inertialScrolling)
 
+34、[js队列_js_queue](/js_queue)
+
 ### html与css
 
 1、[css命名规则_cssNameRule](/cssNameRule)
