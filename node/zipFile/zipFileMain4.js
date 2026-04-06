@@ -154,20 +154,29 @@ function zipRun(index) {
     let zipFileName = `${Date.now()}.fdco`
     console.log(`${fileArr[index].fileName}>>>>>>>${zipFileName}`)
     console.log(`正在压缩.............`)
-    zipFile(null, fileArr2, path.join("D:", "project2", "demo", "zipSuccess", zipFileName), function (err, res) {
-        if (!err) {
-            //压缩成功
-            console.log(`压缩成功！`);
-            if (index + 1 < fileArr.length) {
-                zipRun(index + 1)
+    try {
+        zipFile(null, fileArr2, path.join("D:", "project2", "demo", "zipSuccess", zipFileName), function (err, res) {
+            if (!err) {
+                //压缩成功
+                console.log(`压缩成功！`);
+                if (index + 1 < fileArr.length) {
+                    zipRun(index + 1)
+                }
+            } else {
+                //压缩失败
+                console.log(`压缩失败！`)
+                if (index + 1 < fileArr.length) {
+                    zipRun(index + 1)
+                }
             }
-        } else {
-            //压缩失败
-            console.log(`压缩失败！`)
+
+        });
+    } catch (err) {
+        console.log(`压缩失败：`, err);
+        if (index + 1 < fileArr.length) {
+            zipRun(index + 1)
         }
-
-    });
-
+    }
 }
 
 
