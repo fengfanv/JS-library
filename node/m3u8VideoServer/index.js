@@ -150,7 +150,13 @@ function API_getVideo(req, response) {
         }
         if (/.m3u8$/.test(data.path)) {
             //console.log('m3u8')
-            let newFileData = fileData.toString().replace(new RegExp("(/storage/emulated/0/UCDownloads/VideoData/|file:///storage/emulated/0/UCDownloads/VideoData/|file:///sdcard/UCDownloads/VideoData/|file:///sdcard/Quark/Download/|file:///storage/emulated/0/Quark/Download/|file:///sdcard/Download/QuarkDownloads/)", 'g'), `http://${IPAddress}:8080/cacheFiles/`);
+            let newFileData = fileData.toString()
+            let reg = new RegExp("(/storage/emulated/0/UCDownloads/VideoData/|file:///storage/emulated/0/UCDownloads/VideoData/|file:///sdcard/UCDownloads/VideoData/|file:///sdcard/Quark/Download/|file:///storage/emulated/0/Quark/Download/|file:///sdcard/Download/QuarkDownloads/)", 'g')
+            if (reg.test(newFileData)) {
+                newFileData = newFileData.replace(newFileData, `http://${IPAddress}:8080/cacheFiles/`);
+            } else {
+                newFileData = newFileData.replace(new RegExp(data.path, 'g'), `http://${IPAddress}:8080/cacheFiles/${data.path}`);
+            }
             response.writeHead(200, { 'Content-Type': 'application/x-mpegURL' })
             response.end(newFileData);
         } else {
