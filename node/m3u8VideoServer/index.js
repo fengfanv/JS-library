@@ -151,9 +151,9 @@ function API_getVideo(req, response) {
         if (/.m3u8$/.test(data.path)) {
             //console.log('m3u8')
             let newFileData = fileData.toString()
-            let reg = new RegExp("(/storage/emulated/0/UCDownloads/VideoData/|file:///storage/emulated/0/UCDownloads/VideoData/|file:///sdcard/UCDownloads/VideoData/|file:///sdcard/Quark/Download/|file:///storage/emulated/0/Quark/Download/|file:///sdcard/Download/QuarkDownloads/)", 'g')
+            let reg = new RegExp("/storage/emulated/0/UCDownloads/VideoData/|file:///storage/emulated/0/UCDownloads/VideoData/|file:///sdcard/UCDownloads/VideoData/|file:///sdcard/Quark/Download/|file:///storage/emulated/0/Quark/Download/|file:///sdcard/Download/QuarkDownloads/", 'g')
             if (reg.test(newFileData)) {
-                newFileData = newFileData.replace(newFileData, `http://${IPAddress}:8080/cacheFiles/`);
+                newFileData = newFileData.replace(reg, `http://${IPAddress}:8080/cacheFiles/`);
             } else {
                 newFileData = newFileData.replace(new RegExp(data.path, 'g'), `http://${IPAddress}:8080/cacheFiles/${data.path}`);
             }
@@ -196,11 +196,26 @@ function API_parseZip(req, response) {
         }));
 
         //防止冲突，解压后将压缩文件移动到别的文件夹
-        fs.rename(objPath, objSource, (err) => {
+        // fs.rename(objPath, objSource, (err) => {
+        //     if (err) {
+        //         return console.error('移动失败:', data.path);
+        //     }
+        //     console.log('移动成功:', data.path);
+        // });
+
+        fs.unlink(objPath, (err) => {
             if (err) {
-                return console.error('移动失败:', data.path);
+                console.error('删除文件失败:', err);
+                return;
             }
-            console.log('移动成功:', data.path);
+            console.log('文件删除成功');
+            fs.appendFile('zipList.txt', data.path + '\r\n', (err) => {
+                if (err) {
+                    console.error('追加内容时出错:', err);
+                    return;
+                }
+                console.log('内容追加成功！');
+            });
         });
     })
 }
