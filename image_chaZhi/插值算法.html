@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>插值算法</title>
+    <style>
+        #myCanvas {
+            display: block;
+            border: 4px solid #777777;
+            margin: 0 auto;
+            margin-top: 20vh;
+        }
+
+        .btns {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="myCanvas"></canvas>
+    <div class="btns">
+        <button onclick="clearCanvas()">清除画布</button>
+        <br>
+        <div>
+            <label>插值算法：</label>
+            <select>
+                <option value="最近邻插值">最近邻插值</option>
+                <option value="双线性插值">双线性插值</option>
+                <option value="双三次插值">双三次插值</option>
+                <option value="边缘自适应插值">边缘自适应插值</option>
+            </select>
+        </div>
+        <br>
+        <button onclick="handleRun()">处理</button>
+    </div>
+    <script>
+        //初始化canvas
+        var canvasSize = 200;
+        var c = document.getElementById("myCanvas");
+        c.width = canvasSize;
+        c.height = canvasSize;
+        var ctx = c.getContext("2d");
+        ctx.fillStyle = "white";
+        ctx.fillRect(0, 0, canvasSize, canvasSize);
+
+        //绑定鼠标按下，移动，松开事件
+        let hasTouched = false;
+        c.onmousedown = function (e) {
+            hasTouched = true
+            e.stopPropagation();
+            e.preventDefault();
+        };
+        c.onmousemove = function (e) {
+            if (hasTouched) {
+                let offsetX = e.offsetX;
+                let offsetY = e.offsetY;
+
+                ctx.fillStyle = "black";
+                ctx.fillRect(offsetX - 5, offsetY - 5, 10, 10);
+
+            }
+            e.stopPropagation();
+            e.preventDefault();
+        };
+        c.onmouseup = function (e) {
+            hasTouched = false;
+            e.stopPropagation();
+            e.preventDefault();
+        };
+
+        //清除画布
+        function clearCanvas() {
+            ctx.clearRect(0, 0, canvasSize, canvasSize);
+            ctx.fillStyle = "white";
+            ctx.fillRect(0, 0, canvasSize, canvasSize);
+        }
+
+        //处理
+        function handleRun() {
+            console.log('处理...');
+            const imgData = ctx.getImageData(0, 0, canvasSize, canvasSize);
+            // console.log(imgData.data); //imgData.data = [r,g,b,a,r,g,b,a...]
+            console.log(imgData.data.length / 4 == canvasSize * canvasSize);
+
+            let originalShape = [canvasSize, canvasSize, 4]
+            let t_height = Math.floor(getRandom(50, 350))
+            let t_width = Math.floor(getRandom(50, 350))
+            let t_rgba = 4
+            let targetShape = [t_height, t_width, t_rgba]
+
+            let targetImageData = []
+
+            if (document.getElementsByTagName("select")[0].value == '最近邻插值') {
+                targetImageData = chazhi1(imgData.data, originalShape, targetShape)
+            } else if (document.getElementsByTagName("select")[0].value == '双线性插值') {
+                targetImageData = chazhi2(imgData.data, originalShape, targetShape)
+            } else if (document.getElementsByTagName("select")[0].value == '双三次插值') {
+                targetImageData = chazhi3(imgData.data, originalShape, targetShape)
+            } else if (document.getElementsByTagName("select")[0].value == '边缘自适应插值') {
+                targetImageData = chazhi4(imgData.data, originalShape, targetShape)
+            } else {
+                return alert(document.getElementsByTagName("select")[0].value + '，没写，待研究');
+            }
+
+            renderToCanvas(targetImageData, t_width, t_height)
+        }
+
+        function getRandom(min, max) {
+            return Math.random() * (max - min) + min;
+        }
+
+        function computeMultiArrEfficient_2(arr, multiShape, getIndex = []) {
+            const numDimensions = multiShape.length;
+
+            // 计算每个维度的步长，步长是多维数组中每个维度后面所有维度的元素数目。
+            const strides = new Array(numDimensions);
+            strides[numDimensions - 1] = 1;  // 最后一维的步长为1
+            for (let i = numDimensions - 2; i >= 0; i--) {
+                strides[i] = strides[i + 1] * multiShape[i + 1];
+            }
+            // console.log('shapes', multiShape)
+            // console.log('strides', strides)
+
+            // 计算索引在一维数组中的位置
+            let index = 0;
+            for (let i = 0; i < getIndex.length; i++) {
+                index += getIndex[i] * strides[i];
+            }
+
+            let index_end = multiShape.slice(getIndex.length).reduce(function (prev, item, index, arr) {
+                return (prev *= item);
+            }, 1);
+
+            index_end = index + index_end
+
+            // console.log(index, index_end)
+            // console.log("结果数据", arr.slice(index, index_end))
+            // console.log("结果形状", multiShape.slice(getIndex.length))
+            return {
+                start: index,
+                end: index_end,
+                data: arr.slice(index, index_end),
+                shape: multiShape.slice(getIndex.length)
+            }
+        }
+
+        function renderToCanvas(rgbaArray, width, height) {
+            let div = document.createElement('div');
+            let canvas = document.createElement('canvas');
+            canvas.style.border = '1px solid';
+
+            // 设置Canvas尺寸
+            canvas.width = width;
+            canvas.height = height;
+
+            const ctx = canvas.getContext('2d');
+
+            // 确保数据是Uint8ClampedArray
+            const clampedArray = new Uint8ClampedArray(rgbaArray);
+
+            // 创建ImageData
+            const imageData = new ImageData(clampedArray, width, height);
+
+            // 渲染到Canvas
+            ctx.putImageData(imageData, 0, 0);
+
+            let btn = document.createElement('button');
+            btn.innerText = '删除'
+            btn.onclick = function () {
+                document.body.removeChild(div)
+            }
+            div.appendChild(canvas);
+            div.appendChild(btn);
+            document.body.appendChild(div);
+        }
+
+        //最近邻插值
+        function chazhi1(originalImageData, originalShape, targetShape) {
+            //originalImageData = [r,g,b,a,r,g,b,a...]
+            let [o_height, o_width, o_rgba] = originalShape;
+            let [t_height, t_width, t_rgba] = targetShape;
+            let targetImageData = new Array(t_height * t_width * t_rgba).fill(255); //目标图像
+            //目标图像上的点(x', y')，对应到，源图像上的哪个位置(x, y)？
+            //按比例缩放
+            //x = x' * (源宽度 / 目标宽度) //新高/旧高 = 新宽/旧宽 = k = 宽高缩放比例系数
+            //y = y' * (源高度 / 目标高度) //新高/旧高 = 新宽/旧宽 = k = 宽高缩放比例系数
+            for (let y1 = 0; y1 < t_height; y1++) {
+                for (let x1 = 0; x1 < t_width; x1++) {
+                    //根据目标图像位置，计算源图像位置
+                    let y = y1 * (o_height / t_height)
+                    let x = x1 * (o_width / t_width)
+                    //坐标没有小数，都是整数，如果计算出来的源图像坐标是小数，坐标根据四舍五入取整
+                    y = Math.floor(y)
+                    x = Math.floor(x)
+                    //读取源图像数据
+                    let o_index = [y, x]
+                    let o_res = computeMultiArrEfficient_2(originalImageData, [o_height, o_width, o_rgba], o_index);
+                    //将源图像数据copy到目标图像
+                    let t_index = [y1, x1]
+                    let t_res = computeMultiArrEfficient_2(targetImageData, [t_height, t_width, t_rgba], t_index);
+                    for (i = 0; i < t_res.data.length; i++) {
+                        targetImageData[i + t_res.start] = o_res.data[i]
+                    }
+                }
+            }
+            return targetImageData;
+        }
+
+        //双线性插值
+        function chazhi2(originalImageData, originalShape, targetShape) {
+            //originalImageData = [r,g,b,a,r,g,b,a...]
+            let [o_height, o_width, o_rgba] = originalShape;
+            let [t_height, t_width, t_rgba] = targetShape;
+            let targetImageData = new Array(t_height * t_width * t_rgba).fill(255); //目标图像
+            //目标图像上的点(x', y')，对应到，源图像上的哪个位置(x, y)？
+            //按比例缩放
+            //x = x' * (源宽度 / 目标宽度) //新高/旧高 = 新宽/旧宽 = k = 宽高缩放比例系数
+            //y = y' * (源高度 / 目标高度) //新高/旧高 = 新宽/旧宽 = k = 宽高缩放比例系数
+            for (let y1 = 0; y1 < t_height; y1++) {
+                for (let x1 = 0; x1 < t_width; x1++) {
+                    //根据目标图像位置，计算源图像位置
+                    let y = y1 * (o_height / t_height)
+                    let x = x1 * (o_width / t_width)
+                    //--------------------------------------------- start
+                    // 双线性插值核心代码
+
+                    // 找到最近的四个像素点的坐标
+                    let x0 = Math.floor(x);
+                    let x1_ceil = x0 + 1;
+                    let y0 = Math.floor(y);
+                    let y1_ceil = y0 + 1;
+
+                    // 处理边界情况（防止越界）
+                    if (x1_ceil >= o_width) x1_ceil = o_width - 1;
+                    if (y1_ceil >= o_height) y1_ceil = o_height - 1;
+
+                    // 计算权重
+                    let wx = x - x0; //水平方向权重
+                    let wy = y - y0; //垂直方向权重
+
+                    // 获取（x,y）周围四个点的像素值
+                    let q00 = computeMultiArrEfficient_2(originalImageData, [o_height, o_width, o_rgba], [y0, x0]).data;
+                    let q10 = computeMultiArrEfficient_2(originalImageData, [o_height, o_width, o_rgba], [y0, x1_ceil]).data;
+                    let q01 = computeMultiArrEfficient_2(originalImageData, [o_height, o_width, o_rgba], [y1_ceil, x0]).data;
+                    let q11 = computeMultiArrEfficient_2(originalImageData, [o_height, o_width, o_rgba], [y1_ceil, x1_ceil]).data;
+
+                    // 双线性插值公式
+                    // f(x,y) = f(0,0)(1-x)(1-y) + f(1,0)x(1-y) + f(0,1)(1-x)y + f(1,1)xy
+                    // 分别对R、G、B、A四个通道进行双线性插值计算
+                    let interpolatedValues = [];
+                    for (let channel = 0; channel < 4; channel++) {
+                        let value =
+                            q00[channel] * (1 - wx) * (1 - wy) +
+                            q10[channel] * wx * (1 - wy) +
+                            q01[channel] * (1 - wx) * wy +
+                            q11[channel] * wx * wy;
+
+                        // 四舍五入取整
+                        interpolatedValues.push(Math.round(value));
+                    }
+                    //--------------------------------------------- end
+                    // 将 插值结果(interpolatedValues) 写入目标图像
+                    let t_index = [y1, x1]
+                    let t_res = computeMultiArrEfficient_2(targetImageData, [t_height, t_width, t_rgba], t_index);
+                    for (i = 0; i < t_res.data.length; i++) {
+                        targetImageData[i + t_res.start] = interpolatedValues[i]
+                    }
+                }
+            }
+            return targetImageData;
+        }
+
+        // 双线性：用4个点（2×2）
+        // 双三次：用16个点（4×4），加权方式不同
+
+        //双三次插值
+        function chazhi3(originalImageData, originalShape, targetShape) {
+            //originalImageData = [r,g,b,a,r,g,b,a...]
+            let [o_height, o_width, o_rgba] = originalShape;
+            let [t_height, t_width, t_rgba] = targetShape;
+            let targetImageData = new Array(t_height * t_width * t_rgba).fill(255); //目标图像
+            //目标图像上的点(x', y')，对应到，源图像上的哪个位置(x, y)？
+            //按比例缩放
+            //x = x' * (源宽度 / 目标宽度) //新高/旧高 = 新宽/旧宽 = k = 宽高缩放比例系数
+            //y = y' * (源高度 / 目标高度) //新高/旧高 = 新宽/旧宽 = k = 宽高缩放比例系数
+            for (let y1 = 0; y1 < t_height; y1++) {
+                for (let x1 = 0; x1 < t_width; x1++) {
+                    //根据目标图像位置，计算源图像位置
+                    let y = y1 * (o_height / t_height)
+                    let x = x1 * (o_width / t_width)
+                    //-------------------- 双三次核心 --------------------=
+                    // 找到周围4×4=16个像素点
+                    let x0 = Math.floor(x) - 1;  // 注意：从-1开始，取4个点
+                    let y0 = Math.floor(y) - 1;
+
+                    // 边界保护（防止越界）
+                    x0 = Math.max(0, x0);
+                    y0 = Math.max(0, y0);
+                    let x3 = Math.min(o_width - 1, x0 + 3);
+                    let y3 = Math.min(o_height - 1, y0 + 3);
+
+                    // 重新调整，确保有4个点
+                    if (x3 - x0 < 3) x0 = Math.max(0, x3 - 3);
+                    if (y3 - y0 < 3) y0 = Math.max(0, y3 - 3);
+
+                    // 计算小数部分（权重基础）（相对距离）
+                    let dx = x - Math.floor(x);
+                    let dy = y - Math.floor(y);
+
+                    // 权重函数：不同的核函数（Catmull-Rom、Mitchell-Netravali、B-spline等）会得到不同的结果
+                    // 双三次权重函数（Catmull-Rom核）
+                    function cubicWeight(t) {
+                        let absT = Math.abs(t);
+                        if (absT <= 1) {
+                            return (1.5 * absT - 2.5) * absT * absT + 1;
+                        } else if (absT < 2) {
+                            return (-0.5 * absT + 2.5) * absT * absT - 4 * absT + 2;
+                        }
+                        return 0;
+                    }
+
+                    // 计算16个点的权重
+                    let weights = [];
+                    for (let j = -1; j <= 2; j++) {
+                        for (let i = -1; i <= 2; i++) {
+                            let wx = cubicWeight(i - dx);
+                            let wy = cubicWeight(j - dy);
+                            weights.push(wx * wy);
+                        }
+                    }
+
+                    // 归一化权重（可选，防止亮度偏移）
+                    let weightSum = weights.reduce((a, b) => a + b, 0);
+                    weights = weights.map(w => w / weightSum);
+
+                    // 读取16个像素点并加权求和
+                    let interpolatedValues = [];
+                    for (let channel = 0; channel < 4; channel++) {
+                        let value = 0;
+                        let weightIdx = 0;
+
+                        for (let j = 0; j < 4; j++) {
+                            for (let i = 0; i < 4; i++) {
+                                let px = x0 + i;
+                                let py = y0 + j;
+
+                                // 再次确保不越界
+                                px = Math.min(px, o_width - 1);
+                                py = Math.min(py, o_height - 1);
+
+                                let pixelData = computeMultiArrEfficient_2(
+                                    originalImageData,
+                                    [o_height, o_width, o_rgba],
+                                    [py, px]
+                                ).data;
+
+                                value += pixelData[channel] * weights[weightIdx];
+                                weightIdx++;
+                            }
+                        }
+
+                        interpolatedValues.push(Math.round(Math.max(0, Math.min(255, value)))); // 截断到[0,255]
+                    }
+                    //-------------------- 双三次结束 --------------------
+                    // 将 插值结果(interpolatedValues) 写入目标图像
+                    let t_index = [y1, x1]
+                    let t_res = computeMultiArrEfficient_2(targetImageData, [t_height, t_width, t_rgba], t_index);
+                    for (i = 0; i < t_res.data.length; i++) {
+                        targetImageData[i + t_res.start] = interpolatedValues[i]
+                    }
+                }
+            }
+            return targetImageData;
+        }
+
+        //边缘自适应插值
+        function chazhi4(originalImageData, originalShape, targetShape) {
+            //originalImageData = [r,g,b,a,r,g,b,a...]
+            let [o_height, o_width, o_rgba] = originalShape;
+            let [t_height, t_width, t_rgba] = targetShape;
+            let targetImageData = new Array(t_height * t_width * t_rgba).fill(255); //目标图像
+            //目标图像上的点(x', y')，对应到，源图像上的哪个位置(x, y)？
+            //按比例缩放
+            //x = x' * (源宽度 / 目标宽度) //新高/旧高 = 新宽/旧宽 = k = 宽高缩放比例系数
+            //y = y' * (源高度 / 目标高度) //新高/旧高 = 新宽/旧宽 = k = 宽高缩放比例系数
+            for (let y1 = 0; y1 < t_height; y1++) {
+                for (let x1 = 0; x1 < t_width; x1++) {
+                    //根据目标图像位置，计算源图像位置
+                    let y = y1 * (o_height / t_height)
+                    let x = x1 * (o_width / t_width)
+                    //-------------------- 边缘自适应核心 --------------------
+                    // 1. 找到周围4个点（和双线性一样）
+                    let x0 = Math.floor(x);
+                    let x1_ceil = x0 + 1;
+                    let y0 = Math.floor(y);
+                    let y1_ceil = y0 + 1;
+
+                    // 边界保护
+                    if (x1_ceil >= o_width) x1_ceil = o_width - 1;
+                    if (y1_ceil >= o_height) y1_ceil = o_height - 1;
+
+                    let wx = x - x0;
+                    let wy = y - y0;
+
+                    // 2. 获取4个点的像素值
+                    let q00 = computeMultiArrEfficient_2(originalImageData, [o_height, o_width, o_rgba], [y0, x0]).data;
+                    let q10 = computeMultiArrEfficient_2(originalImageData, [o_height, o_width, o_rgba], [y0, x1_ceil]).data;
+                    let q01 = computeMultiArrEfficient_2(originalImageData, [o_height, o_width, o_rgba], [y1_ceil, x0]).data;
+                    let q11 = computeMultiArrEfficient_2(originalImageData, [o_height, o_width, o_rgba], [y1_ceil, x1_ceil]).data;
+
+                    // 3. 计算边缘强度和方向（使用灰度值）
+                    // 将RGB转换为灰度值
+                    function rgbToGray(r, g, b) {
+                        return 0.299 * r + 0.587 * g + 0.114 * b;
+                    }
+
+                    // 计算四个点的灰度值
+                    let gray00 = rgbToGray(q00[0], q00[1], q00[2]);
+                    let gray10 = rgbToGray(q10[0], q10[1], q10[2]);
+                    let gray01 = rgbToGray(q01[0], q01[1], q01[2]);
+                    let gray11 = rgbToGray(q11[0], q11[1], q11[2]);
+
+                    // 计算水平和垂直梯度
+                    // 水平方向梯度（Gx）
+                    let gx = Math.abs(gray10 - gray00) + Math.abs(gray11 - gray01);
+                    // 垂直方向梯度（Gy）
+                    let gy = Math.abs(gray01 - gray00) + Math.abs(gray11 - gray10);
+
+                    // 添加一个小的epsilon避免除零
+                    const epsilon = 0.0001;
+                    let gx_adj = gx + epsilon;
+                    let gy_adj = gy + epsilon;
+
+                    // 计算边缘方向权重
+                    // 当水平梯度大时，说明是垂直边缘，应该沿水平方向插值
+                    // 当垂直梯度大时，说明是水平边缘，应该沿垂直方向插值
+
+                    // 4. 自适应权重调整
+                    let wx_adapt, wy_adapt;
+
+                    // 计算梯度比例
+                    // edge_strength ∈ [0, 1]
+                    // 0 = 无边缘（平滑区域）→ 纯双线性
+                    // 1 = 强边缘 → 纯自适应插值
+                    let edge_strength = Math.abs(gx_adj - gy_adj) / (gx_adj + gy_adj);
+                    let edge_threshold = 0.3; // 边缘检测阈值
+
+                    if (edge_strength > edge_threshold) {
+                        if (gx_adj > gy_adj) {
+                            // 垂直边缘：水平方向权重增强，垂直方向权重减弱
+                            let direction_weight = (gx_adj - gy_adj) / (gx_adj + gy_adj);
+                            wx_adapt = wx;
+                            wy_adapt = 0.5 + (wy - 0.5) * (1 - direction_weight);
+                        } else {
+                            // 水平边缘：垂直方向权重增强，水平方向权重减弱
+                            let direction_weight = (gy_adj - gx_adj) / (gx_adj + gy_adj);
+                            wx_adapt = 0.5 + (wx - 0.5) * (1 - direction_weight);
+                            wy_adapt = wy;
+                        }
+                    } else {
+                        // 无显著边缘，使用标准双线性
+                        wx_adapt = wx;
+                        wy_adapt = wy;
+                    }
+
+                    // 5. 边缘自适应插值公式
+                    let interpolatedValues = [];
+                    for (let channel = 0; channel < 4; channel++) {
+                        // 计算标准双线性插值
+                        let bilinear =
+                            q00[channel] * (1 - wx) * (1 - wy) +
+                            q10[channel] * wx * (1 - wy) +
+                            q01[channel] * (1 - wx) * wy +
+                            q11[channel] * wx * wy;
+
+                        // 计算自适应插值
+                        let adaptive =
+                            q00[channel] * (1 - wx_adapt) * (1 - wy_adapt) +
+                            q10[channel] * wx_adapt * (1 - wy_adapt) +
+                            q01[channel] * (1 - wx_adapt) * wy_adapt +
+                            q11[channel] * wx_adapt * wy_adapt;
+
+                        // 根据边缘强度混合两种插值结果
+                        let blended = bilinear * (1 - edge_strength) + adaptive * edge_strength;
+
+                        interpolatedValues.push(Math.max(0, Math.min(255, Math.round(blended))));
+                    }
+                    //-------------------- 边缘自适应结束 --------------------
+                    // 将 插值结果(interpolatedValues) 写入目标图像
+                    let t_index = [y1, x1]
+                    let t_res = computeMultiArrEfficient_2(targetImageData, [t_height, t_width, t_rgba], t_index);
+                    for (i = 0; i < t_res.data.length; i++) {
+                        targetImageData[i + t_res.start] = interpolatedValues[i]
+                    }
+                }
+            }
+            return targetImageData;
+        }
+    </script>
+</body>
+
+</html>
